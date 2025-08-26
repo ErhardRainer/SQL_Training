@@ -1,6 +1,6 @@
 # SQL_Training
 Unterlagen zu meiner Vorlesung zum Thema SQL
-* [Microsoft SQL, T-SQL](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL "T-SQL")
+* [Microsoft SQL, T-SQL](tsql.md)
 * [MySQL](https://github.com/ErhardRainer/SQL_Training/tree/main/MySQL "MySQL")
 * [Oracle](https://github.com/ErhardRainer/SQL_Training/tree/main/Oracle "Oracle")
 * [PostgreSQL](https://github.com/ErhardRainer/SQL_Training/tree/main/PostgreSQL "PostgreSQL")
