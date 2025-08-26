@@ -7,31 +7,31 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 
 ## Basis-Kapitel (00–30)
 
-- [01_Normalformen](./01_Normalformen/)  
+- [01_Normalformen](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/01_Normalformen)  
   Grundlagen der Datenbankmodellierung – Normalformen zur Vermeidung von Redundanzen.
 
-- [02_Select](./02_Select/)  
+- [02_Select](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/02_Select)  
   `SELECT`-Grundlagen, Spaltenprojektion, Alias, einfache Sortierung.
 
-- [03_JOIN](./03_JOIN/)  
+- [03_JOIN](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/03_JOIN)  
   Tabellenverknüpfungen: `INNER`, `LEFT/RIGHT`, `FULL OUTER`, Anti-/Semi-Joins.
 
-- [04_Where](./04_Where/)  
+- [04_Where](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/04_Where)  
   Zeilenfilterung mit Operatoren, `LIKE`, `BETWEEN`, `IN`, `NULL`-Vergleiche.
 
-- [05_Funktionen](./05_Funktionen/)  
+- [05_Funktionen](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/05_Funktionen)  
   String-, Datums-, numerische Funktionen; `CASE` und bedingte Logik.
 
-- [06_Delete](./06_Delete/)  
+- [06_Delete](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/06_Delete)  
   Datensätze sicher löschen; `TOP`, `OUTPUT`, Transaktionssicherheit.
 
-- [07_Insert](./07_Insert/)  
+- [07_Insert](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/07_Insert)  
   Einfügen mit `INSERT … VALUES/SELECT`, Default-Werte, `IDENTITY`.
 
-- [08_Update](./08_Update/)  
+- [08_Update](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/08_Update)  
   Aktualisieren bestehender Daten mit `UPDATE`, Join-Update, `OUTPUT`, Integritätsaspekte.
 
-- [09_Set_Operations](./09_Set_Operations/)  
+- [09_Set_Operations](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/09_Set_Operations)  
   Mengenoperatoren: `UNION [ALL]`, `INTERSECT`, `EXCEPT`, Duplikatregeln.
 
 - **10_GroupBy_Aggregate**  
@@ -43,31 +43,31 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - **12_DataTypes_Conversion**  
   Datentypen, `CAST/CONVERT`, Präzision/Skalen, implizite Konvertierungen.
 
-- [13_Merge](./13_Merge/)  
+- [13_Merge](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/13_Merge)  
   Upsert-Szenarien mit `MERGE` (Insert/Update/Delete), typische Fallstricke.
 
-- [14_Pivot_Unpivot](./14_Pivot_Unpivot/)  
+- [14_Pivot_Unpivot](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/14_Pivot_Unpivot)  
   Quer-/Längstransformationen von Daten mit `PIVOT` und `UNPIVOT`.
 
-- [15_SearchInTables](./15_SearchInTables/)  
+- [15_SearchInTables](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/15_SearchInTables)  
   Techniken zum Durchsuchen von Tabellen/Spalten, Metadaten-Abfragen.
 
-- [17_ANIS_NULL_&_Co](./17_ANIS_NULL_%26_Co/)  
+- [17_ANIS_NULL_&_Co](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/17_ANIS_NULL%20%26%20Co)  
   Arbeiten mit `NULL`: `IS NULL`, `ISNULL`, `COALESCE`, Dreiwertige Logik.
 
 - **16_DataIntegrity_Constraints**  
   Schlüssel und Constraints: `PRIMARY KEY`, `FOREIGN KEY`, `CHECK`, `DEFAULT`.
 
-- [18_Cube_Rollup](./18_Cube_Rollup/)  
+- [18_Cube_Rollup](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/18_Cube_Rollup)  
   Erweiterte Aggregationen: `GROUP BY GROUPING SETS`, `ROLLUP`, `CUBE`.
 
-- [19_Transactions](./19_Transactions/)  
+- [19_Transactions](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/19_Transactions)  
   `BEGIN/COMMIT/ROLLBACK`, Fehlerfälle, saubere Transaktionsgrenzen.
 
-- [20_Create_Database](./20_Create_Database/)  
+- [20_Create_Database](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/20_Create_Database)  
   Datenbanken/Objekte anlegen: `CREATE DATABASE`, Schemata, grundlegende DDL.
 
-- [21_QUOTED_IDENTIFIER](./21_QUOTED_IDENTIFIER/)  
+- [21_QUOTED_IDENTIFIER](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/21_QUOTED_IDENTIFIER)  
   Wirkung von `QUOTED_IDENTIFIER` auf Identifikatoren und Anweisungen.
 
 - **22_Views_Schemata**  
@@ -101,16 +101,16 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 
 ## Spezial-Kapitel (60+)
 
-- [60_IsolationLevels](./60_IsolationLevels/)  
+- [60_IsolationLevels](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/60_IsolationLevels)  
   Isolationsstufen, Sperrverhalten, Nebenläufigkeit und Anomalien.
 
-- [61_SubQuery_CTE_TMP](./61_SubQuery_CTE_TMP/)  
+- [61_SubQuery_CTE_TMP](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/61_SubQuery_CTE_TMP)  
   Unterabfragen, `WITH CTE`, temporäre Tabellen/Tabellenvariablen.
 
-- [62_Row_Level_Security](./62_Row_Level_Security/)  
+- [62_Row_Level_Security](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/62_Row_Level_Security)  
   Zeilenbasierte Sicherheit in SQL Server: Policies, Predicates, Performance.
 
-- [63_Collation_Case_Sensitive](./63_Collation_Case_Sensitive/)  
+- [63_Collation_Case_Sensitive](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/63_Collation_Case_Sensitive)  
   Sortierfolgen/Collations, `CI` vs. `CS`, Auswirkungen auf Vergleiche und Joins.
 
 - **64_PerformanceTuning_Advanced**  
@@ -168,6 +168,6 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 
 ## Materialien
 
-- **Präsentation:** [Vorlesung_Präsentation.pptx](./Vorlesung_Pr%C3%A4sentation.pptx)
+- **Präsentation:** [Vorlesung_Präsentation.pptx](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/Vorlesung_Pr%C3%A4sentation.pptx)
 
 ---
