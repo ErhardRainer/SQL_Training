@@ -122,12 +122,12 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - **66_Security_Roles_Permissions**  
   Rollenmodell, Rechteverwaltung, Best Practices für Security.
 
-- **67_TemporalTables_CDC_CT**  
+- **67_HA/DR & Replikation**  
+  Hochverfügbarkeit und Disaster Recovery (HA/DR) sowie Replikations-Topologien
+
+- **68_TemporalTables_CDC_CT**  
   Historisierung mit system-versionierten Tabellen, Change Tracking, CDC.
-
-- **68_InMemory_OLTP**  
-  Memory-Optimized Tables, Natively Compiled Procedures.
-
+  
 - **69_ServiceBroker_Queues**  
   Message-basierte Verarbeitung in SQL Server.
 
@@ -163,6 +163,9 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 
 - **80_AzureSQL_Differences**  
   Unterschiede On-Premises vs. Azure SQL, spezielle Features.
+
+- **81_InMemory_OLTP**  
+  Memory-Optimized Tables, Natively Compiled Procedures.
 
 ---
 
