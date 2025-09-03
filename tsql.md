@@ -122,7 +122,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - **66_Security_Roles_Permissions**  
   Rollenmodell, Rechteverwaltung, Best Practices für Security.
 
-- **67_HA/DR & Replikation**  
+- [67_HA/DR & Replikation]([SQL_Training](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/67_HA_DR/HA_DR.md)  
   Hochverfügbarkeit & Disaster Recovery (AGs, Distributed AGs, Failover Cluster Instance, Log Shipping, (t-)Replikation, Peer-to-Peer, Legacy Mirroring).
 
 - **68_TemporalTables_CDC_CT**  
