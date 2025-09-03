@@ -134,7 +134,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - **70_ExternalTables_PolyBase**  
   Zugriff auf externe Datenquellen über PolyBase/External Tables.
 
-- [71_BackupRestore_Strategies](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/71_BackupRestore_Strategies)
+- [71_BackupRestore_Strategies](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/71_BackupRestore_Strategies)  
   Backup-Typen, Recovery-Modelle, Point-in-Time-Restores, Log-Ketten & Copy-Only.
 
 - **72_SQLAgent_Jobs_Alerts**  
