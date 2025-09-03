@@ -123,7 +123,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
   Rollenmodell, Rechteverwaltung, Best Practices für Security.
 
 - **67_HA/DR & Replikation**  
-  Hochverfügbarkeit und Disaster Recovery (HA/DR) sowie Replikations-Topologien
+  Hochverfügbarkeit & Disaster Recovery (AGs, Distributed AGs, Failover Cluster Instance, Log Shipping, (t-)Replikation, Peer-to-Peer, Legacy Mirroring).
 
 - **68_TemporalTables_CDC_CT**  
   Historisierung mit system-versionierten Tabellen, Change Tracking, CDC.
@@ -135,7 +135,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
   Zugriff auf externe Datenquellen über PolyBase/External Tables.
 
 - [71_BackupRestore_Strategies](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/71_BackupRestore_Strategies)
-  Backup-Typen, Recovery-Modelle, Point-in-Time-Restores.
+  Backup-Typen, Recovery-Modelle, Point-in-Time-Restores, Log-Ketten & Copy-Only.
 
 - **72_SQLAgent_Jobs_Alerts**  
   Automatisierung mit SQL Agent: Jobs, Schedules, Alerts.
