@@ -1,6 +1,6 @@
 # Update mit T-SQL – Übersicht
 
-## 1) Begriffsdefinition
+## 1 | Begriffsdefinition
 
 | SQL-Term            | Update |
 |---                  |---|
@@ -19,68 +19,68 @@
 
 ---
 
-## 2) Struktur (Themenblöcke → je eigenes Notebook)
+## 2 | Struktur (Themenblöcke → je eigenes Notebook)
 
-### Grundlagen & Syntax
+### 2.1 | Grundlagen & Syntax
 Kurzüberblick zu einfachem `UPDATE`, SET-Liste, sicherer WHERE-Filter.  
-_Notebook_: [`08_01_grundlagen_und_syntax.ipynb`](./08_01_grundlagen_und_syntax.ipynb)
+* _Notebook_: [`08_01_grundlagen_und_syntax.ipynb`](./08_01_grundlagen_und_syntax.ipynb)
 
-### UPDATE ... FROM (Join-Update)
+### 2.2 | UPDATE ... FROM (Join-Update)
 Join-basiertes UPDATE zwischen Ziel- und Quellmenge; Eindeutigkeit sicherstellen.  
-_Notebook_: [`08_02_update_from_join.ipynb`](./08_02_update_from_join.ipynb)
+* _Notebook_: [`08_02_update_from_join.ipynb`](./08_02_update_from_join.ipynb)
 
-### UPDATE mit CTE
+### 2.3 | UPDATE mit CTE
 CTE zur Vorstrukturierung/Lesbarkeit der Zielmenge verwenden.  
-_Notebook_: [`08_03_update_mit_cte.ipynb`](./08_03_update_mit_cte.ipynb)
+* _Notebook_: [`08_03_update_mit_cte.ipynb`](./08_03_update_mit_cte.ipynb)
 
-### Transaktionen & TRY/CATCH
+### 2.4 | Transaktionen & TRY/CATCH
 Atomarität, Fehlerbehandlung, Rollback-Strategien.  
-_Notebook_: [`08_04_transaktionen_try_catch.ipynb`](./08_04_transaktionen_try_catch.ipynb)
+* _Notebook_: [`08_04_transaktionen_try_catch.ipynb`](./08_04_transaktionen_try_catch.ipynb)
 
-### Isolation & Lock-Hinweise
+### 2.5 | Isolation & Lock-Hinweise
 Auswirkungen von `SNAPSHOT`, `UPDLOCK`, `ROWLOCK` auf Parallelität und Sperren.  
-_Notebook_: [`08_05_isolation_und_locks.ipynb`](./08_05_isolation_und_locks.ipynb)
+* _Notebook_: [`08_05_isolation_und_locks.ipynb`](./08_05_isolation_und_locks.ipynb)
 
-### Batching (TOP-N-Loops)
+### 2.6 | Batching (TOP-N-Loops)
 Durchsatz steuern, Log-Wachstum und Blockaden reduzieren.  
-_Notebook_: [`08_06_batching_topn.ipynb`](./08_06_batching_topn.ipynb)
+* _Notebook_: [`08_06_batching_topn.ipynb`](./08_06_batching_topn.ipynb)
 
-### OUTPUT & Auditing
+### 2.7 | OUTPUT & Auditing
 Änderungen per `OUTPUT` erfassen; Deltas/Audits speichern.  
-_Notebook_: [`08_07_output_und_auditing.ipynb`](./08_07_output_und_auditing.ipynb)
+* _Notebook_: [`08_07_output_und_auditing.ipynb`](./08_07_output_und_auditing.ipynb)
 
-### Idempotente Updates
+### 2.8 | Idempotente Updates
 Nur ändern, wenn Werte differieren; unnötige Writes vermeiden.  
-_Notebook_: [`08_08_idempotente_updates.ipynb`](./08_08_idempotente_updates.ipynb)
+* _Notebook_: [`08_08_idempotente_updates.ipynb`](./08_08_idempotente_updates.ipynb)
 
-### Optimistic Concurrency (rowversion)
+### 2.9 | Optimistic Concurrency (rowversion)
 Parallelkonflikte via `rowversion` erkennen und behandeln.  
-_Notebook_: [`08_09_rowversion_concurrency.ipynb`](./08_09_rowversion_concurrency.ipynb)
+* _Notebook_: [`08_09_rowversion_concurrency.ipynb`](./08_09_rowversion_concurrency.ipynb)
 
-### Performance & SARGability
+### 2.10 | Performance & SARGability
 Indizes, Statistiken, SARGable-Filter, plan-sensitive Optionen.  
-_Notebook_: [`08_10_performance_sargability.ipynb`](./08_10_performance_sargability.ipynb)
+* _Notebook_: [`08_10_performance_sargability.ipynb`](./08_10_performance_sargability.ipynb)
 
-### Window-Funktionen im UPDATE
+### 2.11 | Window-Funktionen im UPDATE
 Flags/Rankings mit `ROW_NUMBER()`/`PARTITION BY` setzen.  
-_Notebook_: [`08_11_update_mit_windowfunktionen.ipynb`](./08_11_update_mit_windowfunktionen.ipynb)
+* _Notebook_: [`08_11_update_mit_windowfunktionen.ipynb`](./08_11_update_mit_windowfunktionen.ipynb)
 
-### Partitionierte Updates
+### 2.12 | Partitionierte Updates
 Große Tabellen segmentiert aktualisieren, Hotspots vermeiden.  
-_Notebook_: [`08_12_partitionierte_updates.ipynb`](./08_12_partitionierte_updates.ipynb)
+* _Notebook_: [`08_12_partitionierte_updates.ipynb`](./08_12_partitionierte_updates.ipynb)
 
-### Upsert ohne MERGE
+### 2.13 | Upsert ohne MERGE
 Robustes Zweistufenmuster: UPDATE vorhandener, INSERT neuer Schlüssel.  
-_Notebook_: [`08_13_upsert_ohne_merge.ipynb`](./08_13_upsert_ohne_merge.ipynb)
+* _Notebook_: [`08_13_upsert_ohne_merge.ipynb`](./08_13_upsert_ohne_merge.ipynb)
 
-### Temporal/CDC-Awareness
+### 2.14 | Temporal/CDC-Awareness
 Nebenwirkungen auf Historien-/CT-Tabellen verstehen und steuern.  
-_Notebook_: [`08_14_temporal_cdc_awareness.ipynb`](./08_14_temporal_cdc_awareness.ipynb)
+* _Notebook_: [`08_14_temporal_cdc_awareness.ipynb`](./08_14_temporal_cdc_awareness.ipynb)
 
-### Qualität & Betrieb
+### 2.15 | Qualität & Betrieb
 `@@ROWCOUNT`, Vor/Nach-Zählung, Logging-Konventionen, Betriebssicherheit.  
-_Notebook_: [`08_15_quality_operations.ipynb`](./08_15_quality_operations.ipynb)
+* _Notebook_: [`08_15_quality_operations.ipynb`](./08_15_quality_operations.ipynb)
 
-### Anti-Patterns
+### 2.16 | Anti-Patterns
 UPDATE ohne WHERE, nicht-deterministische Joins, Funktions-Filter, blindes Lock-Hinting.  
-_Notebook_: [`08_16_anti_patterns.ipynb`](./08_16_anti_patterns.ipynb)
+* _Notebook_: [`08_16_anti_patterns.ipynb`](./08_16_anti_patterns.ipynb)
