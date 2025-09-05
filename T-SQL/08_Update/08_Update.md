@@ -21,71 +21,66 @@
 
 ## 2) Struktur (Themenblöcke → je eigenes Notebook)
 
-- [Grundlagen & Syntax](#grundlagen--syntax) – Einfaches `UPDATE`, SET-Liste, sichere Filter.  
-  [`08_01_grundlagen_und_syntax.ipynb`](./08_01_grundlagen_und_syntax.ipynb)
-
-- [UPDATE … FROM (Join-Update)](#update--from-join-update) – Ziel/Quelle abgleichen, Join-Eindeutigkeit sicherstellen.  
-  [`08_02_update_from_join.ipynb`](./08_02_update_from_join.ipynb)
-
-- [UPDATE mit CTE](#update-mit-cte) – Zielmenge vorstrukturieren, Lesbarkeit erhöhen.  
-  [`08_03_update_mit_cte.ipynb`](./08_03_update_mit_cte.ipynb)
-
-- [Transaktionen & TRY/CATCH](#transaktionen--trycatch) – Atomarität, Fehlerbehandlung, saubere Rollbacks.  
-  [`08_04_transaktionen_try_catch.ipynb`](./08_04_transaktionen_try_catch.ipynb)
-
-- [Isolation & Lock-Hinweise](#isolation--lock-hinweise) – Auswirkungen von `SNAPSHOT`, `UPDLOCK`, `ROWLOCK`.  
-  [`08_05_isolation_und_locks.ipynb`](./08_05_isolation_und_locks.ipynb)
-
-- [Batching (TOP-N-Loops)](#batching-top-n-loops) – Durchsatz steuern, Log-Wachstum/Blockaden reduzieren.  
-  [`08_06_batching_topn.ipynb`](./08_06_batching_topn.ipynb)
-
-- [OUTPUT & Auditing](#output--auditing) – Änderungen protokollieren, Delta erfassen.  
-  [`08_07_output_und_auditing.ipynb`](./08_07_output_und_auditing.ipynb)
-
-- [Idempotente Updates](#idempotente-updates) – Nur ändern, wenn Werte tatsächlich differieren.  
-  [`08_08_idempotente_updates.ipynb`](./08_08_idempotente_updates.ipynb)
-
-- [Optimistic Concurrency (rowversion)](#optimistic-concurrency-rowversion) – Parallelkonflikte erkennen und behandeln.  
-  [`08_09_rowversion_concurrency.ipynb`](./08_09_rowversion_concurrency.ipynb)
-
-- [Performance & SARGability](#performance--sargability) – Indizes, Statistiken, plan-sensitive Optionen.  
-  [`08_10_performance_sargability.ipynb`](./08_10_performance_sargability.ipynb)
-
-- [Window-Funktionen im UPDATE](#window-funktionen-im-update) – Flags/Rankings via `ROW_NUMBER()`, `PARTITION BY`.  
-  [`08_11_update_mit_windowfunktionen.ipynb`](./08_11_update_mit_windowfunktionen.ipynb)
-
-- [Partitionierte Updates](#partitionierte-updates) – Große Tabellen segmentiert aktualisieren, Hotspots vermeiden.  
-  [`08_12_partitionierte_updates.ipynb`](./08_12_partitionierte_updates.ipynb)
-
-- [Upsert ohne MERGE](#upsert-ohne-merge) – Zweistufig (erst UPDATE, dann INSERT fehlender Schlüssel).  
-  [`08_13_upsert_ohne_merge.ipynb`](./08_13_upsert_ohne_merge.ipynb)
-
-- [Temporal/CDC-Awareness](#temporalcdc-awareness) – Historien-/CT-Nebenwirkungen verstehen und steuern.  
-  [`08_14_temporal_cdc_awareness.ipynb`](./08_14_temporal_cdc_awareness.ipynb)
-
-- [Qualität & Betrieb](#qualität--betrieb) – `@@ROWCOUNT`, Vor/Nach-Zählung, Logging-Konventionen.  
-  [`08_15_quality_operations.ipynb`](./08_15_quality_operations.ipynb)
-
-- [Anti-Patterns](#anti-patterns) – UPDATE ohne WHERE, nicht-deterministische Joins, Funktions-Filter.  
-  [`08_16_anti_patterns.ipynb`](./08_16_anti_patterns.ipynb)
-
----
-
-## Kapitel
-
 ### Grundlagen & Syntax
-### UPDATE … FROM (Join-Update)
+Kurzüberblick zu einfachem `UPDATE`, SET-Liste, sicherer WHERE-Filter.  
+_Notebook_: [`08_01_grundlagen_und_syntax.ipynb`](./08_01_grundlagen_und_syntax.ipynb)
+
+### UPDATE ... FROM (Join-Update)
+Join-basiertes UPDATE zwischen Ziel- und Quellmenge; Eindeutigkeit sicherstellen.  
+_Notebook_: [`08_02_update_from_join.ipynb`](./08_02_update_from_join.ipynb)
+
 ### UPDATE mit CTE
+CTE zur Vorstrukturierung/Lesbarkeit der Zielmenge verwenden.  
+_Notebook_: [`08_03_update_mit_cte.ipynb`](./08_03_update_mit_cte.ipynb)
+
 ### Transaktionen & TRY/CATCH
+Atomarität, Fehlerbehandlung, Rollback-Strategien.  
+_Notebook_: [`08_04_transaktionen_try_catch.ipynb`](./08_04_transaktionen_try_catch.ipynb)
+
 ### Isolation & Lock-Hinweise
+Auswirkungen von `SNAPSHOT`, `UPDLOCK`, `ROWLOCK` auf Parallelität und Sperren.  
+_Notebook_: [`08_05_isolation_und_locks.ipynb`](./08_05_isolation_und_locks.ipynb)
+
 ### Batching (TOP-N-Loops)
+Durchsatz steuern, Log-Wachstum und Blockaden reduzieren.  
+_Notebook_: [`08_06_batching_topn.ipynb`](./08_06_batching_topn.ipynb)
+
 ### OUTPUT & Auditing
+Änderungen per `OUTPUT` erfassen; Deltas/Audits speichern.  
+_Notebook_: [`08_07_output_und_auditing.ipynb`](./08_07_output_und_auditing.ipynb)
+
 ### Idempotente Updates
+Nur ändern, wenn Werte differieren; unnötige Writes vermeiden.  
+_Notebook_: [`08_08_idempotente_updates.ipynb`](./08_08_idempotente_updates.ipynb)
+
 ### Optimistic Concurrency (rowversion)
+Parallelkonflikte via `rowversion` erkennen und behandeln.  
+_Notebook_: [`08_09_rowversion_concurrency.ipynb`](./08_09_rowversion_concurrency.ipynb)
+
 ### Performance & SARGability
+Indizes, Statistiken, SARGable-Filter, plan-sensitive Optionen.  
+_Notebook_: [`08_10_performance_sargability.ipynb`](./08_10_performance_sargability.ipynb)
+
 ### Window-Funktionen im UPDATE
+Flags/Rankings mit `ROW_NUMBER()`/`PARTITION BY` setzen.  
+_Notebook_: [`08_11_update_mit_windowfunktionen.ipynb`](./08_11_update_mit_windowfunktionen.ipynb)
+
 ### Partitionierte Updates
+Große Tabellen segmentiert aktualisieren, Hotspots vermeiden.  
+_Notebook_: [`08_12_partitionierte_updates.ipynb`](./08_12_partitionierte_updates.ipynb)
+
 ### Upsert ohne MERGE
+Robustes Zweistufenmuster: UPDATE vorhandener, INSERT neuer Schlüssel.  
+_Notebook_: [`08_13_upsert_ohne_merge.ipynb`](./08_13_upsert_ohne_merge.ipynb)
+
 ### Temporal/CDC-Awareness
+Nebenwirkungen auf Historien-/CT-Tabellen verstehen und steuern.  
+_Notebook_: [`08_14_temporal_cdc_awareness.ipynb`](./08_14_temporal_cdc_awareness.ipynb)
+
 ### Qualität & Betrieb
+`@@ROWCOUNT`, Vor/Nach-Zählung, Logging-Konventionen, Betriebssicherheit.  
+_Notebook_: [`08_15_quality_operations.ipynb`](./08_15_quality_operations.ipynb)
+
 ### Anti-Patterns
+UPDATE ohne WHERE, nicht-deterministische Joins, Funktions-Filter, blindes Lock-Hinting.  
+_Notebook_: [`08_16_anti_patterns.ipynb`](./08_16_anti_patterns.ipynb)
