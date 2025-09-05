@@ -52,7 +52,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [15_SearchInTables](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/15_SearchInTables)  
   Techniken zum Durchsuchen von Tabellen/Spalten, Metadaten-Abfragen.
 
-- [16_DataIntegrity_Constraints]**  
+- [16_DataIntegrity_Constraints](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/16_DataIntegrity_Constraints/16_DataIntegrity_Constraints.md)  
   Schlüssel und Constraints: `PRIMARY KEY`, `FOREIGN KEY`, `CHECK`, `DEFAULT`.
 
 - [17_ANIS_NULL_&_Co](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/17_ANSI_NULL%20%26%20Co/17_ANSI_NULL.md)  
