@@ -31,70 +31,70 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [08_Update](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/08_Update/08_Update.md)  
   Aktualisieren bestehender Daten mit `UPDATE`, Join-Update, `OUTPUT`, Integritätsaspekte.
 
-- [09_Set_Operations](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/09_Set_Operations)  
+- [09_Set_Operations](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/09_Set_Operations/09_Set_Operations.md)  
   Mengenoperatoren: `UNION [ALL]`, `INTERSECT`, `EXCEPT`, Duplikatregeln.
 
-- **10_GroupBy_Aggregate**  
+- [10_GroupBy_Aggregate](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/10_GroupBy_Aggregate/10_GroupBy_Aggregate.md)  
   Gruppierungen mit `GROUP BY`, Aggregatfunktionen, `HAVING`.
 
-- **11_WindowFunctions**  
+- [11_WindowFunctions](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/11_WindowFunctions/11_WindowFunctions.md)  
   Analytische Funktionen mit `OVER()`: `ROW_NUMBER()`, `RANK()`, `LAG/LEAD`.
 
-- **12_DataTypes_Conversion**  
+- [12_DataTypes_Conversion](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/12_DataTypes_Conversion/12_DataTypes_Conversion.md)  
   Datentypen, `CAST/CONVERT`, Präzision/Skalen, implizite Konvertierungen.
 
-- [13_Merge](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/13_Merge)  
+- [13_Merge](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/13_Merge/13_Merge.md)  
   Upsert-Szenarien mit `MERGE` (Insert/Update/Delete), typische Fallstricke.
 
-- [14_Pivot_Unpivot](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/14_Pivot_Unpivot)  
+- [14_Pivot_Unpivot](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/14_Pivot_Unpivot/14_Pivot_Unpivot.md)  
   Quer-/Längstransformationen von Daten mit `PIVOT` und `UNPIVOT`.
 
 - [15_SearchInTables](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/15_SearchInTables)  
   Techniken zum Durchsuchen von Tabellen/Spalten, Metadaten-Abfragen.
 
-- [17_ANIS_NULL_&_Co](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/17_ANIS_NULL%20%26%20Co)  
-  Arbeiten mit `NULL`: `IS NULL`, `ISNULL`, `COALESCE`, Dreiwertige Logik.
-
-- **16_DataIntegrity_Constraints**  
+- [16_DataIntegrity_Constraints]**  
   Schlüssel und Constraints: `PRIMARY KEY`, `FOREIGN KEY`, `CHECK`, `DEFAULT`.
 
-- [18_Cube_Rollup](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/18_Cube_Rollup)  
+- [17_ANIS_NULL_&_Co](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/17_ANSI_NULL%20%26%20Co/17_ANSI_NULL.md)  
+  Arbeiten mit `NULL`: `IS NULL`, `ISNULL`, `COALESCE`, Dreiwertige Logik.
+
+- [18_Cube_Rollup](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/18_Cube_Rollup/18_Cube_Rollup.md)  
   Erweiterte Aggregationen: `GROUP BY GROUPING SETS`, `ROLLUP`, `CUBE`.
 
-- [19_Transactions](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/19_Transactions)  
+- [19_Transactions](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/19_Transaktions/19_Transactions.md)  
   `BEGIN/COMMIT/ROLLBACK`, Fehlerfälle, saubere Transaktionsgrenzen.
 
-- [20_Create_Database](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/20_Create_Database)  
+- [20_Create_Database](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/20_Create_Database/20_Create_Database.md)  
   Datenbanken/Objekte anlegen: `CREATE DATABASE`, Schemata, grundlegende DDL.
 
-- [21_QUOTED_IDENTIFIER](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/21_QUOTED_IDENTIFIER)  
+- [21_QUOTED_IDENTIFIER](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/21_QUOTED_IDENTIFIER/21_Quoted_Identifier.md)  
   Wirkung von `QUOTED_IDENTIFIER` auf Identifikatoren und Anweisungen.
 
-- **22_Views_Schemata**  
+- [22_Views_Schemata](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/22_Views_Schemata/22_Views_Schemata.md)  
   Erstellung von Views, Einsatzbereiche, Sicherheitsaspekte.
 
-- **23_StoredProcedures**  
+- [23_StoredProcedures](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/23_StoredProcedures/23_StoredProcedures.md)  
   Einführung in Stored Procedures, Parameter, Resultsets.
 
-- **24_UserDefinedFunctions**  
+- [24_UserDefinedFunctions](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/24_UserDefinedFunctions/24_UserDefinedFunctions.md)  
   Skalare und table-valued Funktionen, typische Anwendungsfälle.
 
-- **25_ErrorHandling_TryCatch**  
+- [25_ErrorHandling_TryCatch](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/25_ErrorHandling_TryCatch/25_ErrorHandling_TryCatch.md)  
   Fehlerbehandlung mit `TRY…CATCH`, `THROW/RAISERROR`, Logging.
 
-- **26_Indexes_Basics**  
+- [26_Indexes_Basics](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/26_Indexes_Basics/26_Indexes_Basics.md)  
   Clustered/NONCLUSTERED Indizes, Schlüssel/Include, Performancegrundlagen.
 
-- **27_ExecutionPlans_Basics**  
+- [27_ExecutionPlans_Basics](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/27_ExecutionPlans_Basics/27_ExecutionPlans_Basics.md)  
   Execution Plans lesen und verstehen, Kardinalitätsschätzung.
 
-- **28_JSON_XML_Basics**  
+- [28_JSON_XML_Basics](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/28_JSON_XML_Basics/28_JSON_XML_Basics.md)  
   Grundlagen zu `JSON` und `XML` in SQL Server.
 
-- **29_DateTime_Calendar**  
+- [29_DateTime_Calendar](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/29_DateTime_Calendar/29_DateTime_Calendar.md)  
   Datumslogik: Zeiträume, Kalenderfunktionen, dynamische Zeitfilter.
 
-- **30_BulkLoad_BCP_BULKINSERT**  
+- [30_BulkLoad_BCP_BULKINSERT](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/30_BulkLoad_BCP_BULKINSERT/30_BulkLoad_BCP_BULKINSERT.md)  
   Import/Export von Daten: `BULK INSERT`, BCP, Performance-Aspekte.
 
 ---
