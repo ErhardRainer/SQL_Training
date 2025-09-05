@@ -10,16 +10,16 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [01_Normalformen](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/01_Normalformen)  
   Grundlagen der Datenbankmodellierung – Normalformen zur Vermeidung von Redundanzen.
 
-- [02_Select](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/02_Select)  
+- [02_Select](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md)  
   `SELECT`-Grundlagen, Spaltenprojektion, Alias, einfache Sortierung.
 
-- [03_JOIN](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/03_JOIN)  
+- [03_JOIN](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md)  
   Tabellenverknüpfungen: `INNER`, `LEFT/RIGHT`, `FULL OUTER`, Anti-/Semi-Joins.
 
-- [04_Where](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/04_Where)  
+- [04_Where](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md)  
   Zeilenfilterung mit Operatoren, `LIKE`, `BETWEEN`, `IN`, `NULL`-Vergleiche.
 
-- [05_Funktionen](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/05_Funktionen)  
+- [05_Funktionen](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md)  
   String-, Datums-, numerische Funktionen; `CASE` und bedingte Logik.
 
 - [06_Delete](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md)  
