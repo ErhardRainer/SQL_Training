@@ -182,7 +182,7 @@ Hier sind die spezifischen Custom GPTs, die dabei zum Einsatz kamen:
 
 GPT-1: [SQL Begriffsdefinitionen& Übersicht (für die md-Seiten)](https://chatgpt.com/g/g-68bacb69b10c8191bc2b6eff411b05c2-arbeit-sql-begriffsdefinitionen-ubersicht)
 
-GPT-2: [Beschreibe hier, was dieser GPT-Chatbot gemacht hat, z.B. "GPT für die Erweiterung von Beispielen und die Erstellung von Übungsaufgaben"]
+GPT-2: [Generierung von JupyterNotebooks aus Code-Schnippsel](https://chatgpt.com/g/g-68bb64075e50819186be5a86d9d13464-arbeit-sql-jupyter-notebooks/)
 
 Der manuelle Aufwand für die Erstellung der ursprünglichen Materialien war enorm und bildet das Fundament dieses Projekts. Die KI-Unterstützung diente lediglich dazu, das bereits vorhandene Material zu optimieren und zu ergänzen.
 
