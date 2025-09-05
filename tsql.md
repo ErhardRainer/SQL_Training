@@ -22,7 +22,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [05_Funktionen](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/05_Funktionen)  
   String-, Datums-, numerische Funktionen; `CASE` und bedingte Logik.
 
-- [06_Delete](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/06_Delete)  
+- [06_Delete](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md)  
   Datensätze sicher löschen; `TOP`, `OUTPUT`, Transaktionssicherheit.
 
 - [07_Insert](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/07_Insert)  
