@@ -1,13 +1,13 @@
 # SQL_Training
 Unterlagen zu meiner Vorlesung zum Thema SQL
-* [Microsoft SQL, T-SQL](tsql.md)
-* [MySQL](https://github.com/ErhardRainer/SQL_Training/tree/main/MySQL "MySQL")
-* [Oracle](https://github.com/ErhardRainer/SQL_Training/tree/main/Oracle "Oracle")
-* [PostgreSQL](https://github.com/ErhardRainer/SQL_Training/tree/main/PostgreSQL "PostgreSQL")
-* [HANA SQLScript](https://github.com/ErhardRainer/SQL_Training/tree/main/HANA "HANA")
-* [SQLite](https://github.com/ErhardRainer/SQL_Training/tree/main/SQLite "SQLite")
-* [Sybase](https://github.com/ErhardRainer/SQL_Training/tree/main/Sybase "Sybase")
-* [Derby](https://github.com/ErhardRainer/SQL_Training/tree/main/Derby "Derby")
+* [Microsoft SQL, T-SQL](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/README.md)
+* [MySQL](https://github.com/ErhardRainer/SQL_Training/blob/main/MySQL/README.md)
+* [Oracle](https://github.com/ErhardRainer/SQL_Training/blob/main/Oracle/README.md)
+* [PostgreSQL](https://github.com/ErhardRainer/SQL_Training/blob/main/PostgrSQL/README.md)
+* [HANA SQLScript](https://github.com/ErhardRainer/SQL_Training/blob/main/HANA/README.md)
+* [SQLite](https://github.com/ErhardRainer/SQL_Training/blob/main/SQLite/README.md)
+* [Sybase](https://github.com/ErhardRainer/SQL_Training/blob/main/Sybase/README.md)
+* [Derby](https://github.com/ErhardRainer/SQL_Training/blob/main/Derby/README.md)
 
 # Einführung
 ## SQL-Dialekte
