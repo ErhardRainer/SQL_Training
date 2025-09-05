@@ -26,7 +26,7 @@
 > **Kurzbeschreibung:** Syntax, logische Auswertungsreihenfolge, Unterschiede `WHERE` vs. `HAVING`, `COUNT(*)` vs. `COUNT(col)`.
 
 - 📓 **Notebook:**  
-  [`08_01_groupby_grundlagen.ipynb`](08_01_groupby_grundlagen.ipynb)
+  [`10_01_groupby_grundlagen.ipynb`](10_01_groupby_grundlagen.ipynb)
 
 - 🎥 **YouTube:**  
   - [GROUP BY & HAVING – Basics](https://www.youtube.com/results?search_query=sql+server+group+by+having+tutorial)  
