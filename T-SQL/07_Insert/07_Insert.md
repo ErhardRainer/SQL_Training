@@ -213,4 +213,70 @@
 
 - 📘 **Docs/Blog:**  
   - [`MERGE` – Referenz (Hinweise & Risiken)](https://learn.microsoft.com/en-us/sql/t-sql/statements/merge-transact-sql)  
-  - [Aaron Ber]()
+  - [Aaron Bertrand – Problems with MERGE](https://sqlblog.org/2011/06/20/merge-what-was-i-thinking)
+
+---
+
+### 2.14 | Sicherheit & RLS (INSERT-Rechte, Block-Predicates)
+> **Kurzbeschreibung:** `INSERT`-Berechtigungen, Spaltenrechte, RLS-Block/Filter-Predicates können Inserts verhindern.
+
+- 📓 **Notebook:**  
+  [`08_14_sicherheit_rls_insert.ipynb`](08_14_sicherheit_rls_insert.ipynb)
+
+- 🎥 **YouTube:**  
+  - [Row-Level Security – Overview](https://www.youtube.com/results?search_query=sql+server+row+level+security)
+
+- 📘 **Docs:**  
+  - [RLS – Sicherheitsrichtlinien](https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security)  
+  - [Berechtigungen: `INSERT` & Spaltenrechte](https://learn.microsoft.com/en-us/sql/relational-databases/security/permissions-database-engine)
+
+---
+
+### 2.15 | Betrieb & Qualitätssicherung
+> **Kurzbeschreibung:** `@@ROWCOUNT`, Fehler-/Duplikatprotokoll, Wiederholbarkeit, Monitoring (DMVs/Extended Events).
+
+- 📓 **Notebook:**  
+  [`08_15_ops_quality_insert.ipynb`](08_15_ops_quality_insert.ipynb)
+
+- 🎥 **YouTube:**  
+  - [Monitoring DML – DMVs](https://www.youtube.com/results?search_query=sql+server+dmv+monitoring)
+
+- 📘 **Docs:**  
+  - [`@@ROWCOUNT`](https://learn.microsoft.com/en-us/sql/t-sql/functions/rowcount-transact-sql)  
+  - [DMVs – Referenz](https://learn.microsoft.com/en-us/sql/relational-databases/system-dynamic-management-views/system-dynamic-management-views)
+
+---
+
+### 2.16 | Anti-Patterns
+> **Kurzbeschreibung:** `SELECT MAX(id)+1` statt Identity/Sequence, `@@IDENTITY`, fehlende Spaltenliste, RBAR-Schleifen, ungeprüfte Trigger.
+
+- 📓 **Notebook:**  
+  [`08_16_insert_anti_patterns.ipynb`](08_16_insert_anti_patterns.ipynb)
+
+- 🎥 **YouTube:**  
+  - [Common INSERT Mistakes](https://www.youtube.com/results?search_query=sql+server+insert+mistakes)
+
+- 📘 **Docs/Blog:**  
+  - [Best Practices – Identity & Sequences](https://learn.microsoft.com/en-us/sql/relational-databases/tables/sequence-numbers)  
+  - [Erik Darling – Avoiding RBAR](https://www.erikdarlingdata.com/)
+
+---
+
+## 3 | Weiterführende Informationen
+
+- 📘 Microsoft Learn: [INSERT (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/insert-transact-sql)  
+- 📘 Microsoft Learn: [`OUTPUT`-Klausel](https://learn.microsoft.com/en-us/sql/t-sql/queries/output-clause-transact-sql)  
+- 📘 Microsoft Learn: [`SCOPE_IDENTITY()`](https://learn.microsoft.com/en-us/sql/t-sql/functions/scope-identity-transact-sql) · [`IDENT_CURRENT`/`@@IDENTITY`](https://learn.microsoft.com/en-us/sql/t-sql/functions/ident-current-transact-sql)  
+- 📘 Microsoft Learn: [`SET IDENTITY_INSERT`](https://learn.microsoft.com/en-us/sql/t-sql/statements/set-identity-insert-transact-sql)  
+- 📘 Microsoft Learn: [`CREATE SEQUENCE` / `NEXT VALUE FOR`](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-sequence-transact-sql)  
+- 📘 Microsoft Learn: [Table-Valued Parameters](https://learn.microsoft.com/en-us/sql/relational-databases/tables/use-table-valued-parameters-database-engine)  
+- 📘 Microsoft Learn: [`BULK INSERT`](https://learn.microsoft.com/en-us/sql/t-sql/statements/bulk-insert-transact-sql) · [`OPENROWSET(BULK)`](https://learn.microsoft.com/en-us/sql/t-sql/functions/openrowset-transact-sql) · [bcp](https://learn.microsoft.com/en-us/sql/tools/bcp-utility)  
+- 📘 Microsoft Learn: [`SELECT INTO`](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-into-clause-transact-sql)  
+- 📘 Microsoft Learn: [Transaktionsprotokoll – Architektur & Minimal Logging](https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-log-architecture-and-management)  
+- 📘 Microsoft Learn: [CREATE TRIGGER – INSERT](https://learn.microsoft.com/en-us/sql/t-sql/statements/create-trigger-transact-sql)  
+- 📘 Microsoft Learn: [RLS – Block/Filter Predicates](https://learn.microsoft.com/en-us/sql/relational-databases/security/row-level-security)  
+- 📝 Blog (Aaron Bertrand): [Problems with MERGE](https://sqlblog.org/2011/06/20/merge-what-was-i-thinking)  
+- 📝 Blog (SQLPerformance): [High-Throughput Inserts & Minimal Logging](https://www.sqlperformance.com/?s=minimal+logging)  
+- 📝 Blog (Brent Ozar): [SARGability & DML Overhead](https://www.brentozar.com/archive/2018/02/sargable-queries/)  
+- 🎥 YouTube: [INSERT INTO … SELECT – Best Practices](https://www.youtube.com/results?search_query=sql+server+insert+into+select+best+practices)  
+- 🎥 YouTube (Data Exposed): [Table-Valued Parameters](https://www.youtube.com/results?search_query=data+exposed+table+valued+parameters)  
