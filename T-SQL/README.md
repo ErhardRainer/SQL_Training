@@ -1,8 +1,11 @@
+Dieses Projekt ist eine Sammlung von Schulungsunterlagen und Beispielen, die ich über die Jahre für verschiedene Zwecke erstellt und weiterentwickelt habe. Es dient nicht nur als Lehrmaterial für meine Studenten, sondern auch als praktische Wissensbasis für meine tägliche Consulting-Tätigkeit. Darüber hinaus nutze ich diese Themen, um fundierte Fragen für Assessment-Center auszuarbeiten und so die fachlichen Fähigkeiten von Kandidaten zu bewerten.
+
+Die hier vorliegenden Inhalte sind das Ergebnis jahrelanger manueller Arbeit. Jedes Kapitel wurde sorgfältig konzipiert und geschrieben, um komplexe Themen verständlich zu machen. Im Jahr 2025 wurden einige dieser Kapitel mithilfe von speziell entwickelten Custom GPTs verfeinert, um die Erklärungen zu präzisieren, die Beispiele zu erweitern und die Vollständigkeit sicherzustellen. Die manuelle, praxisorientierte Ausarbeitung bleibt jedoch das Herzstück dieses Projekts.
+
+Ich hoffe, die Unterlagen sind für euch ebenso nützlich, wie sie es für mich und meine Studenten sind.
+
 # SQL Training – Übersicht
-
-Dieses Repository bietet eine strukturierte Einführung in **T-SQL**.  
-Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialthemen.
-
+Dieses Repository bietet eine strukturierte Einführung in T-SQL. Die Kapitel 00–30 bilden das Basiswissen, 60+ sind optionale Spezialthemen.
 ---
 
 ## Basis-Kapitel (00–30)
@@ -101,70 +104,70 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 
 ## Spezial-Kapitel (60+)
 
-- [60_IsolationLevels](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/60_IsolationLevels)  
+- [60_IsolationLevels](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/60_IsolationLevels/60_IsolationLevels.md)  
   Isolationsstufen, Sperrverhalten, Nebenläufigkeit und Anomalien.
 
-- [61_SubQuery_CTE_TMP](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/61_SubQuery_CTE_TMP)  
+- [61_SubQuery_CTE_TMP](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/61_SubQuery_CTE_TMP/61_SubQuery_CTE_TMP.md)  
   Unterabfragen, `WITH CTE`, temporäre Tabellen/Tabellenvariablen.
 
-- [62_Row_Level_Security](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/62_Row_Level_Security)  
+- [62_Row_Level_Security](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/62_Row_Level_Security/62_Row_Level_Security.md)  
   Zeilenbasierte Sicherheit in SQL Server: Policies, Predicates, Performance.
 
-- [63_Collation_Case_Sensitive](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/63_Collation_Case_Sensitive)  
+- [63_Collation_Case_Sensitive](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/63_Collation_Case_Sensitive/63_Collation_Case_Sensitive.md)  
   Sortierfolgen/Collations, `CI` vs. `CS`, Auswirkungen auf Vergleiche und Joins.
 
-- **64_PerformanceTuning_Advanced**  
+- [64_PerformanceTuning_Advanced](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/64_PerformanceTuning_Advanced/64_PerformanceTuning_Advanced.md)  
   Erweiterte Performance-Optimierung, Query Store, Parameter-Sniffing.
 
-- **65_Partitioning**  
+- [65_Partitioning](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/65_Partitioning/65_Partitioning.md)  
   Partitionierte Tabellen und Indizes, Switch-Strategien.
 
-- **66_Security_Roles_Permissions**  
+- [66_Security_Roles_Permissions](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/66_Security_Roles_Permissions/66_Security_Roles_Permissions.md)  
   Rollenmodell, Rechteverwaltung, Best Practices für Security.
 
 - [67_HA/DR & Replikation](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/67_HA_DR/HA_DR.md)  
   Hochverfügbarkeit & Disaster Recovery (AGs, Distributed AGs, Failover Cluster Instance, Log Shipping, (t-)Replikation, Peer-to-Peer, Legacy Mirroring).
 
-- **68_TemporalTables_CDC_CT**  
+- [68_TemporalTables_CDC_CT](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/68_TemporalTables_CDC_CT/68_TemporalTables_CDC_CT.md)  
   Historisierung mit system-versionierten Tabellen, Change Tracking, CDC.
   
-- **69_ServiceBroker_Queues**  
+- [69_ServiceBroker_Queues](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/69_ServiceBroker_Queues/69_ServiceBroker_Queues.md)  
   Message-basierte Verarbeitung in SQL Server.
 
-- **70_ExternalTables_PolyBase**  
+- [70_ExternalTables_PolyBase](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/70_ExternalTables_PolyBase/70_ExternalTables_PolyBase.md)  
   Zugriff auf externe Datenquellen über PolyBase/External Tables.
 
-- [71_BackupRestore_Strategies](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/71_BackupRestore_Strategies)  
+- [71_BackupRestore_Strategies](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/71_BackupRestore_Strategies/71_BackupRestore_Strategies.md)  
   Backup-Typen, Recovery-Modelle, Point-in-Time-Restores, Log-Ketten & Copy-Only.
 
-- **72_SQLAgent_Jobs_Alerts**  
+- [72_SQLAgent_Jobs_Alerts](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/72_SQLAgent_Jobs_Alerts/72_SQLAgent_Jobs_Alerts.md)  
   Automatisierung mit SQL Agent: Jobs, Schedules, Alerts.
 
-- **73_TVPs_TableTypes**  
+- [73_TVPs_TableTypes](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/73_TVPs_TableTypes/73_TVPs_TableTypes.md)  
   Table-Valued Parameters, effiziente Schnittstellen für Prozeduren.
 
-- **74_SnapshotIsolation_Concurrency**  
+- [74_SnapshotIsolation_Concurrency](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/74_SnapshotIsolation_Concurrency/74_SnapshotIsolation_Concurrency.md)  
   `RCSI`, `Snapshot Isolation`, Auswirkungen auf TempDB.
 
-- **75_SSVEPatterns_for_ETL**  
+- [75_SSVEPatterns_for_ETL](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/75_SSVEPatterns_for_ETL/75_SSVEPatterns_for_ETL.md)  
   Best Practices für ETL-Prozesse, Idempotenz, Wasserzeichen, Checksummen.
 
-- **76_Spatial_Geography**  
+- [76_Spatial_Geography](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/76_Spatial_Geography/76_Spatial_Geography.md)  
   Arbeiten mit Geo-/Spatial-Daten, Indizes, Abfragen.
 
-- **77_JSON_ETL_Practices**  
+- [77_JSON_ETL_Practices](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/77_JSON_ETL_Practices/77_JSON_ETL_Practices.md)  
   Verarbeitung von JSON-Daten, Validierung, Fehlertoleranz.
 
-- **78_ColumnstoreIndexes**  
+- [78_ColumnstoreIndexes](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/78_ColumnstoreIndexes/78_ColumnstoreIndexes.md)  
   OLAP-optimierte Indizes, Batch Mode Processing, Data Warehousing.
 
-- **79_TSQL_Testing**  
+- [79_TSQL_Testing](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/79_TSQL_Testing/79_TSQL_Testing.md)  
   Unit-Testing in T-SQL (z. B. mit tSQLt).
 
-- **80_AzureSQL_Differences**  
+- [80_AzureSQL_Differences](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/80_AzureSQL_Differences/80_AzureSQL_Differences.md)  
   Unterschiede On-Premises vs. Azure SQL, spezielle Features.
 
-- **81_InMemory_OLTP**  
+- [81_InMemory_OLTP](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/81_InMemory_OLTP/81_InMemory_OLTP.md)  
   Memory-Optimized Tables, Natively Compiled Procedures.
 
 ---
@@ -174,3 +177,13 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - **Präsentation:** [Vorlesung_Präsentation.pptx](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/Vorlesung_Pr%C3%A4sentation.pptx)
 
 ---
+## Anmerkung
+Hier sind die spezifischen Custom GPTs, die dabei zum Einsatz kamen:
+
+GPT-1: [SQL Begriffsdefinitionen& Übersicht (für die md-Seiten)](https://chatgpt.com/g/g-68bacb69b10c8191bc2b6eff411b05c2-arbeit-sql-begriffsdefinitionen-ubersicht)
+
+GPT-2: [Beschreibe hier, was dieser GPT-Chatbot gemacht hat, z.B. "GPT für die Erweiterung von Beispielen und die Erstellung von Übungsaufgaben"]
+
+Der manuelle Aufwand für die Erstellung der ursprünglichen Materialien war enorm und bildet das Fundament dieses Projekts. Die KI-Unterstützung diente lediglich dazu, das bereits vorhandene Material zu optimieren und zu ergänzen.
+
+Ich hoffe, die Unterlagen helfen euch weiter!
