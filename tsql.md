@@ -25,7 +25,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [06_Delete](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md)  
   Datensätze sicher löschen; `TOP`, `OUTPUT`, Transaktionssicherheit.
 
-- [07_Insert](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/07_Insert)  
+- [07_Insert](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/07_Insert/07_Insert.md)  
   Einfügen mit `INSERT … VALUES/SELECT`, Default-Werte, `IDENTITY`.
 
 - [08_Update](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/08_Update/08_Update.md)  
