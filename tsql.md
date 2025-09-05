@@ -28,7 +28,7 @@ Die Kapitel **00–30** bilden das Basiswissen, **60+** sind optionale Spezialth
 - [07_Insert](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/07_Insert)  
   Einfügen mit `INSERT … VALUES/SELECT`, Default-Werte, `IDENTITY`.
 
-- [08_Update](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/08_Update)  
+- [08_Update](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/08_Update/08_Update.md)  
   Aktualisieren bestehender Daten mit `UPDATE`, Join-Update, `OUTPUT`, Integritätsaspekte.
 
 - [09_Set_Operations](https://github.com/ErhardRainer/SQL_Training/tree/main/T-SQL/09_Set_Operations)  
