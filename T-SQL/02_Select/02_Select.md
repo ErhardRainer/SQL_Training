@@ -35,7 +35,7 @@
 > **Kurzbeschreibung:** Minimale Syntax, Projektion, Alias, logische Verarbeitungsreihenfolge und deterministische Ausgabe.
 
 - 📓 **Notebook:**  
-  [`08_01_select_grundlagen.ipynb`](08_01_select_grundlagen.ipynb)
+  [`02_01_select_grundlagen.ipynb`](08_01_select_grundlagen.ipynb)
 
 - 🎥 **YouTube:**  
   - [SELECT Statement – Basics (SQL Server)](https://www.youtube.com/results?search_query=sql+server+select+statement+basics)
@@ -49,7 +49,7 @@
 > **Kurzbeschreibung:** Werte berechnen, bedingt ableiten und sauber typisieren; Fallstricke mit `FORMAT()` vermeiden.
 
 - 📓 **Notebook:**  
-  [`08_02_select_ausdruecke_case_cast.ipynb`](08_02_select_ausdruecke_case_cast.ipynb)
+  [`02_02_select_ausdruecke_case_cast.ipynb`](08_02_select_ausdruecke_case_cast.ipynb)
 
 - 🎥 **YouTube:**  
   - [CASE Expression – Patterns](https://www.youtube.com/results?search_query=sql+server+case+expression+t-sql)
@@ -64,7 +64,7 @@
 > **Kurzbeschreibung:** Wann `DISTINCT` genügt und wann Aggregation sinnvoller ist; Einfluss auf Pläne & Performance.
 
 - 📓 **Notebook:**  
-  [`08_03_distinct_vs_groupby.ipynb`](08_03_distinct_vs_groupby.ipynb)
+  [`02_03_distinct_vs_groupby.ipynb`](08_03_distinct_vs_groupby.ipynb)
 
 - 🎥 **YouTube:**  
   - [DISTINCT vs GROUP BY](https://www.youtube.com/results?search_query=sql+server+distinct+vs+group+by)
@@ -78,7 +78,7 @@
 > **Kurzbeschreibung:** Zeilenlimitierung korrekt einsetzen und stabil sortieren; Unterschiede zwischen Limitierung und Pagination.
 
 - 📓 **Notebook:**  
-  [`08_04_top_offset_fetch.ipynb`](08_04_top_offset_fetch.ipynb)
+  [`02_04_top_offset_fetch.ipynb`](08_04_top_offset_fetch.ipynb)
 
 - 🎥 **YouTube:**  
   - [TOP & ORDER BY – Best Practices](https://www.youtube.com/results?search_query=sql+server+top+with+ties+offset+fetch)
@@ -93,7 +93,7 @@
 > **Kurzbeschreibung:** Stabile Sortierkriterien, Kollisionen durch `NULL`/Kollation, zufällige Reihenfolge (`ORDER BY NEWID()`).
 
 - 📓 **Notebook:**  
-  [`08_05_order_by_determinismus.ipynb`](08_05_order_by_determinismus.ipynb)
+  [`02_05_order_by_determinismus.ipynb`](08_05_order_by_determinismus.ipynb)
 
 - 🎥 **YouTube:**  
   - [ORDER BY – Do’s & Don’ts](https://www.youtube.com/results?search_query=sql+server+order+by+best+practices)
@@ -107,7 +107,7 @@
 > **Kurzbeschreibung:** Klassische Aggregation, Filterung nach Aggregaten und typische Fehlerquellen.
 
 - 📓 **Notebook:**  
-  [`08_06_groupby_having.ipynb`](08_06_groupby_having.ipynb)
+  [`02_06_groupby_having.ipynb`](08_06_groupby_having.ipynb)
 
 - 🎥 **YouTube:**  
   - [GROUP BY & HAVING Tutorial](https://www.youtube.com/results?search_query=sql+server+group+by+having+tutorial)
@@ -122,7 +122,7 @@
 > **Kurzbeschreibung:** Mehrdimensionale Summen in einer Abfrage; `GROUPING_ID` zur Unterscheidung der Ebenen.
 
 - 📓 **Notebook:**  
-  [`08_07_grouping_sets_rollup_cube.ipynb`](08_07_grouping_sets_rollup_cube.ipynb)
+  [`02_07_grouping_sets_rollup_cube.ipynb`](08_07_grouping_sets_rollup_cube.ipynb)
 
 - 🎥 **YouTube:**  
   - [GROUPING SETS / ROLLUP / CUBE](https://www.youtube.com/results?search_query=sql+server+grouping+sets+rollup+cube)
@@ -137,7 +137,7 @@
 > **Kurzbeschreibung:** Rangfolgen, laufende Summen, gleitende Fenster; richtige Frame-Definition für korrekte Ergebnisse.
 
 - 📓 **Notebook:**  
-  [`08_08_window_functions_over.ipynb`](08_08_window_functions_over.ipynb)
+  [`02_08_window_functions_over.ipynb`](08_08_window_functions_over.ipynb)
 
 - 🎥 **YouTube:**  
   - [Window Functions Deep Dive](https://www.youtube.com/results?search_query=sql+server+window+functions+over+clause)
@@ -152,7 +152,7 @@
 > **Kurzbeschreibung:** Skalar-, Mehrzeilen- und existenzbasierte Unterabfragen in der Projektion und im `FROM`.
 
 - 📓 **Notebook:**  
-  [`08_09_subqueries_scalar_table.ipynb`](08_09_subqueries_scalar_table.ipynb)
+  [`02_09_subqueries_scalar_table.ipynb`](08_09_subqueries_scalar_table.ipynb)
 
 - 🎥 **YouTube:**  
   - [Subqueries in SELECT](https://www.youtube.com/results?search_query=sql+server+subqueries+in+select)
@@ -166,7 +166,7 @@
 > **Kurzbeschreibung:** Zeilenweise Ausdehnung/Transformation; `CROSS/OUTER APPLY` für TVFs und JSON-Shredding.
 
 - 📓 **Notebook:**  
-  [`08_10_apply_openjson.ipynb`](08_10_apply_openjson.ipynb)
+  [`02_10_apply_openjson.ipynb`](08_10_apply_openjson.ipynb)
 
 - 🎥 **YouTube:**  
   - [CROSS APPLY Patterns](https://www.youtube.com/results?search_query=sql+server+cross+apply+openjson)
@@ -181,7 +181,7 @@
 > **Kurzbeschreibung:** Berichtsfreundliche Drehung von Daten sowie Alternativen mit `CASE`+Aggregation.
 
 - 📓 **Notebook:**  
-  [`08_11_pivot_unpivot.ipynb`](08_11_pivot_unpivot.ipynb)
+  [`02_11_pivot_unpivot.ipynb`](08_11_pivot_unpivot.ipynb)
 
 - 🎥 **YouTube:**  
   - [PIVOT Explained](https://www.youtube.com/results?search_query=sql+server+pivot+unpivot)
@@ -195,7 +195,7 @@
 > **Kurzbeschreibung:** Tabellenanlage aus Abfrage, Minimal-Logging, Zielschemadefinition und Parallelität.
 
 - 📓 **Notebook:**  
-  [`08_12_select_into_insert_select.ipynb`](08_12_select_into_insert_select.ipynb)
+  [`02_12_select_into_insert_select.ipynb`](08_12_select_into_insert_select.ipynb)
 
 - 🎥 **YouTube:**  
   - [SELECT INTO vs INSERT SELECT](https://www.youtube.com/results?search_query=sql+server+select+into+vs+insert+select)
@@ -210,7 +210,7 @@
 > **Kurzbeschreibung:** Ein-/Mehrzeilenverhalten, `SET` vs. `SELECT`, Umgang mit `NULL` und Mehrspaltenzuweisungen.
 
 - 📓 **Notebook:**  
-  [`08_13_select_variable_assignment.ipynb`](08_13_select_variable_assignment.ipynb)
+  [`02_13_select_variable_assignment.ipynb`](08_13_select_variable_assignment.ipynb)
 
 - 🎥 **YouTube:**  
   - [SET vs SELECT (Variables)](https://www.youtube.com/results?search_query=sql+server+set+vs+select+variables)
@@ -225,7 +225,7 @@
 > **Kurzbeschreibung:** Direkte Serialisierung des Resultsets; Modi (`AUTO`/`PATH`) und Größen-/NVARCHAR-Limits.
 
 - 📓 **Notebook:**  
-  [`08_14_for_json_for_xml.ipynb`](08_14_for_json_for_xml.ipynb)
+  [`02_14_for_json_for_xml.ipynb`](08_14_for_json_for_xml.ipynb)
 
 - 🎥 **YouTube:**  
   - [FOR JSON in SQL Server](https://www.youtube.com/results?search_query=sql+server+for+json)  
@@ -240,7 +240,7 @@
 > **Kurzbeschreibung:** Lesesperren, `READ COMMITTED SNAPSHOT`, `NOLOCK`/`READUNCOMMITTED` Risiken, `READPAST`.
 
 - 📓 **Notebook:**  
-  [`08_15_select_isolation_hints.ipynb`](08_15_select_isolation_hints.ipynb)
+  [`02_15_select_isolation_hints.ipynb`](08_15_select_isolation_hints.ipynb)
 
 - 🎥 **YouTube:**  
   - [NOLOCK Explained](https://www.youtube.com/results?search_query=sql+server+nolock+read+committed+snapshot)
