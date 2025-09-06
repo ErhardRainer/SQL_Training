@@ -22,4 +22,4 @@ th { cursor: pointer; background: #f6f8fa; }
 tbody tr:nth-child(odd){ background: #fcfcfd; }
 </style>
 
-<!-- <script src="https://www.kryogenix.org/code/browser/sorttable/sorttable.js"></script> -->
+<script src="sorttable.js"></script>
