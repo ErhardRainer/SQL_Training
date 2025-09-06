@@ -1,30 +1,111 @@
-<!-- DataTables (CSS) -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kapitelübersicht</title>
 
-<!-- jQuery + DataTables (JS) -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css" />
+<style>
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 24px; }
+h1 { margin: 0 0 12px 0; }
+table.dataTable thead th { background: #f6f8fa; }
+.dataTables_wrapper .dataTables_filter input { width: 16rem; }
+</style>
+</head>
+<body>
 
 <h1>Kapitelübersicht</h1>
+<p>Quelle: <code>ErhardRainer/SQL_Training</code> @ <code>main</code> &middot; Einträge: <strong>70</strong></p>
 
 <table id="chapters" class="display" style="width:100%">
   <thead>
-    <tr><th>Kapitel</th><th>Punkte</th><th>Datum</th></tr>
+    <tr><th>Datei</th><th>Titel</th><th>Kurzbeschreibung</th></tr>
   </thead>
   <tbody>
-    <tr><td>02_Select.md</td><td>12</td><td>2025-09-06</td></tr>
-    <tr><td>03_Join.md</td><td>7</td><td>2025-09-01</td></tr>
-    <tr><td>04_GroupBy.md</td><td>19</td><td>2025-08-30</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L34" target="_blank" rel="noopener">02_Select.md</a></td><td>SELECT-Grundlagen &amp; Syntax</td><td>Minimale Syntax, Projektion, Alias, logische Verarbeitungsreihenfolge und deterministische Ausgabe.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L48" target="_blank" rel="noopener">02_Select.md</a></td><td>Ausdrücke, `CASE`, `CAST/CONVERT`, `ISNULL/COALESCE`</td><td>Werte berechnen, bedingt ableiten und sauber typisieren; Fallstricke mit `FORMAT()` vermeiden.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L63" target="_blank" rel="noopener">02_Select.md</a></td><td>`DISTINCT` vs. `GROUP BY` zum Dedupen</td><td>Wann `DISTINCT` genügt und wann Aggregation sinnvoller ist; Einfluss auf Pläne &amp; Performance.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L77" target="_blank" rel="noopener">02_Select.md</a></td><td>`TOP`, `WITH TIES`, `PERCENT` &amp; Pagination mit `OFFSET/FETCH`</td><td>Zeilenlimitierung korrekt einsetzen und stabil sortieren; Unterschiede zwischen Limitierung und Pagination.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L92" target="_blank" rel="noopener">02_Select.md</a></td><td>Sortierung mit `ORDER BY` &amp; Determinismus</td><td>Stabile Sortierkriterien, Kollisionen durch `NULL`/Kollation, zufällige Reihenfolge (`ORDER BY NEWID()`).</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L106" target="_blank" rel="noopener">02_Select.md</a></td><td>Aggregation mit `GROUP BY` &amp; `HAVING`</td><td>Klassische Aggregation, Filterung nach Aggregaten und typische Fehlerquellen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L121" target="_blank" rel="noopener">02_Select.md</a></td><td>Erweiterte Aggregation: `GROUPING SETS`, `ROLLUP`, `CUBE`</td><td>Mehrdimensionale Summen in einer Abfrage; `GROUPING_ID` zur Unterscheidung der Ebenen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L136" target="_blank" rel="noopener">02_Select.md</a></td><td>Fensterfunktionen (`OVER`): Ranking, Aggregate, Frames</td><td>Rangfolgen, laufende Summen, gleitende Fenster; richtige Frame-Definition für korrekte Ergebnisse.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L151" target="_blank" rel="noopener">02_Select.md</a></td><td>Unterabfragen &amp; korrelierte Abfragen</td><td>Skalar-, Mehrzeilen- und existenzbasierte Unterabfragen in der Projektion und im `FROM`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L165" target="_blank" rel="noopener">02_Select.md</a></td><td>`APPLY` mit TVFs &amp; `OPENJSON`</td><td>Zeilenweise Ausdehnung/Transformation; `CROSS/OUTER APPLY` für TVFs und JSON-Shredding.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L180" target="_blank" rel="noopener">02_Select.md</a></td><td>`PIVOT`/`UNPIVOT` &amp; Alternative Muster</td><td>Berichtsfreundliche Drehung von Daten sowie Alternativen mit `CASE`+Aggregation.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L194" target="_blank" rel="noopener">02_Select.md</a></td><td>`SELECT INTO` vs. `INSERT … SELECT`</td><td>Tabellenanlage aus Abfrage, Minimal-Logging, Zielschemadefinition und Parallelität.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L209" target="_blank" rel="noopener">02_Select.md</a></td><td>Variablenzuweisung mit `SELECT`</td><td>Ein-/Mehrzeilenverhalten, `SET` vs. `SELECT`, Umgang mit `NULL` und Mehrspaltenzuweisungen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L224" target="_blank" rel="noopener">02_Select.md</a></td><td>Ausgabe als JSON/XML: `FOR JSON` / `FOR XML`</td><td>Direkte Serialisierung des Resultsets; Modi (`AUTO`/`PATH`) und Größen-/NVARCHAR-Limits.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/02_Select/02_Select.md#L239" target="_blank" rel="noopener">02_Select.md</a></td><td>Isolation, Sperren &amp; Hints bei `SELECT`</td><td>Lesesperren, `READ COMMITTED SNAPSHOT`, `NOLOCK`/`READUNCOMMITTED` Risiken, `READPAST`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L33" target="_blank" rel="noopener">03_Join.md</a></td><td>Join-Grundlagen &amp; Syntax</td><td>Überblick über `FROM … JOIN … ON …`, INNER/OUTER/CROSS, Aliasse und die logische Lesereihenfolge der Abfrage.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L49" target="_blank" rel="noopener">03_Join.md</a></td><td>ON vs WHERE bei OUTER JOINs</td><td>Warum Filter in `WHERE` nach dem Join wirken und einen LEFT OUTER faktisch zum INNER machen können; korrekte Platzierung von Filtern.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L65" target="_blank" rel="noopener">03_Join.md</a></td><td>Self-Join &amp; Aliasierung</td><td>Selbstverknüpfungen für Hierarchien/Beziehungen; saubere Aliasse und mehrfache Joins derselben Tabelle.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L81" target="_blank" rel="noopener">03_Join.md</a></td><td>APPLY (CROSS/OUTER) – Lateral Joins</td><td>Zeilenweise Auswertung mit TVFs/abgeleiteten Tabellen; Muster wie JSON/XML-Parsing, Top-N-pro-Gruppe, „per row Top 1“.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L97" target="_blank" rel="noopener">03_Join.md</a></td><td>Semi-/Anti-Joins: EXISTS, IN, NOT EXISTS, EXCEPT</td><td>Effiziente Existenzprüfungen/Ausschlüsse ohne Duplikatsvervielfältigung; typische Fehlerbilder und Performance.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L113" target="_blank" rel="noopener">03_Join.md</a></td><td>Physische Join-Algorithmen &amp; Hints</td><td>Nested Loops, Merge, Hash – wann welcher Operator; gezielte Nutzung von Join-/Query-Hints und Risiken.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L129" target="_blank" rel="noopener">03_Join.md</a></td><td>Performance: Indizes, Kardinalität, IQP</td><td>SARGability, passende (komposite) Indizes, Kardinalitätsschätzung &amp; Intelligent Query Processing; typische Fallstricke.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L145" target="_blank" rel="noopener">03_Join.md</a></td><td>Collation &amp; JOINs (Strings)</td><td>Kollationskonflikte in String-Joins erkennen/beheben (`COLLATE`, `DATABASE_DEFAULT`, tempdb-Fallen).</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L161" target="_blank" rel="noopener">03_Join.md</a></td><td>Joins mit JSON/XML/TVFs</td><td>Typische Muster mit `CROSS APPLY OPENJSON`, `CROSS APPLY … nodes()` und Table-Valued Functions.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L177" target="_blank" rel="noopener">03_Join.md</a></td><td>Set-Operatoren vs JOIN</td><td>Wann `UNION/UNION ALL/INTERSECT/EXCEPT` statt Join sinnvoll ist; kombinierte Strategien.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L193" target="_blank" rel="noopener">03_Join.md</a></td><td>Transaktionen, Isolation &amp; Sperren bei Joins</td><td>Wie Isolation Levels, Blocking und Versioning (RCSI/SI) Join-Abfragen beeinflussen; Deadlocks vermeiden.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/03_JOIN/03_Join.md#L209" target="_blank" rel="noopener">03_Join.md</a></td><td>Best Practices &amp; Anti-Patterns</td><td>Saubere Join-Schlüssel, passende Indizes, keine Funktionen auf Join-Spalten, `RIGHT JOIN` selten nötig, Hints nur gezielt.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L32" target="_blank" rel="noopener">04_WHERE.md</a></td><td>WHERE-Grundlagen &amp; Suchbedingungen</td><td>Syntax, logische Auswertung und typische Operatoren in `WHERE`; TRUE/FALSE/UNKNOWN und Kurzschlusslogik.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L47" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Operatoren: `IN`/`BETWEEN`/`LIKE`/`AND`/`OR`/`NOT`</td><td>Ausdrucksstarke Filter mit Bereichs-, Mengen- und Musteroperatoren; Klammerung und Prioritäten.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L62" target="_blank" rel="noopener">04_WHERE.md</a></td><td>`NULL` &amp; dreiwertige Logik</td><td>`IS NULL` vs. `= NULL`, `NOT IN`-Fallstricke, `COALESCE`/`ISNULL` als Muster und korrekte Negation.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L77" target="_blank" rel="noopener">04_WHERE.md</a></td><td>`WHERE` vs. `ON` bei JOINs</td><td>Unterschied zwischen Join-Bedingungen (`ON`) und Zeilenfiltern (`WHERE`); warum `WHERE` einen `LEFT JOIN` faktisch zum `INNER` machen kann.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L92" target="_blank" rel="noopener">04_WHERE.md</a></td><td>SARGability &amp; Funktionen im Prädikat</td><td>Warum `WHERE LEFT(Col,3)=&#x27;ABC&#x27;` schlecht ist, aber `Col LIKE &#x27;ABC%&#x27;` sargierbar; Alternativen mit berechneten Spalten/Indizes.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L107" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Datentypen, implizite Konvertierungen &amp; Kollation</td><td>Wie Typumwandlungen und Kollationen Filter und Indexzugriffe beeinflussen; `N&#x27;…&#x27;` für Unicode, `COLLATE` gezielt einsetzen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L122" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Unterabfragen: `EXISTS`, `IN`, `ANY`/`ALL`</td><td>Existenzprüfungen, Mengenvergleiche und korrelierte Unterabfragen als flexible Filterbausteine.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L137" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Filtern nach Fensterfunktionen (`ROW_NUMBER`, `SUM OVER`)</td><td>Warum `WHERE` keine Window-Ausdrücke sieht; Muster mit CTE/abgeleiteter Tabelle, um auf Rang/Window-Ergebnis zu filtern.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L152" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Gefilterte Indizes &amp; ausrichtbare Prädikate</td><td>Filterbedingungen im Indexdesign, Kardinalität und Parameterisierung; Beispiel: `WHERE IsActive = 1`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L167" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Partition Elimination &amp; Bereichsprädikate</td><td>Partitionsbewusste Filter (`WHERE DateCol &gt;= … AND &lt; …`) für effiziente Bereichszugriffe ohne implizite Konvertierungen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L182" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Columnstore &amp; Prädikat-Pushdown</td><td>Wie Batch-/Segment-Elimination und Prädikat-Pushdown bei Columnstore-Indexen Filter stark beschleunigen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L197" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Parameter Sniffing &amp; Query Hints für `WHERE`</td><td>Stabilere Pläne für variable Selektivität (`OPTIMIZE FOR`, `RECOMPILE`, lokale Variablen) und deren Trade-offs.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/04_Where/04_WHERE.md#L212" target="_blank" rel="noopener">04_WHERE.md</a></td><td>Sicherheit: Row-Level Security (RLS)</td><td>Filter- und Block-Prädikate durch Sicherheitsrichtlinien; Anwendung in Views, Direct-Table-Access und Joins.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L24" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Überblick &amp; Kategorien</td><td>Große Landkarte der T-SQL-Funktionen, Kategorien, Determinismus, Einsatzgebiete.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L40" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Numerische Grundfunktionen (`ABS`, `SIGN`, `ROUND`, `CEILING`, `FLOOR`)</td><td>Häufige Rechenhelfer, Rundung/Skalierung und Präzisionsfallen bei `decimal`/`float`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L54" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Grad ↔ Bogenmaß (`RADIANS`, `DEGREES`)</td><td>Sichere Umrechnung Winkelmaße für trigonometrische Berechnungen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L68" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Winkel-Funktionen (`SIN`, `COS`, `TAN`, `ASIN`…)</td><td>Trigonometrie in T-SQL – Wertebereiche, Rückgabewinkel, typische Muster.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L82" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Logarithmus &amp; Exponential (`LOG`, `LOG10`, `EXP`, `POWER`, `SQRT`)</td><td>Wachstum, Normalisierung, Skalenwechsel; Basiswahl und Präzision.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L96" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Textfunktionen (`SUBSTRING`, `LEN`, `LEFT/RIGHT`, `REPLACE`, `CONCAT`, `STRING_SPLIT`)</td><td>Strings schneiden/suchen/ersetzen, Tokenisieren, Längenmessung; Unicode &amp; Collation.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L111" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Konvertierung &amp; Typen (`CAST`, `CONVERT`, `TRY_CONVERT`, `PARSE`, `TRY_PARSE`)</td><td>Sichere Typwechsel, Kulturabhängigkeit von `PARSE`, Performance-Hinweise &amp; Data-Type-Precedence.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L129" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Datum &amp; Zeit (`GETDATE`, `SYSDATETIME`, `DATEADD`, `DATEDIFF`, `EOMONTH`, `FORMAT`)</td><td>Zeitarithmetik, Monats-/Kalenderlogik, Wochenstart (`DATEFIRST`) und `FORMAT`-Fallstricke.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L144" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Bedingte &amp; NULL-Handling (`CASE`, `IIF`, `CHOOSE`, `COALESCE`, `ISNULL`, `NULLIF`)</td><td>Kontrollfluss in Ausdrücken, Standardwerte, Division-durch-Null vermeiden mit `NULLIF`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L159" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Aggregatfunktionen &amp; Textaggregation (`SUM`, `AVG`, `COUNT`, `MIN/MAX`, `STRING_AGG`)</td><td>Gruppieren &amp; verdichten, Distinct-Aggregate, Textlisten stabil sortieren.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L175" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Fenster- &amp; Ranking-Funktionen (`ROW_NUMBER`, `LAG/LEAD`, `FIRST_VALUE`…)</td><td>Reihenfolgen &amp; gleitende Berechnungen mit `OVER(PARTITION BY … ORDER BY …)` und Frames.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L190" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>JSON-Funktionen (`ISJSON`, `JSON_VALUE`, `JSON_QUERY`, `JSON_MODIFY`, `OPENJSON`)</td><td>JSON validieren, extrahieren, verändern; mit `OPENJSON` + `APPLY` zu Zeilen shreddern.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L205" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>System- &amp; Metadatenfunktionen (`@@ROWCOUNT`, `ERROR_*`, `CONNECTIONPROPERTY`, `COLLATIONPROPERTY`)</td><td>Laufzeitinfos, Fehlerdiagnose, Kollationsdetails, Server-/DB-Status abfragen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L220" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Performance &amp; SARGability mit Funktionen</td><td>Funktionen vermeiden in `WHERE/JOIN` (Index-Nutzung), Alternativen mit persistierten berechneten Spalten, Inline-Logik, UDF-Inlining (ab SQL 2019).</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/05_Funktionen/05_Funktionen.md#L235" target="_blank" rel="noopener">05_Funktionen.md</a></td><td>Anti-Patterns &amp; Best Practices</td><td>`FORMAT()` in OLTP, `WHERE LEFT(col,…)` statt sargierbarer Muster, Kulturabhängigkeiten, `TRY_*` bevorzugen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L27" target="_blank" rel="noopener">06_Delete.md</a></td><td>Grundlagen &amp; Syntax</td><td>Minimale `DELETE`-Syntax, sichere Filterung, Pseudo-Tabelle `deleted`.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L41" target="_blank" rel="noopener">06_Delete.md</a></td><td>`DELETE … FROM` (Join-Delete)</td><td>Löschen anhand einer zweiten Quelle (Join/CTE) – Duplikate und Eindeutigkeit korrekt behandeln.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L56" target="_blank" rel="noopener">06_Delete.md</a></td><td>Doppelte Zeilen löschen (CTE + `ROW_NUMBER`)</td><td>Duplikate per Window-Funktion markieren und gezielt entfernen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L71" target="_blank" rel="noopener">06_Delete.md</a></td><td>Transaktionen, Fehlerbehandlung &amp; `XACT_ABORT`</td><td>Sauberes Rollback, Fehler signalisieren, Teilfehler vermeiden.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L86" target="_blank" rel="noopener">06_Delete.md</a></td><td>Isolation &amp; Sperren in der Praxis</td><td>Deadlocks vermeiden, `READPAST` gezielt einsetzen, Lock Escalation verstehen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L101" target="_blank" rel="noopener">06_Delete.md</a></td><td>Batching &amp; „Ordered Deletes“</td><td>Große Löschungen in Häppchen (`TOP (N)`-Schleife); deterministische Reihenfolge via Join auf eine geordnete Teilmenge.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L116" target="_blank" rel="noopener">06_Delete.md</a></td><td>`OUTPUT` für Auditing/ETL</td><td>Gelöschte Zeilen in eine Audit-/Staging-Tabelle schreiben.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L130" target="_blank" rel="noopener">06_Delete.md</a></td><td>Referentielle Integrität &amp; Trigger</td><td>`ON DELETE CASCADE/SET NULL` planen; Auswirkungen von `AFTER/INSTEAD OF DELETE`-Triggern.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L145" target="_blank" rel="noopener">06_Delete.md</a></td><td>Soft Delete &amp; Sichtbarkeit (RLS, Filter)</td><td>„Soft Delete“ (z. B. `IsDeleted=1`) vs. hartes Löschen; gefilterte Indizes, RLS-Interaktion.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L160" target="_blank" rel="noopener">06_Delete.md</a></td><td>Temporal, CDC &amp; Change Tracking</td><td>Wie `DELETE` in systemversionierten Tabellen, CDC und Change Tracking protokolliert erscheint.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L176" target="_blank" rel="noopener">06_Delete.md</a></td><td>Partitionierte &amp; großvolumige Löschungen</td><td>Bereichsweise löschen mit Partition Elimination; Partition switch-out + TRUNCATE als schnelles Muster.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L191" target="_blank" rel="noopener">06_Delete.md</a></td><td>`TRUNCATE TABLE` vs. `DELETE`</td><td>Unterschiede bei Logging, Einschränkungen, Identity-Reset, Triggern und FK-Beziehungen.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L206" target="_blank" rel="noopener">06_Delete.md</a></td><td>`MERGE` &amp; synchronisierendes Löschen</td><td>„Not matched by source then DELETE“ – sauber, aber bekannte `MERGE`-Fallstricke beachten.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L221" target="_blank" rel="noopener">06_Delete.md</a></td><td>Qualität, Betrieb &amp; Überwachung</td><td>`@@ROWCOUNT`, Warte-Mechanismen, Protokoll-/Fragmentationsfolgen, DMVs/Extended Events.</td></tr>
+<tr><td><a href="https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/06_Delete/06_Delete.md#L236" target="_blank" rel="noopener">06_Delete.md</a></td><td>Anti-Patterns &amp; Sicherheit</td><td>`DELETE` ohne `WHERE`, ungeprüfte Join-Löschungen, `NOT IN` + `NULL`, Funktionen auf Spalten, fehlende Rechte/RLS.</td></tr>
   </tbody>
 </table>
 
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script>
 $(function(){
   $('#chapters').DataTable({
-    pageLength: 10,
-    order: [],                 // keine Default-Sortierung
-    lengthChange: false,       // kein "Zeilen pro Seite"-Dropdown
-    language: {                // deutsche UI-Texte
+    pageLength: 25,
+    order: [],
+    deferRender: true,
+    lengthChange: false,
+    language: {
       search: "Suche:",
       zeroRecords: "Keine passenden Einträge gefunden",
       info: "_START_–_END_ von _TOTAL_",
@@ -34,3 +115,6 @@ $(function(){
   });
 });
 </script>
+
+</body>
+</html>
