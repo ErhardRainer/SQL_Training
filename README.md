@@ -2,6 +2,8 @@
 
 # SQL Training: SQL-Mastery: Entfessele die Macht der Daten
 
+siehe auch: [GitHub-Pages](https://erhardrainer.github.io/SQL_Training/)
+
 Unterlagen zu meiner Vorlesung zum Thema SQL
 * [Microsoft SQL, T-SQL](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/README.md)
 * [MySQL](https://github.com/ErhardRainer/SQL_Training/blob/main/MySQL/README.md)
