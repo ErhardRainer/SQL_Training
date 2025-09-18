@@ -8,15 +8,15 @@ Dieses Modul hilft dir, **laufende Stored-Procedure-Ausführungen** zu finden, z
 
 ### 1) Jupyter-Notebook (SQL-Kernel)
 
-* **Datei:** `82_Troubleshooting_Sessions_Requests.ipynb`
+* **Datei:** [`82_Troubleshooting_Sessions_Requests.ipynb`](82_Troubleshooting_Sessions_Requests.ipynb)
 * **Zweck:** Geführte Diagnose mit kommentierten T-SQL-Zellen: Verbindungstest, Session/Request-Übersicht, Waits/Blocking, Plan-Einsicht, Memory-Grants, Transaktionen, optionale Extended-Events (Ringbuffer).
 * **Einsatz:** Ideal für **Schulungen** und Live-Analysen in **Azure Data Studio** (Kernel „SQL“) oder jeder Jupyter-Umgebung mit SQL-Kernel.
 
 ### 2) SQL-Skripte
 
-* **`82_Troubleshooting_Sessions_Request_Full.sql`** – *Einzelsession-Fokus*:
+* [**`82_Troubleshooting_Sessions_Request_Full.sql`**](82_Troubleshooting_Sessions_Request_Full.sql) – *Einzelsession-Fokus*:
   Findet **genau eine** Ziel-Session anhand eines Suchmusters/Prozedurnamens und liefert zwei **Summary-Resultsets** (Request/Plan/Memory + Transaktionen).
-* **`Check_sp.sql`** – *Multi-Session-Variante*:
+* [**`Check_sp.sql`**](Check_sp.sql) – *Multi-Session-Variante*:
   Ermittelt **mehrere** passende Sessions (limitierbar) und gibt die beiden **Summaries für alle** Kandidaten aus – sinnvoll bei parallelen Läufen oder weiten Textmustern.
 
 ---
@@ -25,7 +25,7 @@ Dieses Modul hilft dir, **laufende Stored-Procedure-Ausführungen** zu finden, z
 
 ### Notebook
 
-1. **Azure Data Studio** öffnen → **Open File** → `82_Troubleshooting_Sessions_Requests.ipynb`.
+1. **Azure Data Studio** öffnen → **Open File** → [`82_Troubleshooting_Sessions_Requests.ipynb`](82_Troubleshooting_Sessions_Requests.ipynb).
 2. Oben **SQL-Verbindung** wählen.
 3. Zellen von oben nach unten ausführen und – falls nötig – die Parameterzelle anpassen (`@ProcName`, `@LikeText`, Zeitfenster, etc.).
 
