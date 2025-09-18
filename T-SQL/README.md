@@ -170,6 +170,9 @@ Dieses Repository bietet eine strukturierte Einführung in T-SQL. Die Kapitel 00
 - [81_InMemory_OLTP](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/81_InMemory_OLTP/81_InMemory_OLTP.md)  
   Memory-Optimized Tables, Natively Compiled Procedures.
 
+- [82_Troubleshooting_Sessions_Requests](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/82_Troubleshooting_Sessions_Requests/82_Troubleshooting_Sessions_Requests.md)  
+  Client-/Session-Troubleshooting und Monitoring (DMVs/XE).
+
 ---
 
 ## Materialien
