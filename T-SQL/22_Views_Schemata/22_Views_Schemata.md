@@ -27,7 +27,7 @@
 > **Kurzbeschreibung:** Kapselung, Wiederverwendbarkeit, Sicherheits‐ und Abstraktionsschicht; Schemata als Struktur- und Sicherheitsgrenze.
 
 - 📓 **Notebook:**  
-  [`08_01_views_schemata_grundlagen.ipynb`](08_01_views_schemata_grundlagen.ipynb)
+  [`22_01_views_schemata_grundlagen.ipynb`](22_01_views_schemata_grundlagen.ipynb)
 
 - 🎥 **YouTube:**  
   - [SQL Server Views – Basics](https://www.youtube.com/results?search_query=sql+server+views+tutorial)  
@@ -42,7 +42,7 @@
 > **Kurzbeschreibung:** Schema präfixieren, Spaltenliste explizit, deterministische Ausdrücke; kein `ORDER BY` (außer mit `TOP`, aber nicht zur Sortierung verwenden).
 
 - 📓 **Notebook:**  
-  [`08_02_create_view_best_practices.ipynb`](08_02_create_view_best_practices.ipynb)
+  [`22_02_create_view_best_practices.ipynb`](22_02_create_view_best_practices.ipynb)
 
 - 🎥 **YouTube:**  
   - [Create View – Best Practices](https://www.youtube.com/results?search_query=sql+server+create+view+best+practices)
@@ -56,7 +56,7 @@
 > **Kurzbeschreibung:** Regeln für DML-fähige Views (eine Basistabelle, keine Aggregation/Distinct/Union). Komplexere Fälle mit `INSTEAD OF`-Triggern.
 
 - 📓 **Notebook:**  
-  [`08_03_updatable_views_instead_of_trigger.ipynb`](08_03_updatable_views_instead_of_trigger.ipynb)
+  [`22_03_updatable_views_instead_of_trigger.ipynb`](22_03_updatable_views_instead_of_trigger.ipynb)
 
 - 🎥 **YouTube:**  
   - [Updatable Views Explained](https://www.youtube.com/results?search_query=sql+server+updatable+views)
@@ -71,7 +71,7 @@
 > **Kurzbeschreibung:** Verhindert „Entfliehen“ aus View-Filter; Insert/Update muss die View-Bedingung erfüllen.
 
 - 📓 **Notebook:**  
-  [`08_04_with_check_option.ipynb`](08_04_with_check_option.ipynb)
+  [`22_04_with_check_option.ipynb`](22_04_with_check_option.ipynb)
 
 - 🎥 **YouTube:**  
   - [WITH CHECK OPTION Demo](https://www.youtube.com/results?search_query=sql+server+with+check+option)
@@ -85,7 +85,7 @@
 > **Kurzbeschreibung:** Zugriff über View ohne Tabellenrechte; Rechte auf Schema-Ebene (`GRANT ON SCHEMA`) sauber gestalten.
 
 - 📓 **Notebook:**  
-  [`08_05_security_views_schema_permissions.ipynb`](08_05_security_views_schema_permissions.ipynb)
+  [`22_05_security_views_schema_permissions.ipynb`](22_05_security_views_schema_permissions.ipynb)
 
 - 🎥 **YouTube:**  
   - [Ownership Chaining & Views](https://www.youtube.com/results?search_query=sql+server+ownership+chaining+views)
@@ -100,7 +100,7 @@
 > **Kurzbeschreibung:** Schutz vor Breaking Changes an Basistabellen; 2-teilige Namen, explizite Spaltenlisten erforderlich.
 
 - 📓 **Notebook:**  
-  [`08_06_schemabinding_views.ipynb`](08_06_schemabinding_views.ipynb)
+  [`22_06_schemabinding_views.ipynb`](22_06_schemabinding_views.ipynb)
 
 - 🎥 **YouTube:**  
   - [SCHEMABINDING Deep Dive](https://www.youtube.com/results?search_query=sql+server+schemabinding+view)
@@ -114,7 +114,7 @@
 > **Kurzbeschreibung:** Eindeutiger Clustered Index, deterministische Ausdrücke, `COUNT_BIG`, Set-Optionen, gleiche Owner. Für OLAP/berichtsnahe Szenarien.
 
 - 📓 **Notebook:**  
-  [`08_07_indexed_views_requirements.ipynb`](08_07_indexed_views_requirements.ipynb)
+  [`22_07_indexed_views_requirements.ipynb`](22_07_indexed_views_requirements.ipynb)
 
 - 🎥 **YouTube:**  
   - [Indexed Views – When & How](https://www.youtube.com/results?search_query=sql+server+indexed+views)
@@ -129,7 +129,7 @@
 > **Kurzbeschreibung:** Horizontales Partitionieren über Tabellen; Check-Constraints für Partition Elimination; DML-Regeln.
 
 - 📓 **Notebook:**  
-  [`08_08_partitionierte_views_union_all.ipynb`](08_08_partitionierte_views_union_all.ipynb)
+  [`22_08_partitionierte_views_union_all.ipynb`](22_08_partitionierte_views_union_all.ipynb)
 
 - 🎥 **YouTube:**  
   - [Partitioned Views – Demo](https://www.youtube.com/results?search_query=sql+server+partitioned+views)
@@ -143,7 +143,7 @@
 > **Kurzbeschreibung:** Plan-Caching, Statistiken der Basistabellen, Recompile-Muster; Verschachtelungstiefe von Views gering halten.
 
 - 📓 **Notebook:**  
-  [`08_09_performance_views_maintenance.ipynb`](08_09_performance_views_maintenance.ipynb)
+  [`22_09_performance_views_maintenance.ipynb`](22_09_performance_views_maintenance.ipynb)
 
 - 🎥 **YouTube:**  
   - [View Performance Tips](https://www.youtube.com/results?search_query=sql+server+view+performance)
@@ -157,7 +157,7 @@
 > **Kurzbeschreibung:** `ORDER BY` ist in Views unzulässig (außer mit `TOP`), **garantiert aber keine Reihenfolge** – immer im äußeren Select sortieren.
 
 - 📓 **Notebook:**  
-  [`08_10_order_by_in_views_top100percent.ipynb`](08_10_order_by_in_views_top100percent.ipynb)
+  [`22_10_order_by_in_views_top100percent.ipynb`](22_10_order_by_in_views_top100percent.ipynb)
 
 - 🎥 **YouTube:**  
   - [TOP 100 PERCENT myth](https://www.youtube.com/results?search_query=sql+server+top+100+percent+order+by+view)
@@ -171,7 +171,7 @@
 > **Kurzbeschreibung:** Module/Fachdomänen trennen (z. B. `Sales`, `Ref`), Besitzer/Default-Schema definieren, Namenskonventionen.
 
 - 📓 **Notebook:**  
-  [`08_11_schema_design_basics.ipynb`](08_11_schema_design_basics.ipynb)
+  [`22_11_schema_design_basics.ipynb`](22_11_schema_design_basics.ipynb)
 
 - 🎥 **YouTube:**  
   - [Schemas – Design & Security](https://www.youtube.com/results?search_query=sql+server+schemas+design)
@@ -185,7 +185,7 @@
 > **Kurzbeschreibung:** Objekte sicher zwischen Schemata verschieben; Rechte/Abhängigkeiten berücksichtigen.
 
 - 📓 **Notebook:**  
-  [`08_12_alter_schema_move_objects.ipynb`](08_12_alter_schema_move_objects.ipynb)
+  [`22_12_alter_schema_move_objects.ipynb`](22_12_alter_schema_move_objects.ipynb)
 
 - 🎥 **YouTube:**  
   - [ALTER SCHEMA – Move Objects](https://www.youtube.com/results?search_query=sql+server+alter+schema+move+object)
@@ -199,7 +199,7 @@
 > **Kurzbeschreibung:** Rollen & Grants auf Schemaebene (`SELECT`/`INSERT`/`UPDATE`/`EXECUTE`), Least-Privilege, Audits.
 
 - 📓 **Notebook:**  
-  [`08_13_schema_vs_object_permissions.ipynb`](08_13_schema_vs_object_permissions.ipynb)
+  [`22_13_schema_vs_object_permissions.ipynb`](22_13_schema_vs_object_permissions.ipynb)
 
 - 🎥 **YouTube:**  
   - [Grant on SCHEMA – How it works](https://www.youtube.com/results?search_query=sql+server+grant+schema+permissions)
@@ -214,7 +214,7 @@
 > **Kurzbeschreibung:** `sys.views`, `sys.sql_modules`, `sys.schemas`, Abhängigkeitsgraph via `sys.sql_expression_dependencies`/DMVs.
 
 - 📓 **Notebook:**  
-  [`08_14_metadata_dependencies_views_schema.ipynb`](08_14_metadata_dependencies_views_schema.ipynb)
+  [`22_14_metadata_dependencies_views_schema.ipynb`](22_14_metadata_dependencies_views_schema.ipynb)
 
 - 🎥 **YouTube:**  
   - [Find View Dependencies](https://www.youtube.com/results?search_query=sql+server+view+dependencies)
@@ -229,7 +229,7 @@
 > **Kurzbeschreibung:** Abwägen zwischen View, Inline-TVF (Parameter!), Synonym, temporären Tabellen/Ctes – Einsatzkriterien & Wartung.
 
 - 📓 **Notebook:**  
-  [`08_15_views_vs_tvf_synonym_temp.ipynb`](08_15_views_vs_tvf_synonym_temp.ipynb)
+  [`22_15_views_vs_tvf_synonym_temp.ipynb`](22_15_views_vs_tvf_synonym_temp.ipynb)
 
 - 🎥 **YouTube:**  
   - [Views vs Inline TVF](https://www.youtube.com/results?search_query=sql+server+view+vs+inline+table+valued+function)
@@ -244,7 +244,7 @@
 > **Kurzbeschreibung:** `SELECT *`, `ORDER BY` in View, tiefe View-Verschachtelung, fehlendes `SCHEMABINDING`, „Views als Sicherheitsgrenze“ missverstehen, indizierte Views mit nicht-deterministischen Ausdrücken.
 
 - 📓 **Notebook:**  
-  [`08_16_views_schemata_anti_patterns.ipynb`](08_16_views_schemata_anti_patterns.ipynb)
+  [`22_16_views_schemata_anti_patterns.ipynb`](22_16_views_schemata_anti_patterns.ipynb)
 
 - 🎥 **YouTube:**  
   - [Common View Mistakes](https://www.youtube.com/results?search_query=sql+server+view+mistakes)
