@@ -1,0 +1,231 @@
+metadata:
+  topic_slug: ""
+  generated_at: "YYYY-MM-DD"
+  pipeline_mode: "full"
+  based_on:
+    episode: "blog/<topic-slug>/episode.yaml"
+    sources: "blog/<topic-slug>/sources.yaml"
+    insights: "blog/<topic-slug>/demo/insights.yaml"
+
+anchor_story:
+  title: ""
+  symptom: ""
+  scenario: ""
+  evidence_level: "docs_based"
+  source_refs: []
+  article_usage:
+    section: ""
+    style: "inline"
+
+syntax_surface:
+  SQLServer:
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  PostgreSQL:
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  Oracle:
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  MySQL:
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+
+dialect_min_examples:
+  SQLServer:
+    snippet: ""
+    focus: ""
+    error_case: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  PostgreSQL:
+    snippet: ""
+    focus: ""
+    error_case: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  Oracle:
+    snippet: ""
+    focus: ""
+    error_case: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  MySQL:
+    snippet: ""
+    focus: ""
+    error_case: ""
+    evidence_level: "docs_based"
+    source_refs: []
+
+dialect_preflight_blocks:
+  - id: "DP1"
+    intent: ""
+    systems:
+      SQLServer:
+        snippet: ""
+        natural_form: ""
+        idiomatic_solution: ""
+        protection_pattern: ""
+        safe_pattern_note: ""
+        pitfall: ""
+        evidence_level: "docs_based"
+        source_refs: []
+      PostgreSQL:
+        snippet: ""
+        natural_form: ""
+        idiomatic_solution: ""
+        protection_pattern: ""
+        safe_pattern_note: ""
+        pitfall: ""
+        evidence_level: "docs_based"
+        source_refs: []
+      Oracle:
+        snippet: ""
+        natural_form: ""
+        idiomatic_solution: ""
+        protection_pattern: ""
+        safe_pattern_note: ""
+        pitfall: ""
+        evidence_level: "docs_based"
+        source_refs: []
+      MySQL:
+        snippet: ""
+        natural_form: ""
+        idiomatic_solution: ""
+        protection_pattern: ""
+        safe_pattern_note: ""
+        pitfall: ""
+        evidence_level: "docs_based"
+        source_refs: []
+    article_usage:
+      section: ""
+      style: "per_system_blocks"   # per_system_blocks | main_plus_variants
+
+dialect_safety_patterns:
+  SQLServer:
+    snippet: ""
+    purpose: ""
+    idiomatic_role: ""
+    pitfall_avoided: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  PostgreSQL:
+    snippet: ""
+    purpose: ""
+    idiomatic_role: ""
+    pitfall_avoided: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  Oracle:
+    snippet: ""
+    purpose: ""
+    idiomatic_role: ""
+    pitfall_avoided: ""
+    evidence_level: "docs_based"
+    source_refs: []
+  MySQL:
+    snippet: ""
+    purpose: ""
+    idiomatic_role: ""
+    pitfall_avoided: ""
+    evidence_level: "docs_based"
+    source_refs: []
+
+historical_contrast_snippets:
+  - id: "HC1"
+    system: ""
+    version_scope: ""
+    purpose: ""
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+
+micro_examples:
+  - id: "MX1"
+    class: "robust"   # robust | risky | prepared_source
+    title: ""
+    purpose: ""
+    forward_reference_hint: ""
+    snippet: ""
+    evidence_level: "docs_based"
+    source_refs: []
+    article_usage:
+      section: ""
+      style: "inline"
+
+strategy_snippets:
+  - id: "SS1"
+    strategy: ""
+    target_risk_class: ""
+    snippet: ""
+    operational_caveat: ""
+    evidence_level: "docs_based"
+    source_refs: []
+    article_usage:
+      section: ""
+      style: "code"
+
+comparison_tables:
+  - id: "CT1"
+    title: ""
+    dimensions: []
+    rows: []
+    article_usage:
+      section: ""
+      style: "table"
+
+warning_boxes:
+  - id: "WB1"
+    title: ""
+    message: ""
+    severity: "high"
+    evidence_level: "docs_based"
+    source_refs: []
+
+anti_pattern_blocks:
+  - id: "AP1"
+    anti_pattern: ""
+    robust_form: ""
+    rationale: ""
+    evidence_level: "docs_based"
+    source_refs: []
+
+signature_visual:
+  format: "mermaid"   # mermaid | ascii
+  title: ""
+  purpose: ""
+  body: ""
+  evidence_level: "docs_based"
+  source_refs: []
+  article_usage:
+    section: ""
+    style: "diagram"
+
+decision_visual:
+  format: "mermaid"   # mermaid | ascii
+  title: ""
+  body: ""
+  evidence_level: "docs_based"
+  source_refs: []
+
+quality_gates:
+  - "Mindestens eine Ankergeschichte oder ein konkretes Fehlersymptom ist vorhanden"
+  - "Mindestens ein robustes Micro-Beispiel ist vorhanden"
+  - "Mindestens ein riskantes Micro-Beispiel ist vorhanden"
+  - "Mindestens eine sichere Alternativstrategie mit vorbereiteter Quelle ist vorhanden"
+  - "Dialect-aware Preflight-Bloecke sind pro relevanten Dialekt vorhanden oder bewusst begrenzt"
+  - "Pro relevantem Dialekt ist ein natuerliches Sicherheits- oder Vorbereitungs-Muster vorbereitet"
+  - "Pro behandeltem System ist ein minimales Beispiel mit Fokus und Fehlerfall vorbereitet"
+  - "Aktive historische Kontrastversionen haben sichtbare Snippets oder Minimalbeispiele"
+  - "Empfohlene Strategien besitzen minimale Code-Skelette"
+  - "Mindestens eine Vergleichstabelle ist vorhanden"
+  - "Mindestens ein Warnhinweis ist vorhanden"
+  - "Mindestens ein Anti-Pattern-vs.-robuste-Form-Block ist vorhanden"
+  - "Eine visuelle Darstellung des Entscheidungsmodells ist vorhanden"
+  - "Eine zweite merkfaehige Hauptvisualisierung ist vorhanden"
+  - "Syntax-Oberflaechen bleiben kurz"
+  - "Evidenz-Level sind pro Snippet dokumentiert"

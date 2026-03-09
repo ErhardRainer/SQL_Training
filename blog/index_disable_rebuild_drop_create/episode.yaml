@@ -1,0 +1,713 @@
+article:
+  title: "Index Disable + Rebuild vs. Drop + Create: Wann welche Strategie sinnvoll ist"
+  slug: "index_disable_rebuild_drop_create"
+  topic_number: 62
+  as_of_date: "2026-03-09"
+  status: "reviewed"
+  language: "de"
+  series: "SQL-Mastery: Entfessle die Macht der Daten"
+  leading_system: "SQLServer"
+  canonical_label: "Index Disable + Rebuild vs. Drop + Create"
+  thesis: "Disable plus Rebuild und Drop plus Create beantworten nicht dieselbe Frage. Disable oder ein aehnlicher definitionserhaltender Zustand ist stark, wenn dieselbe Indexdefinition spaeter kontrolliert zurueckkehren soll. Drop plus Create ist die sauberere Standardform, sobald Definition, Optionen, Speicherort oder Rollback-Modell bewusst neu festgelegt werden muessen."
+  summary_goal: "Der Artikel soll dieselbe Problemklasse als vier Datenbankkulturen lesbar machen: SQL Server mit echtem DISABLE, Oracle mit UNUSABLE und INVISIBLE, PostgreSQL mit REINDEX oder DROP/CREATE und MySQL mit INVISIBLE sowie Online-DDL fuer CREATE oder DROP."
+  audience:
+    - "Fortgeschrittene SQL-Anwender"
+    - "DBA"
+    - "Data Engineers"
+    - "Architekten fuer Datenplattformen"
+  tone:
+    intro_dialog: "humorous_but_not_banal"
+    body: "technical_precise"
+    ending: "respectful_reconciliation"
+
+workflow:
+  allowed_phases:
+    - "01_episode_yaml_builder"
+    - "01a_sources_research"
+    - "02_episode_yaml_validator"
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "05a_micro_examples_builder"
+    - "06_article_writer"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+    - "09_crosslink_planning"
+    - "10_crosslink_integration"
+    - "11_link_validation"
+    - "12_self_review"
+    - "13_external_review"
+    - "14_finalize_article"
+    - "final"
+  pipeline_mode: "article_only"
+  current_phase: "12_self_review"
+  target_phase: "12_self_review"
+  skip_steps:
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2022 (16.x)"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS"
+    include: true
+  ANSI95:
+    product: "SQL Standard"
+    version: "nur als Meta-Ebene zur Trennung von Problemklasse und Produktausdruck"
+    include: true
+
+repository_paths:
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+  article_readme: "blog/index_disable_rebuild_drop_create/README.md"
+  episode_yaml: "blog/index_disable_rebuild_drop_create/episode.yaml"
+  demo_spec: "blog/index_disable_rebuild_drop_create/demo/demo_spec.yaml"
+  insights: "blog/index_disable_rebuild_drop_create/demo/insights.yaml"
+  micro_examples: "blog/index_disable_rebuild_drop_create/micro_examples.yaml"
+  sources: "blog/index_disable_rebuild_drop_create/sources.yaml"
+  notes_md: "blog/index_disable_rebuild_drop_create/notes.md"
+  crosslinks_plan: "blog/index_disable_rebuild_drop_create/crosslinks_plan.yaml"
+
+author_notes:
+  source_path: "blog/index_disable_rebuild_drop_create/notes.md"
+  use_if_present: true
+  note_items:
+    - id: "N1"
+      summary: "Die Ankergeschichte mit 40 Millionen Zeilen und 13 Millionen Updates soll zeigen, dass oft nicht das UPDATE selbst, sondern die Indexpflege dominiert."
+      priority: "must_cover"
+      planned_section: "1. Was das Problem eigentlich ist"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Notiz liefert ein glaubwuerdiges Fehlersymptom und den operativen Einstieg."
+    - id: "N2"
+      summary: "Die Leitfrage soll nicht 'Was ist besser?' sein, sondern ob die Definition erhalten bleiben oder bewusst neu gebaut werden soll."
+      priority: "must_cover"
+      planned_section: "2. Warum die intuitive Sicht zu kurz greift"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Das ist die konzeptionelle Hauptachse des Artikels."
+    - id: "N3"
+      summary: "SQL Server fuehrt das Thema, weil die Produktdokumentation DISABLE, REBUILD und DROP_EXISTING besonders klar gegeneinander abgrenzt."
+      priority: "must_cover"
+      planned_section: "Warum SQL Server in dieser Episode fuehrt"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Fuehrungsentscheidung soll fachlich und nicht nur repo-getrieben sein."
+    - id: "N4"
+      summary: "Disable plus Rebuild und Drop plus Create loesen nicht exakt dasselbe Problem."
+      priority: "must_cover"
+      planned_section: "3. Welche internen Klassen es gibt"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Risikoklassen muessen auf dieser These aufsetzen."
+    - id: "N5"
+      summary: "Clustered versus nonclustered ist die wichtigste praktische Unterscheidung und muss eine Hauptlinie des Artikels sein."
+      priority: "must_cover"
+      planned_section: "6. Deep Dive: SQL Server als fuehrendes System"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Hier entscheidet sich der Produktions-Blast-Radius am deutlichsten."
+    - id: "N6"
+      summary: "Constraints, Views und abhaengige Objekte muessen als echte Entscheidungsfaktoren vorkommen."
+      priority: "must_cover"
+      planned_section: "8. Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Der Artikel soll nicht in einer reinen Performance-Diskussion stecken bleiben."
+    - id: "N7"
+      summary: "Online oder offline, Bulk-Load-Motive und Wartungsfenster gehoeren in die Strategieabschnitte."
+      priority: "must_cover"
+      planned_section: "10. Die Hauptstrategien sauber eingeordnet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Strategiewahl ist ein Betriebsmodell, nicht nur eine DDL-Entscheidung."
+    - id: "N8"
+      summary: "Skriptbarkeit, Versionierung und Rollback unterscheiden die beiden Wege stark."
+      priority: "must_cover"
+      planned_section: "7. Die wichtigste praktische Unterscheidung"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Drop plus Create ist oft ehrlicher, wenn die Definition ohnehin neu geplant werden muss."
+    - id: "N9"
+      summary: "Andere Systeme sollen als eigene Datenbankkulturen lesbar werden: Oracle mit UNUSABLE oder INVISIBLE, PostgreSQL mit REINDEX oder DROP/CREATE, MySQL mit INVISIBLE und Online-DDL."
+      priority: "must_cover"
+      planned_section: "Systemvergleich auf einen Blick"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Episode soll keine Uebersetzungsuebung werden."
+    - id: "N10"
+      summary: "Disable nur scheinbar bequem, Drop oft aufwaendiger aber sauberer, wenn Definition, Optionen oder Platzierung sich aendern."
+      priority: "must_cover"
+      planned_section: "10. Die Hauptstrategien sauber eingeordnet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Standardempfehlung muss sauber begruendet werden."
+    - id: "N11"
+      summary: "Dateigruppen, Partitionierung und andere physische Eigenschaften sollen als Gruende fuer einen bewussten Recreate-Pfad sichtbar werden."
+      priority: "should_cover"
+      planned_section: "4. Wovon Verhalten, Risiko und Kosten abhaengen"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Diese Punkte erklaeren, warum DROP_EXISTING oder CREATE oft mehr ist als nur ein Rueckweg."
+    - id: "N12"
+      summary: "Replikation, Log-Shipping, Auditing und Monitoring wurden als moegliche Nebenwirkungen genannt, sollen aber nur mit sauberer Quellenlage stark formuliert werden."
+      priority: "optional_context"
+      planned_section: "8. Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+      planned_artifact: "sources"
+      handling: "omit_with_reason"
+      rationale: "Ohne belastbare quellengebundene Abdeckung werden diese Punkte nur als allgemeine Vorsicht, nicht als starke Produktbehauptung verarbeitet."
+
+evidence_model:
+  allowed_levels:
+    - "docs_based"
+    - "inference_based"
+    - "demo_based"
+    - "executed_test_based"
+    - "benchmark_based"
+  available_levels:
+    - "docs_based"
+    - "inference_based"
+  wording_rules:
+    docs_based: "dokumentationsbasiert formulieren"
+    inference_based: "vorsichtig und als Ableitung markieren"
+    demo_based: "nicht verfuegbar in diesem Lauf"
+    executed_test_based: "nicht verfuegbar in diesem Lauf"
+    benchmark_based: "nicht verfuegbar in diesem Lauf"
+
+render_rules:
+  suppress_empty_related_blog_articles: true
+  suppress_empty_training_blocks: true
+  suppress_absent_benchmarks: true
+  suppress_absent_demo_results: true
+  suppress_empty_method_status_lines: true
+  suppress_internal_pipeline_terms_in_body: true
+
+presentation:
+  persona_mode: "intro_outro_only"
+  reader_guide_position: "after_visible_metadata"
+  toc_position: "after_scope_before_heavy_blocks"
+  pre_toc_zone_style: "compact"
+  allowed_pre_toc_blocks:
+    - "versions_and_scope"
+    - "method_status"
+    - "reader_guide_or_short_tldr"
+    - "leading_system_rationale"
+    - "training_links"
+    - "dialect_availability_note"
+  standalone_sections_must_appear_in_toc: true
+  persona_entry_position: "before_first_main_section"
+  require_comparison_table: true
+  require_warning_box: true
+  require_anti_pattern_block: true
+  require_decision_visual: true
+  require_signature_visual: true
+  require_min_examples_per_treated_system: true
+  require_explicit_error_case: true
+  require_anchor_failure_story: true
+  require_historical_contrast_snippets: false
+  require_strategy_code_for_recommended_patterns: true
+  require_risk_class_cross_references: true
+  require_forward_reference_for_early_class_labels: true
+  require_operational_caveats_in_strategy_code: true
+  avoid_adjacent_framework_duplication: true
+  require_dialect_aware_prechecks: true
+  require_dialect_native_safety_patterns: true
+  require_practical_observations: true
+  allow_controlled_expert_judgment: true
+  framing_goal: "same_problem_four_database_cultures"
+
+systems:
+  SQLServer:
+    role: "lead"
+    reason: "SQL Server ist hier das Fuehrungssystem, weil es als eines der wenigen grossen Systeme einen echten DISABLE-Zustand fuer Indizes bietet und die Dokumentation die Unterschiede zwischen DISABLE, REBUILD, DROP und CREATE WITH DROP_EXISTING sehr klar beschreibt."
+  PostgreSQL:
+    role: "contrast_strong"
+    reason: "PostgreSQL ist der wichtigste Kontrast fuer Systeme ohne DISABLE-Pfad: dieselbe Problemklasse wird dort ueber REINDEX sowie CREATE oder DROP INDEX, jeweils auch concurrent-faehig, geloest."
+  Oracle:
+    role: "contrast_strong"
+    reason: "Oracle zeigt mit UNUSABLE und INVISIBLE zwei deutlich verschiedene Zustaende und macht damit besonders sichtbar, dass 'nicht vom Optimizer benutzt' und 'nicht gewartet' nicht dasselbe sind."
+  MySQL:
+    role: "contrast"
+    reason: "MySQL bringt mit INVISIBLE und InnoDB-Online-DDL eine andere Praxis mit: Reads lassen sich gefahrlos testen, aber die Schreiblast verschwindet erst wirklich durch DROP."
+  ANSI95:
+    role: "meta"
+    reason: "ANSI bleibt Meta-Ebene und trennt Problemklasse von Produktausdruck."
+
+chapters:
+  - id: 1
+    title: "Einstieg mit Dialog"
+    purpose: "Die Ankergeschichte aufspannen und den Konflikt als Betriebsfrage statt als Syntaxfrage setzen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 2
+    title: "Leserleitfaden"
+    purpose: "Lesepfade nach Betriebsziel und Dialektinteresse geben"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 3
+    title: "TL;DR gesamt und pro System"
+    purpose: "Fruehe Orientierung ueber Hauptthese und Dialektkulturen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 4
+    title: "Was das Problem eigentlich ist"
+    purpose: "Definitionserhalt gegen bewusste Neudefinition als Problemklasse fassen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 5
+    title: "Warum die intuitive Sicht zu kurz greift"
+    purpose: "Die Kurzfrage 'disable oder drop' in die eigentliche Entscheidungslogik ueberfuehren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 6
+    title: "Welche internen Klassen es gibt"
+    purpose: "robust, conditionally_safe, risky und avoid fuer diese Problemklasse definieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 7
+    title: "Wovon Verhalten, Risiko und Kosten abhaengen"
+    purpose: "Indexart, Abhaengigkeiten, Definitionstreue und Live-Traffic als Einflussfaktoren ordnen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 8
+    title: "Was intern eigentlich passiert"
+    purpose: "Definition, Segmentdaten, Optimizer-Sichtbarkeit und Rebuild-Mechanik trennen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 4 }
+      PostgreSQL: { mode: "contrast_strong", depth: 3 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 9
+    title: "Deep Dive des fuehrenden Systems"
+    purpose: "Clustered versus nonclustered, Constraint-Folgen und DROP_EXISTING im SQL-Server-Kontext vertiefen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "deep_dive", depth: 4 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 10
+    title: "Die wichtigste praktische Unterscheidung"
+    purpose: "Gleiche Definition spaeter wiederhaben gegen bewusste Neudefinition unterscheiden"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 11
+    title: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+    purpose: "Abhaengigkeiten und Betriebsfolgen ueber die vier Systeme hinweg lesbar machen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast_strong", depth: 2 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 12
+    title: "Vor jeder produktiven Umsetzung: technische Vorpruefung"
+    purpose: "Dialektbewusste Vorpruefungen und Sicherheitsmuster fuer den echten Betrieb zeigen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 3 }
+      Oracle: { mode: "contrast", depth: 3 }
+      MySQL: { mode: "contrast", depth: 3 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 13
+    title: "Die Hauptstrategien sauber eingeordnet"
+    purpose: "Disable/Rebuild, Rebuild/Reindex, Invisible-Test und Drop/Create mit klaren Grenzen einordnen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 4 }
+      PostgreSQL: { mode: "contrast_strong", depth: 3 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 14
+    title: "Ein praxisnahes Entscheidungsmodell"
+    purpose: "Vom Objektzustand und Betriebsziel zur passenden Strategie fuehren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 15
+    title: "Fazit"
+    purpose: "Die Kernthese verdichten: nicht das schnellere Statement, sondern der passendere Objektzustand entscheidet"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 16
+    title: "Kurzform fuer die Praxis"
+    purpose: "Kurze Handlungsregel fuer die Produktionsentscheidung"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+risk_classes:
+  robust:
+    description: "Die spaetere Zieldefinition ist bereits klar, der Rueckweg ist skript- oder metadatensauber vorbereitet, und der gewaehlte Pfad passt zur Indexart und zur Betriebsrealitaet."
+    examples:
+      - "SQL Server: einzelner nonclustered Index mit unveraenderter Definition wird fuer einen Bulk-Load deaktiviert und danach gezielt rebuildet."
+      - "PostgreSQL: derselbe Index soll in der Definition bleiben und wird per REINDEX, bei Live-Traffic bevorzugt concurrent, neu aufgebaut."
+      - "Oracle: UNUSABLE plus REBUILD ONLINE fuer einen nicht constraint-kritischen Bulk-Load."
+    refinements:
+      - "definition_preserving"
+      - "script_backed_recreate"
+  conditionally_safe:
+    description: "Die Strategie ist vertretbar, aber nur mit vollstaendigem DDL-Skript, klarer Abhaengigkeitenkarte und bewusster Wahl fuer online oder offline."
+    examples:
+      - "DROP plus CREATE mit vollstaendig versionierter Definition und bewusstem Maintenance-Fenster."
+      - "SQL Server CREATE INDEX WITH DROP_EXISTING bei definitorischen Aenderungen."
+      - "MySQL CREATE oder DROP eines sekundaren InnoDB-Indexes unter Live-Traffic mit gepruefter Online-DDL-Unterstuetzung."
+    refinements:
+      - "live_traffic_sensitive"
+      - "definition_changes"
+  risky:
+    description: "Der Pfad kann funktionieren, aber Abhaengigkeiten, Lock-Folgen oder unvollstaendige DDL-Rekonstruktion machen ihn fehlertraechtig."
+    examples:
+      - "SQL Server: clustered Index auf einer aktiven Tabelle deaktivieren."
+      - "PostgreSQL: fehlgeschlagener concurrent Build laesst einen INVALID-Index mit Update-Overhead zurueck."
+      - "Oracle: UNUSABLE bei einem eindeutigkeitsrelevanten Index ohne Kenntnis der Constraint-Folgen."
+    refinements:
+      - "dependency_blind"
+      - "blast_radius_underestimated"
+  avoid:
+    description: "Der Ansatz verwechselt Optimizer-Sichtbarkeit mit Schreibkosten, verzichtet auf sauberes DDL oder ignoriert den Objektzustand der Tabelle."
+    examples:
+      - "MySQL oder Oracle INVISIBLE als vermeintliche Schreiboptimierung behandeln."
+      - "DROP plus CREATE ohne vollstaendiges Recreate-Skript, Optionen, Fillfactor, Compression oder Tablespace-Angaben."
+      - "DISABLE auf Verdacht ueber alle Indizes einer Produktions-Tabelle, ohne clustered/constraint-bezogene Unterschiede zu pruefen."
+    refinements:
+      - "visibility_is_not_disable"
+      - "definition_lost"
+
+preflight_checks:
+  - id: "P1"
+    question: "Soll exakt dieselbe Indexdefinition spaeter wieder aktiv sein, oder aendert sich Key, INCLUDE, Filter, Compression, Filegroup oder Tablespace?"
+    generic_intent: "Definitionserhalt gegen bewusste Neudefinition trennen"
+    query_pattern: "Vollstaendige DDL des Indexes inklusive Optionen und Platzierung erfassen, bevor ueber DISABLE, REBUILD, REINDEX oder DROP entschieden wird"
+    purpose: "Verhindern, dass DROP plus CREATE aus Erinnerung rekonstruiert werden muss"
+    expected_signal: "Die exakte Definition liegt als Skript oder Metadatenexport vor"
+    per_system:
+      SQLServer:
+        natural_form: "Indexdefinition ueber sys.indexes, sys.index_columns und bestehende Skripte erfassen; bei definitorischen Aenderungen CREATE INDEX WITH DROP_EXISTING in Betracht ziehen"
+        protection_pattern: "Definition vor dem ersten Eingriff versionieren"
+        idiomatic_solution: "ALTER INDEX REBUILD nur fuer unveraenderte Definitionen; ansonsten CREATE INDEX ... WITH (DROP_EXISTING = ON)"
+        safe_pattern: "Vorher DDL und Compression explizit sichern"
+        working_style_note: "SQL Server hat einen echten definitionserhaltenden Pfad, aber nicht fuer jede Indexart denselben Blast Radius"
+        pitfall: "DROP plus CREATE aus Erinnerung verliert Optionen schneller als erwartet"
+      PostgreSQL:
+        natural_form: "CREATE INDEX-Definition ueber pg_indexes sichern und dann zwischen REINDEX und neuer CREATE INDEX-Definition unterscheiden"
+        protection_pattern: "Indexdef vor einem Drop aus pg_indexes sichern"
+        idiomatic_solution: "Gleiche Definition: REINDEX; neue Definition: CREATE INDEX, unter Live-Traffic meist CONCURRENTLY"
+        safe_pattern: "Concurrent-Pfade nur mit ihren Caveats einplanen"
+        working_style_note: "PostgreSQL kennt keinen echten DISABLE-Zustand fuer normale Indizes"
+        pitfall: "Ohne gesichertes indexdef-Skript wird DROP plus CREATE unnoetig riskant"
+      Oracle:
+        natural_form: "DDL ueber DBMS_METADATA und USER_INDEXES sichern; UNUSABLE nur fuer definitionserhaltende Faelle, INVISIBLE fuer reine Read-Tests"
+        protection_pattern: "UNUSABLE und INVISIBLE bewusst unterscheiden"
+        idiomatic_solution: "Gleiche Definition: REBUILD; neue Definition oder neue Speicherattribute: CREATE INDEX"
+        safe_pattern: "Vorher Status, Sichtbarkeit und Uniqueness pruefen"
+        working_style_note: "Oracle trennt Segmentzustand und Optimizer-Sichtbarkeit klarer als viele Teams erwarten"
+        pitfall: "INVISIBLE ist keine Schreibentlastung"
+      MySQL:
+        natural_form: "SHOW CREATE TABLE und INFORMATION_SCHEMA.STATISTICS als Ausgangspunkt fuer die exakte Rekonstruktion verwenden"
+        protection_pattern: "Vor DROP immer die aktuelle Tabellen-DDL sichern"
+        idiomatic_solution: "INVISIBLE nur zum Testen, CREATE oder DROP fuer echte Strukturveraenderungen"
+        safe_pattern: "InnoDB-Online-DDL-Faehigkeit fuer das konkrete Vorhaben pruefen"
+        working_style_note: "MySQLs INVISIBLE ist ein Testwerkzeug fuer Reads, kein DISABLE-Ersatz"
+        pitfall: "Wer INVISIBLE als spaeteren Schreibvorteil liest, entscheidet auf der falschen Achse"
+
+  - id: "P2"
+    question: "Ist der betroffene Index clustered, PK- oder UNIQUE-gebunden oder haengen weitere Objekte und FKs daran?"
+    generic_intent: "Blast Radius und Constraint-Folgen vorab sichtbar machen"
+    query_pattern: "Indexart, Constraint-Bezug und abhaengige Objekte vor jedem disable- oder drop-nahen Schritt inventarisieren"
+    purpose: "Verhindern, dass ein lokaler Eingriff die Tabelle oder referenzierende Objekte ungewollt lahmlegt"
+    expected_signal: "Abhaengigkeiten und Rueckweg sind dokumentiert"
+    per_system:
+      SQLServer:
+        natural_form: "sys.indexes, sys.key_constraints, sys.foreign_keys und abhaengige Views gemeinsam betrachten"
+        protection_pattern: "Clustered, PK- und UNIQUE-Indizes getrennt von isolierten nonclustered Indizes behandeln"
+        idiomatic_solution: "DISABLE nur dort verwenden, wo die Tabelle selbst nicht unzugaenglich wird"
+        safe_pattern: "Vor DISABLE die FK- und Constraint-Folgen explizit pruefen"
+        working_style_note: "Bei SQL Server ist clustered versus nonclustered die zentrale Sicherheitslinie"
+        pitfall: "Ein deaktivierter clustered Index nimmt der Tabelle den normalen DML-Zugriff"
+      PostgreSQL:
+        natural_form: "pg_constraint, pg_index und pg_class fuer indexgebundene Constraints und invalid states lesen"
+        protection_pattern: "Constraint-tragende Indizes nicht wie austauschbare Zusatzindizes behandeln"
+        idiomatic_solution: "Fuer constraint-nahe Faelle eher REINDEX als DROP erwaegen"
+        safe_pattern: "CONCURRENTLY nur mit den dokumentierten Einschraenkungen verwenden"
+        working_style_note: "PostgreSQL blockiert bei normalem DROP INDEX deutlich haerter als viele vermuten"
+        pitfall: "DROP INDEX CONCURRENTLY funktioniert nicht fuer PK- oder UNIQUE-traegende Indizes"
+      Oracle:
+        natural_form: "USER_INDEXES und USER_CONSTRAINTS zusammen lesen, dazu STATUS, VISIBILITY und UNIQUENESS"
+        protection_pattern: "UNUSABLE bei Unique-Enforcement nur mit voller Kenntnis der DML-Folgen"
+        idiomatic_solution: "INVISIBLE fuer Tests, UNUSABLE fuer Bulk-Load- oder Maintenance-first-Faelle"
+        safe_pattern: "SKIP_UNUSABLE_INDEXES und Constraint-Typ vorab einordnen"
+        working_style_note: "Oracle erlaubt DML trotz UNUSABLE nur unter klaren Bedingungen"
+        pitfall: "Eindeutigkeitsrelevante unusable Indizes koennen DML mit Fehlern beenden"
+      MySQL:
+        natural_form: "INFORMATION_SCHEMA.STATISTICS und SHOW CREATE TABLE fuer PK-, UNIQUE- und InnoDB-Kontext lesen"
+        protection_pattern: "Explizite und implizite PK-Rolle des Indexes vor INVISIBLE pruefen"
+        idiomatic_solution: "Sekundaere Indizes anders behandeln als Primary-Key-nahe Strukturen"
+        safe_pattern: "Read-Test mit INVISIBLE nur dort, wo der Index nicht faktisch die PK-Rolle uebernimmt"
+        working_style_note: "InnoDB erlaubt nicht jeden Sichtbarkeitswechsel auf jedem Index"
+        pitfall: "Ein faktischer Primary-Key-Index kann nicht einfach invisible werden"
+
+  - id: "P3"
+    question: "Welches Online- oder Offline-Fenster ist realistisch, und wie teuer ist der gewaehlte Rueckweg unter Live-Traffic?"
+    generic_intent: "Lock- und Laufzeitmodell vor dem Eingriff mitdenken"
+    query_pattern: "Fuer das konkrete System pruefen, ob Rebuild, Reindex, Create oder Drop online, concurrent oder nur offline realistisch ist"
+    purpose: "Wartungsfenster und Nutzerverkehr gegen die Strategie abgleichen"
+    expected_signal: "Online- oder Offline-Faehigkeit ist fuer den konkreten Indextyp und das konkrete Statement geklaert"
+    per_system:
+      SQLServer:
+        natural_form: "Online-Richtlinien fuer ALTER INDEX REBUILD und CREATE INDEX WITH DROP_EXISTING gegen Indextyp und Tabellenzustand pruefen"
+        protection_pattern: "Disabled clustered Indizes nie als online-faehig annehmen"
+        idiomatic_solution: "Nichtclustered same-definition-Faelle mit REBUILD, definitorische Aenderungen mit DROP_EXISTING planen"
+        safe_pattern: "Endlock, Zusatzplatz und DML-Mehrarbeit bei Online-Rebuilds mit einkalkulieren"
+        working_style_note: "Online ist kein Synonym fuer kostenlos"
+        pitfall: "Disabled clustered Indizes muessen offline rebuildet werden"
+      PostgreSQL:
+        natural_form: "Zwischen normalem REINDEX oder CREATE INDEX und den CONCURRENTLY-Varianten bewusst waehlen"
+        protection_pattern: "Mehrarbeit und moegliche INVALID-Reste bei concurrent paths mitplanen"
+        idiomatic_solution: "Gleiche Definition unter Live-Traffic bevorzugt per REINDEX INDEX CONCURRENTLY"
+        safe_pattern: "Fehlgeschlagene concurrent Builds aktiv bereinigen"
+        working_style_note: "Concurrent vermeidet Write-Blocking, kostet aber mehr Zeit und Arbeit"
+        pitfall: "INVALID-Indizes koennen trotz Fehlschlag weiter Update-Overhead erzeugen"
+      Oracle:
+        natural_form: "REBUILD ONLINE nur fuer unterstuetzte Indextypen und nicht als pauschalen Default verwenden"
+        protection_pattern: "Online-Faehigkeit und Indextyp gemeinsam pruefen"
+        idiomatic_solution: "UNUSABLE plus REBUILD ONLINE dort, wo DML waehrend des Rebuilds weiterlaufen muss"
+        safe_pattern: "Bei grossen CREATE-Pfaden Logging- und Backup-Konsequenzen bewusst einplanen"
+        working_style_note: "Oracle gibt viele Freiheitsgrade, verlangt aber genaue Typ- und Constraint-Pruefung"
+        pitfall: "Nicht jeder Indextyp ist online rebuildbar"
+      MySQL:
+        natural_form: "InnoDB-Online-DDL-Tabelle fuer sekundare Indexoperationen gegen CREATE oder DROP auf dem Zielobjekt pruefen"
+        protection_pattern: "Permits Concurrent DML nicht mit Nullkosten verwechseln"
+        idiomatic_solution: "DROP oder CREATE sekundarer Indizes als In-Place-Operation mit Live-DML einplanen, wenn die Engine es traegt"
+        safe_pattern: "Bei Bedarf erst INVISIBLE fuer Read-Test, dann DROP fuer echte Schreibentlastung"
+        working_style_note: "MySQL ist bei Online-DDL oft pragmatisch, aber semantisch schmaler"
+        pitfall: "INVISIBLE spart keine Schreibarbeit"
+
+  - id: "P4"
+    question: "Ist der Rueckfallpfad terminierbar, idempotent und fuer das Team nachvollziehbar?"
+    generic_intent: "Operative Kontrollierbarkeit statt heroischer Einmalaktion sichern"
+    query_pattern: "Rueckkehr in den Sollzustand als kleines Ablaufmuster mit Terminierung, Flag-Reset oder explizitem Recreate-Skript festhalten"
+    purpose: "Verhindern, dass ein temporaerer Zustand zum Dauerzustand wird"
+    expected_signal: "Es existiert eine kurze, versionierte Arbeitsanweisung fuer Rueckbau oder Wiederaktivierung"
+    per_system:
+      SQLServer:
+        natural_form: "Disable-Rebuild- oder DROP_EXISTING-Skelett mit klarer Rueckkehrlogik festhalten"
+        protection_pattern: "Falls Kompression genutzt wird, DATA_COMPRESSION explizit in den Rebuild aufnehmen"
+        idiomatic_solution: "Rebuild-Statement vor dem Disable fertig haben"
+        safe_pattern: "Bei Batch-Loads Terminierungsbedingung und Nachaktivierung im selben Runbook notieren"
+        working_style_note: "SQL Server straft vergessene Rueckkehrschritte sichtbarer als viele Teams erwarten"
+        pitfall: "Disabled Indizes bleiben disabled, bis jemand sie wirklich rebuilt oder droppt"
+      PostgreSQL:
+        natural_form: "Fuer concurrent paths den Umgang mit INVALID-Indizes und erneuten Builds vorher definieren"
+        protection_pattern: "Drop-and-retry oder REINDEX INDEX CONCURRENTLY als dokumentierten Rueckfallpfad festlegen"
+        idiomatic_solution: "Reindex- oder Create-Skript inklusive Bereinigungsschritt versionieren"
+        safe_pattern: "Concurrent-Retries nicht improvisieren"
+        working_style_note: "Die Hauptfrage ist hier weniger 'disable oder drop' als 'welcher Rueckweg bleibt unter Last kontrollierbar?'"
+        pitfall: "Abgebrochene concurrent Runs ohne Cleanup lassen technischen Muell zurueck"
+      Oracle:
+        natural_form: "UNUSABLE, REBUILD ONLINE und ggf. VISIBLE oder INVISIBLE als klaren Ablauf dokumentieren"
+        protection_pattern: "Bei NOLOGGING-Create den noetigen Backup-Schritt mit aufnehmen"
+        idiomatic_solution: "Segmentzustand und Optimizer-Sichtbarkeit bewusst getrennt rueckfuehren"
+        safe_pattern: "Nach einem Create ohne Logging Ruecksicherungspfad klar benennen"
+        working_style_note: "Oracle bietet viele Hebel, aber sie brauchen ein sauberes Runbook"
+        pitfall: "Ein wieder nutzbarer Index ist noch kein vollstaendig betriebsbereiter Rueckfallpfad"
+      MySQL:
+        natural_form: "VISIBLE oder INVISIBLE fuer Tests, CREATE oder DROP fuer echte Strukturwechsel mit klarer Terminierung festhalten"
+        protection_pattern: "SHOW CREATE TABLE vorab sichern und nachher erneut verifizieren"
+        idiomatic_solution: "Read-Test und Write-Entlastung als zwei getrennte Schritte planen"
+        safe_pattern: "Bei grossen Tabellen den Recreate-Pfad nicht nur technisch, sondern auch zeitlich budgetieren"
+        working_style_note: "MySQL verlangt weniger Objektzustaende, aber mehr Klarheit ueber das Ziel des Eingriffs"
+        pitfall: "Testzustand und Produktivzustand werden leicht verwechselt, wenn INVISIBLE und DROP als dasselbe behandelt werden"
+
+decision_model:
+  - step: 1
+    question: "Soll spaeter exakt dieselbe Definition zurueckkehren?"
+    action_if_yes: "Definitionserhaltende Pfade wie DISABLE plus REBUILD, REINDEX oder UNUSABLE plus REBUILD pruefen."
+    action_if_no: "Script-first Drop/Create oder CREATE INDEX WITH DROP_EXISTING bevorzugen."
+  - step: 2
+    question: "Ist der Index clustered, constraint-gebunden oder haengt die Tabellenverfuegbarkeit direkt daran?"
+    action_if_yes: "Disable-nahe Pfade stark einschaenken; Blast Radius und Rueckweg zuerst klaeren."
+    action_if_no: "Ein temporaerer definitionserhaltender Zustand bleibt im Rennen."
+  - step: 3
+    question: "Braucht das System waehrend der Operation schreibenden Live-Traffic?"
+    action_if_yes: "Online-, concurrent- oder in-place-Pfade je System gezielt waehlen und deren Zusatzkosten einplanen."
+    action_if_no: "Offline-Rebuild oder geplantes Drop/Create kann die ehrliche und kuerzere Form sein."
+  - step: 4
+    question: "Ist das Recreate-Skript vollstaendig genug, um Optionen, Compression und Platzierung verlustfrei wiederherzustellen?"
+    action_if_yes: "DROP plus CREATE oder DROP_EXISTING ist operativ kontrollierbar."
+    action_if_no: "Kein DROP ohne vorab gesicherte Definition."
+  - step: 5
+    question: "Geht es nur um einen Read-Test oder wirklich um weniger Schreibkosten?"
+    action_if_yes: "Read-Test: INVISIBLE in Oracle oder MySQL; Schreibkosten senken: nur ein nicht gewarteter oder gedroppter Index hilft."
+    action_if_no: "Strategie weiter auf Definitionserhalt oder bewusste Neudefinition zuschneiden."
+
+signature_visual:
+  preferred_form: "definition_state_matrix"
+  purpose: "Sichtbar machen, ob die Indexdefinition im Katalog bleibt, der Segmentzustand verschwindet oder das Objekt komplett neu erzeugt werden muss."
+  key_message: "Der Kernkonflikt lautet nicht schneller gegen langsamer, sondern Definition bleibt gegen Definition muss neu aus DDL entstehen."
+  anchor_section: "5. Was intern eigentlich passiert"
+
+crosslinks:
+  training_targets:
+    SQLServer:
+      - "T-SQL/26_Indexes_Basics/26_Indexes_Basics.md"
+      - "T-SQL/16_DataIntegrity_Constraints/16_DataIntegrity_Constraints.md"
+      - "T-SQL/30_BulkLoad_BCP_BULKINSERT/30_BulkLoad_BCP_BULKINSERT.md"
+      - "T-SQL/64_PerformanceTuning_Advanced/64_PerformanceTuning_Advanced.md"
+      - "T-SQL/65_Partitioning/65_Partitioning.md"
+    PostgreSQL: []
+    Oracle: []
+    MySQL: []
+  related_blog_articles:
+    - "blog/update-with-join/README.md"
+    - "blog/partitionierung/README.md"
+  backlink_targets:
+    - "T-SQL/README.md"
+    - "PostgreSQL/README.md"
+    - "Oracle/README.md"
+    - "MySQL/README.md"
+
+ending:
+  style: "respectful_reconciliation"
+  goal: "Die Persona soll die Kernthese verdichten: erst den gewuenschten Objektzustand und den Rueckweg klaeren, dann das Statement waehlen."
+  participants:
+    - "Sam"
+    - "Pete"
+    - "Ora"
+    - "My"
+    - "Mutter ANSI-95"
+  max_words: 220
+
+quality_gates:
+  - "Keine kuenstliche Gleichverteilung"
+  - "Fuehrendes System bleibt Erkenntnisachse"
+  - "Keine erfundene Syntax"
+  - "Keine erfundenen Interna"
+  - "Standard und Implementierung sauber trennen"
+  - "Narrative Elemente bleiben knapp"
+  - "Keine Redundanz"
+  - "Kurzform fuer die Praxis enthalten"
+  - "Workflow-Metadaten fuer den Artikelheader sind vorbereitet"
+  - "Methodischer Status und Evidenzmodell sind vorbereitet"
+  - "Render-Regeln fuer leere optionale Bereiche sind gesetzt"
+  - "Praesentationsregeln fuer Vergleichstabelle, Warnblock, Anti-Pattern-Block und Entscheidungsvisualisierung sind gesetzt"
+  - "Minimale Dialektbeispiele und expliziter Fehlerfall sind vorbereitet"
+  - "Inhaltsverzeichnis-Regeln, Persona-Platzierung und Ankergeschichte sind vorbereitet"
+  - "Historische Kontrast-Snippets sind nicht aktiv geplant und werden deshalb nicht erzwungen"
+  - "Strategie-Code und Risikoklassen-Querverweise sind vorbereitet"
+  - "Dialect-aware Vorpruefungen und Systemidiome sind vorbereitet"
+  - "Praxisbeobachtungen und kontrollierte fachliche Urteilssaetze sind vorbereitet"
+  - "Dialekt-native Sicherheitsmuster und Datenbankkulturen sind vorbereitet"
+  - "Eine zusaetzliche merkfaehige Hauptvisualisierung ist vorbereitet"
+  - "Author notes sind strukturiert uebernommen und spaeter verfolgbar"
+
+sources_expected:
+  - "Microsoft Learn: Disable indexes and constraints"
+  - "Microsoft Learn: Enable indexes and constraints"
+  - "Microsoft Learn: CREATE INDEX (Transact-SQL)"
+  - "Microsoft Learn: Reorganize and rebuild indexes"
+  - "Microsoft Learn: Guidelines for online index operations"
+  - "PostgreSQL 18 Documentation: REINDEX"
+  - "PostgreSQL 18 Documentation: CREATE INDEX"
+  - "PostgreSQL 18 Documentation: DROP INDEX"
+  - "Oracle AI Database 26ai Administrator's Guide: Managing Indexes"
+  - "Oracle AI Database 26ai SQL Language Reference: ALTER INDEX"
+  - "Oracle AI Database 26ai SQL Language Reference: CREATE INDEX"
+  - "MySQL 8.4 Reference Manual: Invisible Indexes"
+  - "MySQL 8.4 Reference Manual: CREATE INDEX Statement"
+  - "MySQL 8.4 Reference Manual: DROP INDEX Statement"
+  - "MySQL 8.4 Reference Manual: InnoDB Online DDL Operations"

@@ -1,0 +1,98 @@
+metadata:
+  topic_slug: ""
+  generated_at: "YYYY-MM-DD"
+  generated_from:
+    demo_spec: "blog/<topic-slug>/demo/demo_spec.yaml"
+    systems: []
+  confidence_policy: "official_docs_plus_examples"
+
+insights:
+  - id: "I1"
+    statement: ""
+    category: ""      # syntax | semantics | execution | indexing | logging | locking | strategy | precheck | crosslink
+    confidence: ""    # high | medium | low
+    evidence_level: ""   # docs_based | inference_based | demo_based | executed_test_based | benchmark_based
+    applies_to:
+      systems: []
+      scenarios: []
+    evidence_from:
+      - path: ""
+        anchor: ""
+    article_implication:
+      include_in:
+        chapters: []
+      emphasis: ""   # lead | strong | medium | hint
+    wording_guidance:
+      allowed: ""
+      avoid: ""
+
+must_include:
+  - ""
+
+must_not_claim:
+  - ""
+
+open_uncertainties:
+  - question: ""
+    reason: ""
+    affected_systems: []
+    action: ""   # soften | omit | verify_later
+
+risk_class_support:
+  robust:
+    supporting_insights: []
+  conditionally_safe:
+    supporting_insights: []
+  risky:
+    supporting_insights: []
+  avoid:
+    supporting_insights: []
+
+dialect_idiom_hints:
+  SQLServer:
+    natural_prechecks: []
+    natural_safe_patterns: []
+    protection_patterns: []
+    pitfalls: []
+    culture_notes: []
+  PostgreSQL:
+    natural_prechecks: []
+    natural_safe_patterns: []
+    protection_patterns: []
+    pitfalls: []
+    culture_notes: []
+  Oracle:
+    natural_prechecks: []
+    natural_safe_patterns: []
+    protection_patterns: []
+    pitfalls: []
+    culture_notes: []
+  MySQL:
+    natural_prechecks: []
+    natural_safe_patterns: []
+    protection_patterns: []
+    pitfalls: []
+    culture_notes: []
+
+visualization_hints:
+  signature_visual:
+    preferred_form: ""   # joined_update_lifecycle | raw_to_prepared_to_write | read_vs_write_logic
+    key_message: ""
+    supporting_insights: []
+
+crosslink_hints:
+  training_topics:
+    SQLServer: []
+    PostgreSQL: []
+    Oracle: []
+    MySQL: []
+  related_blog_topics: []
+
+quality_gates:
+  - "Belastbare Aussagen und Unsicherheiten sind getrennt"
+  - "Jede starke These hat nachvollziehbare Evidenz"
+  - "Nicht belegte Generalisierungen sind ausgeschlossen"
+  - "Jede Insight traegt einen Evidenz-Level"
+  - "Dialect-aware Prechecks, Schutzmuster und Stolperstellen sind pro System verdichtbar"
+  - "Dialekt-native Sicherheitsmuster und Kulturhinweise sind pro System verdichtbar"
+  - "Mindestens ein belastbarer Hinweis fuer eine merkfaehige Hauptvisualisierung ist vorbereitet"

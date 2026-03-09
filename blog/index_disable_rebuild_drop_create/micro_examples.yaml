@@ -1,0 +1,404 @@
+metadata:
+  topic_slug: "index_disable_rebuild_drop_create"
+  generated_at: "2026-03-09"
+  pipeline_mode: "article_only"
+  based_on:
+    episode: "blog/index_disable_rebuild_drop_create/episode.yaml"
+    sources: "blog/index_disable_rebuild_drop_create/sources.yaml"
+    insights: "blog/index_disable_rebuild_drop_create/demo/insights.yaml (not generated in this run)"
+
+anchor_story:
+  title: "Das Update war schnell, bis die Indizes mitrechnen mussten"
+  symptom: "Auf einer Tabelle mit rund 40 Millionen Zeilen sollten etwa 13 Millionen Zeilen aktualisiert werden. Schon kleine Teilmengen waren auffaellig langsam, und der Plan zeigte: Nicht das UPDATE dominierte, sondern die laufende Indexpflege."
+  scenario: "Der naechste Gedanke lautet oft: Dann deaktiviere oder droppe ich eben die Indizes. Genau dort beginnt aber die eigentliche Fachfrage: Soll dieselbe Definition spaeter kontrolliert zurueckkehren, oder wird die Struktur bewusst neu aufgebaut?"
+  evidence_level: "inference_based"
+  source_refs:
+    - "C17"
+    - "C18"
+  article_usage:
+    section: "1. Was das Problem eigentlich ist"
+    style: "inline"
+
+syntax_surface:
+  SQLServer:
+    snippet: "ALTER INDEX IX_Sales_OrderDate ON dbo.Sales DISABLE;\nALTER INDEX IX_Sales_OrderDate ON dbo.Sales REBUILD;\nCREATE INDEX IX_Sales_OrderDate ON dbo.Sales (OrderDate) WITH (DROP_EXISTING = ON);"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C1"
+      - "C4"
+  PostgreSQL:
+    snippet: "REINDEX INDEX CONCURRENTLY sales_orderdate_idx;\nDROP INDEX CONCURRENTLY sales_orderdate_idx;\nCREATE INDEX CONCURRENTLY sales_orderdate_idx ON sales (order_date);"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C8"
+      - "C9"
+      - "C10"
+  Oracle:
+    snippet: "ALTER INDEX sales_orderdate_ix UNUSABLE;\nALTER INDEX sales_orderdate_ix REBUILD ONLINE;\nALTER INDEX sales_orderdate_ix INVISIBLE;"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C11"
+      - "C13"
+      - "C14"
+  MySQL:
+    snippet: "ALTER TABLE sales ALTER INDEX idx_order_date INVISIBLE;\nDROP INDEX idx_order_date ON sales;\nCREATE INDEX idx_order_date ON sales (order_date);"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C15"
+      - "C16"
+
+dialect_min_examples:
+  SQLServer:
+    snippet: "ALTER INDEX IX_Sales_OrderDate ON dbo.Sales DISABLE;\n-- Wartungsfenster\nALTER INDEX IX_Sales_OrderDate ON dbo.Sales\nREBUILD WITH (ONLINE = ON, DATA_COMPRESSION = PAGE);"
+    focus: "Definition bleibt im Katalog; ein nichtclustered Index kann fuer dieselbe Definition kontrolliert zurueckkehren."
+    error_case: "Ein clustered Index derselben Art nimmt der Tabelle den normalen DML-Zugriff und muss offline rebuildet werden."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C1"
+      - "C3"
+      - "C7"
+  PostgreSQL:
+    snippet: "REINDEX INDEX CONCURRENTLY sales_orderdate_idx;"
+    focus: "Gleiche Definition unter Live-Traffic moeglichst per REINDEX wiederherstellen statt ueber ein improvisiertes DROP/CREATE."
+    error_case: "Ein fehlgeschlagener concurrent Build kann einen INVALID-Index zuruecklassen, der weiter Update-Overhead erzeugt."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C8"
+      - "C9"
+  Oracle:
+    snippet: "ALTER INDEX sales_orderdate_ix UNUSABLE;\nALTER INDEX sales_orderdate_ix REBUILD ONLINE;"
+    focus: "UNUSABLE ist die Oracle-nahe Form fuer 'nicht benutzen und nicht pflegen', waehrend REBUILD die Definition wieder nutzbar macht."
+    error_case: "Bei eindeutigkeitsrelevanten unusable Indizes koennen DML-Statements trotz SKIP_UNUSABLE_INDEXES mit Fehlern enden."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C11"
+      - "C12"
+      - "C13"
+  MySQL:
+    snippet: "ALTER TABLE sales ALTER INDEX idx_order_date INVISIBLE;"
+    focus: "Read-Pfad testen, bevor der Index wirklich gedroppt wird."
+    error_case: "INVISIBLE spart keine Schreibkosten, weil MySQL den Index weiter pflegt."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C15"
+
+dialect_preflight_blocks:
+  - id: "DP1"
+    intent: "Abhaengigkeiten und Indexzustand vor dem Eingriff sichtbar machen"
+    systems:
+      SQLServer:
+        snippet: "SELECT name, type_desc, is_disabled, is_primary_key, is_unique_constraint\nFROM sys.indexes\nWHERE object_id = OBJECT_ID('dbo.Sales');"
+        natural_form: "Erst clustered versus nonclustered, PK und UNIQUE sauber lesen."
+        idiomatic_solution: "Isolierte nonclustered Indizes anders behandeln als clustered oder constraint-nahe Indizes."
+        protection_pattern: "FK- und Constraint-Folgen vor DISABLE pruefen."
+        safe_pattern_note: "Wenn derselbe Index Vertragsobjekt ist, kippt DISABLE schnell in risky."
+        pitfall: "Die Tabelle kann ueber einen deaktivierten clustered Index praktisch verschwinden."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C1"
+          - "C2"
+      PostgreSQL:
+        snippet: "SELECT c.conname, c.contype, i.relname AS index_name\nFROM pg_constraint AS c\nLEFT JOIN pg_class AS i ON i.oid = c.conindid\nWHERE i.relname = 'sales_orderdate_idx';"
+        natural_form: "Constraint-tragende Indizes vor DROP oder concurrent create gesondert betrachten."
+        idiomatic_solution: "Bei gleicher Definition eher REINDEX als DROP, wenn ein Constraint beteiligt ist."
+        protection_pattern: "CONCURRENTLY-Einschraenkungen fuer PK und UNIQUE mitpruefen."
+        safe_pattern_note: "PostgreSQLs Problem ist weniger DISABLE als der harte Unterschied zwischen normalen und concurrent Pfaden."
+        pitfall: "DROP INDEX CONCURRENTLY steht fuer constraint-tragende Indizes nicht zur Verfuegung."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C10"
+      Oracle:
+        snippet: "SELECT index_name, status, visibility, uniqueness\nFROM user_indexes\nWHERE table_name = 'SALES';"
+        natural_form: "STATUS und VISIBILITY getrennt lesen."
+        idiomatic_solution: "UNUSABLE fuer Nicht-Pflege, INVISIBLE fuer Read-Test."
+        protection_pattern: "Bei UNIQUE-Indizes den Constraint-Effekt vorab pruefen."
+        safe_pattern_note: "Oracle trennt Segmentzustand und Optimizer-Sichtbarkeit sauber."
+        pitfall: "INVISIBLE und UNUSABLE sind fachlich nicht austauschbar."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C11"
+          - "C12"
+          - "C14"
+      MySQL:
+        snippet: "SELECT INDEX_NAME, NON_UNIQUE, IS_VISIBLE\nFROM INFORMATION_SCHEMA.STATISTICS\nWHERE TABLE_SCHEMA = DATABASE()\n  AND TABLE_NAME = 'sales';"
+        natural_form: "Vor einem Test mit INVISIBLE zuerst die reale PK- und UNIQUE-Rolle des Indexes lesen."
+        idiomatic_solution: "Read-Test und echte Write-Entlastung als zwei getrennte Entscheidungen behandeln."
+        protection_pattern: "SHOW CREATE TABLE als DDL-Sicherung vor DROP festhalten."
+        safe_pattern_note: "INVISIBLE ist MySQLs Vorbereitungswerkzeug, nicht das Ziel des eigentlichen Maintenance-Falls."
+        pitfall: "Ein unsichtbarer Index schreibt trotzdem mit."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C15"
+    article_usage:
+      section: "9. Vor jeder produktiven Umsetzung: technische Vorpruefung"
+      style: "per_system_blocks"
+
+  - id: "DP2"
+    intent: "Den Live-Traffic-Pfad und die Recreate-Faehigkeit pruefen"
+    systems:
+      SQLServer:
+        snippet: "SELECT name, data_compression_desc\nFROM sys.partitions AS p\nJOIN sys.indexes AS i\n  ON i.object_id = p.object_id AND i.index_id = p.index_id\nWHERE i.object_id = OBJECT_ID('dbo.Sales');"
+        natural_form: "Vor REBUILD oder DROP_EXISTING Optionen und Kompression explizit lesen."
+        idiomatic_solution: "Bei unveraenderter Definition REBUILD, bei Strukturwechsel DROP_EXISTING."
+        protection_pattern: "DATA_COMPRESSION explizit im Rueckweg mitnehmen."
+        safe_pattern_note: "Der Rueckweg muss vor dem Disable stehen, nicht erst danach."
+        pitfall: "Kompression kann nach DISABLE unbemerkt verloren gehen."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C4"
+          - "C7"
+      PostgreSQL:
+        snippet: "SELECT indexname, indexdef\nFROM pg_indexes\nWHERE schemaname = 'public'\n  AND tablename = 'sales';"
+        natural_form: "Indexdef sichern, bevor CREATE INDEX CONCURRENTLY oder DROP INDEX CONCURRENTLY ueberhaupt diskutiert wird."
+        idiomatic_solution: "Gleiche Definition per REINDEX INDEX CONCURRENTLY, neue Definition per CREATE INDEX CONCURRENTLY."
+        protection_pattern: "Concurrent-Fehlerfall und Cleanup mitplanen."
+        safe_pattern_note: "Wer concurrent sagt, muss auch INVALID-Reste mitdenken."
+        pitfall: "Ohne gesichertes indexdef wird aus schneller DDL schnell Trial-and-Error."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C8"
+          - "C9"
+      Oracle:
+        snippet: "SELECT DBMS_METADATA.GET_DDL('INDEX', 'SALES_ORDERDATE_IX') FROM dual;"
+        natural_form: "Oracle-DDL vor einem Drop aus Metadaten ziehen und REBUILD ONLINE nur fuer unterstuetzte Typen ansetzen."
+        idiomatic_solution: "UNUSABLE plus REBUILD fuer gleiche Definition, CREATE fuer definitorische Aenderungen."
+        protection_pattern: "Bei CREATE-Pfaden Logging- und Backup-Folgen bewusst mitdenken."
+        safe_pattern_note: "Oracle bietet viele Hebel, aber sie wollen ein Runbook."
+        pitfall: "Online-REBUILD ist kein Freifahrtschein fuer jeden Indextyp."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C13"
+      MySQL:
+        snippet: "SHOW CREATE TABLE sales;"
+        natural_form: "Vor DROP immer die komplette Tabellen-DDL sichern und dann erst den Online-DDL-Pfad bewerten."
+        idiomatic_solution: "Sekundaeren Index unter InnoDB gezielt droppen oder neu erzeugen, wenn Write-Entlastung wirklich gewollt ist."
+        protection_pattern: "INVISIBLE zuerst nur fuer Read-Tests nutzen."
+        safe_pattern_note: "Permits Concurrent DML ist nuetzlich, aber nicht dasselbe wie ein kostenloser Eingriff."
+        pitfall: "Wer nur INVISIBLE setzt, hat den Write-Fall nicht geloest."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C16"
+    article_usage:
+      section: "9. Vor jeder produktiven Umsetzung: technische Vorpruefung"
+      style: "per_system_blocks"
+
+dialect_safety_patterns:
+  SQLServer:
+    snippet: "CREATE INDEX IX_Sales_OrderDate\nON dbo.Sales (OrderDate)\nWITH (DROP_EXISTING = ON, ONLINE = ON, DATA_COMPRESSION = PAGE);"
+    purpose: "Saubere Neudefinition mit expliziten Optionen statt impliziter Rueckkehr auf Standardwerte."
+    idiomatic_role: "Script-first redefinition."
+    pitfall_avoided: "Optionen oder Kompression beim Rueckbau verlieren."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C4"
+      - "C7"
+  PostgreSQL:
+    snippet: "REINDEX INDEX CONCURRENTLY sales_orderdate_idx;"
+    purpose: "Gleiche Definition unter Live-Traffic neu aufbauen, ohne in ein improvisiertes DROP/CREATE zu kippen."
+    idiomatic_role: "Definitionserhaltender Live-Pfad."
+    pitfall_avoided: "Unnoetiges Write-Blocking fuer denselben Index."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C8"
+  Oracle:
+    snippet: "ALTER INDEX sales_orderdate_ix INVISIBLE;"
+    purpose: "Vor einem Drop testen, ob die Leselogik den Index noch braucht."
+    idiomatic_role: "Read-path probe before destructive change."
+    pitfall_avoided: "Ein vorschneller Drop ohne Test, ob die Query-Plans kippen."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C14"
+  MySQL:
+    snippet: "ALTER TABLE sales ALTER INDEX idx_order_date INVISIBLE;"
+    purpose: "Optimizer-Abhaengigkeit pruefen, bevor der Index wirklich entfernt wird."
+    idiomatic_role: "Vorbereitender Sicherheitstest fuer Reads."
+    pitfall_avoided: "Blindes Droppen eines fuer wichtige Reads noch benoetigten Indexes."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C15"
+
+historical_contrast_snippets: []
+
+micro_examples:
+  - id: "MX1"
+    class: "robust"
+    title: "Gleiche Definition, isolierter nonclustered Index"
+    purpose: "Zeigen, wann definitionserhaltende Maintenance stark wird."
+    forward_reference_hint: "Die formalen Risikoklassen folgen spaeter in Abschnitt 3 des Artikels."
+    snippet: "SQL Server: nichtclustered Index disable -> Batch schreiben -> rebuild derselben Definition.\nLeitidee: Die Definition bleibt, nur die laufende Pflegelast pausiert."
+    evidence_level: "inference_based"
+    source_refs:
+      - "C1"
+      - "C3"
+      - "C18"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX2"
+    class: "risky"
+    title: "Clustered Index deaktivieren, um schneller zu updaten"
+    purpose: "Den wichtigsten Produktionsfehler explizit sichtbar machen."
+    forward_reference_hint: "Diese Form landet spaeter in den Klassen risky oder avoid."
+    snippet: "SQL Server: clustered Index disable -> Tabelle fuer normalen DML-Zugriff unzugaenglich -> Rueckweg nur offline.\nLeitidee: vermeintliche Beschleunigung kippt in Ausfall."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C1"
+      - "C3"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX3"
+    class: "prepared_source"
+    title: "Neudefinition script-first statt Hoffnung"
+    purpose: "Den sauberen Recreate-Pfad markieren, wenn die Definition sich sowieso aendert."
+    forward_reference_hint: "Die robuste Form wird spaeter in den Strategien konkretisiert."
+    snippet: "Definition exportieren -> Zieldefinition bewusst anpassen -> CREATE oder DROP_EXISTING mit allen Optionen ausfuehren -> Zustand verifizieren."
+    evidence_level: "inference_based"
+    source_refs:
+      - "C4"
+      - "C16"
+      - "C17"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+
+strategy_snippets:
+  - id: "SS1"
+    strategy: "sqlserver_disable_rebuild_same_definition"
+    target_risk_class: "robust"
+    snippet: "ALTER INDEX IX_Sales_OrderDate ON dbo.Sales DISABLE;\n-- Bulk-Load oder Batch-Update nur fuer das geplante Wartungsfenster\nALTER INDEX IX_Sales_OrderDate ON dbo.Sales\nREBUILD WITH (ONLINE = ON, DATA_COMPRESSION = PAGE);"
+    operational_caveat: "Nur fuer nichtclustered Indizes mit klarer Rueckkehrlogik geeignet; wenn Kompression genutzt wird, muss DATA_COMPRESSION explizit wieder mit angegeben werden."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C3"
+      - "C7"
+    article_usage:
+      section: "10. Die Hauptstrategien sauber eingeordnet"
+      style: "code"
+  - id: "SS2"
+    strategy: "sqlserver_drop_existing_redefinition"
+    target_risk_class: "conditionally_safe"
+    snippet: "CREATE INDEX IX_Sales_OrderDate\nON dbo.Sales (OrderDate, CustomerID)\nINCLUDE (Status)\nWITH (DROP_EXISTING = ON, ONLINE = ON, DATA_COMPRESSION = PAGE);"
+    operational_caveat: "Nur dann robust, wenn die vollstaendige Zieldefinition bereits versioniert ist; bei constraint-nahen Indizes die Vertragsobjekte separat mitdenken."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C4"
+      - "C5"
+    article_usage:
+      section: "10. Die Hauptstrategien sauber eingeordnet"
+      style: "code"
+  - id: "SS3"
+    strategy: "postgresql_reindex_or_create_concurrently"
+    target_risk_class: "conditionally_safe"
+    snippet: "REINDEX INDEX CONCURRENTLY sales_orderdate_idx;\n-- oder bei neuer Definition:\nCREATE INDEX CONCURRENTLY sales_orderdate_idx_new ON sales (order_date);"
+    operational_caveat: "Concurrent-Pfade brauchen mehr Zeit und koennen INVALID-Reste hinterlassen; Cleanup und Terminierung muessen vorab feststehen."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C8"
+      - "C9"
+    article_usage:
+      section: "10. Die Hauptstrategien sauber eingeordnet"
+      style: "code"
+
+comparison_tables:
+  - id: "CT1"
+    title: "Index temporaer aus dem Weg raeumen: Systemvergleich"
+    dimensions:
+      - "System"
+      - "Definition bleibt sichtbar?"
+      - "Schreibpflege pausiert?"
+      - "Natuerlicher Rueckweg"
+      - "Kritischer Fallstrick"
+    rows:
+      - system: "SQLServer"
+        definition_bleibt_sichtbar: "Ja, bei DISABLE"
+        schreibpflege_pausiert: "Ja, bei deaktiviertem Index"
+        natuerlicher_rueckweg: "REBUILD oder CREATE ... WITH DROP_EXISTING"
+        kritischer_fallstrick: "Clustered und constraint-nahe Indizes haben grossen Blast Radius"
+      - system: "PostgreSQL"
+        definition_bleibt_sichtbar: "Nicht als eigener Disable-Zustand"
+        schreibpflege_pausiert: "Nur ueber Rebuild oder Drop/Create indirekt"
+        natuerlicher_rueckweg: "REINDEX, CREATE INDEX, DROP INDEX, jeweils ggf. CONCURRENTLY"
+        kritischer_fallstrick: "Concurrent-Fails koennen INVALID-Indizes mit Update-Overhead hinterlassen"
+      - system: "Oracle"
+        definition_bleibt_sichtbar: "Ja, bei UNUSABLE und INVISIBLE"
+        schreibpflege_pausiert: "Ja, bei UNUSABLE; nein, bei INVISIBLE"
+        natuerlicher_rueckweg: "REBUILD ONLINE oder CREATE"
+        kritischer_fallstrick: "INVISIBLE ist kein Ersatz fuer UNUSABLE"
+      - system: "MySQL"
+        definition_bleibt_sichtbar: "Ja, bei INVISIBLE"
+        schreibpflege_pausiert: "Nein, INVISIBLE wird weiter gepflegt"
+        natuerlicher_rueckweg: "DROP oder CREATE als ALTER TABLE, bei InnoDB oft online-nahe"
+        kritischer_fallstrick: "Read-Test und Write-Entlastung werden leicht verwechselt"
+    article_usage:
+      section: "Systemvergleich auf einen Blick"
+      style: "table"
+
+warning_boxes:
+  - id: "WB1"
+    title: "Die haeufigste Produktionsfalle"
+    message: "Deaktiviere in SQL Server keinen clustered Index auf einer produktiv genutzten Tabelle, nur weil ein grosses Update teuer ist. Du sparst damit nicht nur Indexpflege, sondern nimmst der Tabelle auch ihren normalen DML-Zugriff und zwingst den Rueckweg in einen Offline-Rebuild."
+    severity: "high"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C1"
+      - "C3"
+  - id: "WB2"
+    title: "Unsichtbar ist nicht deaktiviert"
+    message: "Oracle- und MySQL-INVISIBLE-Indizes sind gute Werkzeuge, um Read-Pfade zu testen. Sie senken aber nicht die laufende Schreibpflege. Wer damit einen Bulk-Write beschleunigen will, optimiert am falschen Ende."
+    severity: "high"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C14"
+      - "C15"
+
+anti_pattern_blocks:
+  - id: "AP1"
+    anti_pattern: "Alle Indizes einer grossen Tabelle vorsorglich deaktivieren, ohne clustered, PK- oder UNIQUE-Rolle zu trennen."
+    robust_form: "Nur isolierte nonclustered Indizes mit unveraenderter Rueckkehrdefinition temporaer deaktivieren; alle anderen Faelle erst nach Dependency-Map und versionierter Recreate-Definition anfassen."
+    rationale: "Der objektlogische Blast Radius ist wichtiger als die gefuehlte Abkuerzung im Wartungsfenster."
+    evidence_level: "inference_based"
+    source_refs:
+      - "C2"
+      - "C18"
+
+signature_visual:
+  format: "ascii"
+  title: "Definition bleibt, Daten fehlen - oder Definition ist ganz weg"
+  purpose: "Den Unterschied zwischen definitionserhaltendem Zustand und bewusstem Recreate greifbar machen."
+  body: "DISABLE / UNUSABLE\n  -> Definition bleibt im Katalog\n  -> Segment oder Datenpfad ist nicht nutzbar oder nicht gepflegt\n  -> Rueckweg ist REBUILD\n\nDROP\n  -> Definition ist weg\n  -> Rueckweg braucht vollstaendige DDL\n  -> CREATE baut bewusst neu auf\n\nINVISIBLE\n  -> Definition bleibt sichtbar\n  -> Optimizer nutzt den Index nicht\n  -> Schreibpflege laeuft weiter"
+  evidence_level: "inference_based"
+  source_refs:
+    - "C11"
+    - "C14"
+    - "C15"
+  article_usage:
+    section: "5. Was intern eigentlich passiert"
+    style: "diagram"
+
+decision_visual:
+  format: "mermaid"
+  title: "Welche Strategie passt wirklich?"
+  body: "flowchart TD\n    A[Dieselbe Definition spaeter wiederhaben?] -->|Ja| B[System hat definitionserhaltenden Pfad?]\n    A -->|Nein| G[Script-first Recreate planen]\n    B -->|Ja| C[Index ist clustered oder constraint-nah?]\n    B -->|Nein| H[REINDEX oder CREATE/DROP nach Live-Traffic waehlen]\n    C -->|Ja| D[Disable meiden oder nur mit Wartungsfenster]\n    C -->|Nein| E[Disable oder UNUSABLE plus Rebuild moeglich]\n    D --> I[Risky oder conditionally_safe]\n    E --> F[Rueckweg, Optionen und Terminierung vorher festhalten]\n    F --> J[robust]\n    G --> K[Vollstaendige DDL und Online-Pfad vorhanden?]\n    K -->|Ja| L[conditionally_safe bis robust]\n    K -->|Nein| M[avoid]"
+  evidence_level: "inference_based"
+  source_refs:
+    - "C17"
+    - "C18"
+
+quality_gates:
+  - "Mindestens eine Ankergeschichte oder ein konkretes Fehlersymptom ist vorhanden"
+  - "Mindestens ein robustes Micro-Beispiel ist vorhanden"
+  - "Mindestens ein riskantes Micro-Beispiel ist vorhanden"
+  - "Mindestens eine sichere Alternativstrategie mit vorbereiteter Quelle ist vorhanden"
+  - "Dialect-aware Preflight-Bloecke sind pro relevanten Dialekt vorhanden oder bewusst begrenzt"
+  - "Pro relevantem Dialekt ist ein natuerliches Sicherheits- oder Vorbereitungs-Muster vorbereitet"
+  - "Pro behandeltem System ist ein minimales Beispiel mit Fokus und Fehlerfall vorbereitet"
+  - "Keine historische Kontrastversion ist aktiv gewichtet; darum bleibt der Block leer"
+  - "Empfohlene Strategien besitzen minimale Code-Skelette"
+  - "Mindestens eine Vergleichstabelle ist vorhanden"
+  - "Mindestens ein Warnhinweis ist vorhanden"
+  - "Mindestens ein Anti-Pattern-vs.-robuste-Form-Block ist vorhanden"
+  - "Eine visuelle Darstellung des Entscheidungsmodells ist vorhanden"
+  - "Eine zweite merkfaehige Hauptvisualisierung ist vorhanden"
+  - "Syntax-Oberflaechen bleiben kurz"
+  - "Evidenz-Level sind pro Snippet dokumentiert"

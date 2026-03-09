@@ -1,0 +1,201 @@
+metadata:
+  topic_slug: "update-with-join"
+  as_of_date: "2026-03-08"
+  maintained_by: "Codex"
+  notes: |
+    Offene Quellenluecken:
+    - Kein frei zugaenglicher ISO/ANSI-Primartext wurde in diesem Lauf eingebunden. ANSI bleibt deshalb im Artikel eine vorsichtige Meta-Ebene und keine harte Normreferenz.
+    - Die MySQL-Referenz dokumentiert fuer Mehrfachtreffer, dass jede passende Zeile einmal aktualisiert wird, legt aber in der hier genutzten Dokumentation keine explizite Gewinnerlogik fuer konfliktierende Quellwerte offen. Der Artikel behauptet deshalb keine deterministische Quellzeilenauswahl.
+    - Fuer Oracle wird die aktuelle Direktsyntax gegen 26ai und die historische Gegenfolie gegen 19c abgesichert; Zwischenreleases werden nur indirekt mitgedacht.
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2022 (16.x), mit Build-/CU-Bezug bis CU23 vom 2026-01-29"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18, Dokumentationsstand 18.3 / Release 18 vom 2025-09-25"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai als aktuelle Schreiboberflaeche; Oracle Database 19c als historische Referenz"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS, Reference Manual und Release Notes 8.4.x"
+    include: true
+
+sources:
+  SQLServer:
+    official_docs:
+      - title: "UPDATE (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/queries/update-transact-sql?view=sql-server-ver16"
+        scope: "syntax"
+        version_scope: "SQL Server 2022 (16.x)"
+      - title: "Transaction locking and row versioning guide - SQL Server"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver16"
+        scope: "semantics"
+        version_scope: "SQL Server 2022 (16.x)"
+    release_notes:
+      - title: "Build versions for SQL Server 2022"
+        url: "https://learn.microsoft.com/en-us/troubleshoot/sql/releases/sqlserver-2022/build-versions"
+        version_scope: "SQL Server 2022 (16.x), Stand CU23 vom 2026-01-29"
+    supporting: []
+  PostgreSQL:
+    official_docs:
+      - title: "PostgreSQL 18 Documentation - UPDATE"
+        url: "https://www.postgresql.org/docs/18/sql-update.html"
+        scope: "syntax"
+        version_scope: "PostgreSQL 18"
+    release_notes:
+      - title: "PostgreSQL 18 Released!"
+        url: "https://www.postgresql.org/about/news/postgresql-18-released-3142/"
+        version_scope: "Release 18 vom 2025-09-25"
+    supporting: []
+  Oracle:
+    official_docs:
+      - title: "Oracle AI Database 26 SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/UPDATE.html"
+        scope: "syntax"
+        version_scope: "Oracle AI Database 26ai"
+    release_notes:
+      - title: "Oracle AI Database 26 New Features - Direct Joins for UPDATE and DELETE Statements"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/nfcoa/appdev_sql.html"
+        version_scope: "Oracle AI Database 26ai"
+    supporting:
+      - title: "Oracle Database 19c SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/UPDATE.html"
+        scope: "syntax"
+        version_scope: "Oracle Database 19c"
+  MySQL:
+    official_docs:
+      - title: "MySQL 8.4 Reference Manual - UPDATE Statement"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/update.html"
+        scope: "syntax"
+        version_scope: "MySQL 8.4"
+      - title: "MySQL Innovation and LTS Overview"
+        url: "https://www.mysql.com/products/innovation-and-lts.html"
+        scope: "admin"
+        version_scope: "MySQL 8.4 LTS"
+    release_notes:
+      - title: "MySQL 8.4 Release Notes"
+        url: "https://dev.mysql.com/doc/relnotes/mysql/8.4/en/"
+        version_scope: "MySQL 8.4.x"
+    supporting: []
+  ANSI95:
+    official_docs: []
+    supporting: []
+
+claims_register:
+  - claim_id: "C1"
+    claim: "Die sichtbare Schreiboberflaeche fuer joined updates unterscheidet sich materiell zwischen SQL Server, PostgreSQL, Oracle und MySQL; es gibt keine portable Einheitsform, auf die der Artikel sich verlassen darf."
+    supported_by:
+      - system: "SQLServer"
+        source_title: "UPDATE (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/queries/update-transact-sql?view=sql-server-ver16"
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18 Documentation - UPDATE"
+        url: "https://www.postgresql.org/docs/18/sql-update.html"
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26 SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/UPDATE.html"
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual - UPDATE Statement"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/update.html"
+    confidence: "high"
+    article_section: "Was das Problem eigentlich ist"
+
+  - claim_id: "C2"
+    claim: "SQL Server stuft `UPDATE ... FROM` ohne deterministische Quellzuordnung als undefiniert ein."
+    supported_by:
+      - system: "SQLServer"
+        source_title: "UPDATE (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/queries/update-transact-sql?view=sql-server-ver16"
+    confidence: "high"
+    article_section: "Deep Dive des fuehrenden Systems"
+
+  - claim_id: "C3"
+    claim: "In SQL Server bleiben exklusive Schreibsperren fuer Datenaenderungen bis zum Transaktionsende erhalten; Row Versioning reduziert Lesesperren, hebt Schreibsperren aber nicht auf."
+    supported_by:
+      - system: "SQLServer"
+        source_title: "Transaction locking and row versioning guide - SQL Server"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-locking-and-row-versioning-guide?view=sql-server-ver16"
+    confidence: "high"
+    article_section: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+
+  - claim_id: "C4"
+    claim: "PostgreSQL verlangt bei `UPDATE ... FROM` faktisch, dass der Join pro Zielzeile hoechstens eine Ausgaberow erzeugt; sonst wird nur eine nicht gut vorhersagbare Join-Zeile verwendet."
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18 Documentation - UPDATE"
+        url: "https://www.postgresql.org/docs/18/sql-update.html"
+    confidence: "high"
+    article_section: "Die wichtigste praktische Unterscheidung"
+
+  - claim_id: "C5"
+    claim: "PostgreSQL dokumentiert fuer grosse Updates betriebliche Nebenwirkungen wie Table Bloat, Replica Lag und Lock Contention und empfiehlt in solchen Faellen kleinere Batches."
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18 Documentation - UPDATE"
+        url: "https://www.postgresql.org/docs/18/sql-update.html"
+    confidence: "high"
+    article_section: "Wovon Verhalten, Risiko und Kosten abhaengen"
+
+  - claim_id: "C6"
+    claim: "MySQL 8.4 behandelt joined updates ueber die Multi-Table-Update-Form; jede passende Zeile wird einmal aktualisiert, und `ORDER BY` sowie `LIMIT` sind in dieser Form nicht erlaubt."
+    supported_by:
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual - UPDATE Statement"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/update.html"
+    confidence: "high"
+    article_section: "Was das Problem eigentlich ist"
+
+  - claim_id: "C7"
+    claim: "MySQL warnt bei Multi-Table-Updates mit InnoDB-Foreign-Keys vor moeglichen Optimizer-Reihenfolgen, die zum Fehlschlag und Rollback fuehren; offiziell empfohlen wird dann ein Single-Table-Update mit `ON UPDATE`-Kaskade."
+    supported_by:
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual - UPDATE Statement"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/update.html"
+    confidence: "high"
+    article_section: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+
+  - claim_id: "C8"
+    claim: "Oracle AI Database 26ai unterstuetzt direkte Joins in `UPDATE`; dieselbe Zielzeile darf dabei hoechstens einmal geaendert werden, sonst entsteht `ORA-30926`."
+    supported_by:
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26 SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/UPDATE.html"
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26 New Features - Direct Joins for UPDATE and DELETE Statements"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/nfcoa/appdev_sql.html"
+    confidence: "high"
+    article_section: "Oracle als starker Kontrastfall"
+
+  - claim_id: "C9"
+    claim: "Oracle Database 19c stützt das Thema ueber Subqueries ab, die fuer jede aktualisierte Zielzeile genau eine Rueckgabezeile liefern muessen."
+    supported_by:
+      - system: "Oracle"
+        source_title: "Oracle Database 19c SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/UPDATE.html"
+    confidence: "high"
+    article_section: "Oracle als starker Kontrastfall"
+
+  - claim_id: "C10"
+    claim: "Oracle muss versionsscharf gelesen werden: 26ai kennt direkte Joins in `UPDATE`, waehrend 19c das Thema ueber exakt-eine-Zeile-Subqueries abbildet."
+    supported_by:
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26 SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/UPDATE.html"
+      - system: "Oracle"
+        source_title: "Oracle Database 19c SQL Language Reference - UPDATE"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/UPDATE.html"
+    confidence: "high"
+    article_section: "Oracle als starker Kontrastfall"
+
+quality_gates:
+  - "Mindestens eine offizielle Quelle pro relevantem System"
+  - "Versionsbezug jeder Quelle ist dokumentiert"
+  - "Zentrale Claims sind im claims_register hinterlegt"
+  - "Unsichere oder nicht voll abgesicherte Aussagen sind explizit als Luecke markiert"
+  - "Keine starke Produktbehauptung wird allein auf nicht zugaengliche ANSI-Quellen gestuetzt"

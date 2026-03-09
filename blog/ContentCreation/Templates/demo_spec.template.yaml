@@ -1,0 +1,125 @@
+dataset:
+  name: ""
+  purpose: ""
+  topic_slug: ""
+  as_of_date: "YYYY-MM-DD"
+  generation_mode: "csv"   # csv | manual | synthetic | mixed
+  owner: "human_or_ai"
+  notes: ""
+
+global_rules:
+  use_shared_business_logic: true
+  use_same_scenarios_across_systems: true
+  allow_engine_specific_sql: true
+  avoid_nonessential_vendor_features: true
+  include_negative_cases: true
+
+logical_model:
+  description: ""
+  entities:
+    - name: ""
+      purpose: ""
+      columns:
+        - name: ""
+          logical_type: ""
+          nullable: true
+          role: ""    # pk | fk | business_key | attribute | metric | helper
+
+scenarios:
+  - id: "S1"
+    name: ""
+    purpose: ""
+    expected_behavior: ""   # robust | conditionally_safe | risky | avoid
+    requires_deduplication: false
+    requires_index_discussion: false
+    notes: ""
+
+precheck_intents:
+  - id: "P1"
+    intent: ""
+    purpose: ""
+    expected_signal: ""
+    applies_to_scenarios: []
+    dialect_rendering_expectation:
+      SQLServer:
+        natural_precheck_shape: ""
+        natural_safe_pattern_shape: ""
+        working_style_note: ""
+      PostgreSQL:
+        natural_precheck_shape: ""
+        natural_safe_pattern_shape: ""
+        working_style_note: ""
+      Oracle:
+        natural_precheck_shape: ""
+        natural_safe_pattern_shape: ""
+        working_style_note: ""
+      MySQL:
+        natural_precheck_shape: ""
+        natural_safe_pattern_shape: ""
+        working_style_note: ""
+
+visual_storylines:
+  - id: "V1"
+    purpose: ""
+    preferred_form: ""   # joined_update_lifecycle | raw_to_prepared_to_write | read_vs_write_logic
+    key_nodes: []
+
+physical_assets:
+  shared_csv_files:
+    - path: "demo/<topic-slug>/data/<file>.csv"
+      table: ""
+      description: ""
+  snapshots: []
+
+per_system_mapping:
+  SQLServer:
+    schema_name: "demo"
+    tables: []
+    indexes: []
+    constraints: []
+  PostgreSQL:
+    schema_name: "demo"
+    tables: []
+    indexes: []
+    constraints: []
+  Oracle:
+    schema_name: "DEMO"
+    tables: []
+    indexes: []
+    constraints: []
+  MySQL:
+    schema_name: "demo"
+    tables: []
+    indexes: []
+    constraints: []
+
+required_examples:
+  - type: "robust"
+    description: ""
+  - type: "conditionally_safe"
+    description: ""
+  - type: "risky"
+    description: ""
+  - type: "avoid"
+    description: ""
+  - type: "precheck"
+    description: ""
+  - type: "dialect_aware_precheck"
+    description: ""
+
+expected_artifacts:
+  per_system:
+    - "01_schema.sql"
+    - "02_load_data.sql"
+    - "03_examples.sql"
+    - "04_validation.sql"
+    - "05_cleanup.sql"
+
+quality_gates:
+  - "Gemeinsame fachliche Demo-Welt ist klar definiert"
+  - "Alle relevanten Risikoklassen sind als Szenario modelliert"
+  - "Systeme verwenden dieselbe Business-Logik, aber systemeigene SQL-Form"
+  - "Negative und sichere Varianten sind beide enthalten"
+  - "Precheck-Intents sind systemneutral definiert und spaeter dialect-aware renderbar"
+  - "Precheck-Intents bereiten auch natuerliche Sicherheitsmuster pro Dialekt vor"
+  - "Mindestens eine Visual-Storyline fuer eine merkfaehige Hauptvisualisierung ist vorbereitet"

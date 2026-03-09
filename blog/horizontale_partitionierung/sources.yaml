@@ -1,0 +1,330 @@
+metadata:
+  topic_slug: "horizontale_partitionierung"
+  as_of_date: "2026-03-09"
+  maintained_by: "Codex"
+  notes: "Offizielle Produktdokumentation als Primaerquellen. Architektururteile ueber mehrere Tabellen sind als inference_based markiert."
+  notes_input_path: "blog/horizontale_partitionierung/notes.md"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2025 (17.x)"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18.3"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS"
+    include: true
+
+sources:
+  SQLServer:
+    official_docs:
+      - title: "Partitioned tables and indexes"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/partitions/partitioned-tables-and-indexes?view=sql-server-ver17"
+        scope: "semantics"
+        version_scope: "SQL Server 2025 documentation set"
+      - title: "CREATE PARTITION FUNCTION (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-partition-function-transact-sql?view=sql-server-ver17"
+        scope: "syntax"
+        version_scope: "SQL Server 2025 documentation set"
+      - title: "CREATE VIEW (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql?view=sql-server-ver17"
+        scope: "semantics"
+        version_scope: "SQL Server 2025 documentation set"
+    release_notes:
+      - title: "SQL Server 2025 release notes"
+        url: "https://learn.microsoft.com/en-us/sql/sql-server/sql-server-2025-release-notes?view=sql-server-ver17"
+        scope: "admin"
+        version_scope: "SQL Server 2025 (17.x)"
+    supporting:
+      - title: "CREATE PARTITION SCHEME (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-partition-scheme-transact-sql?view=sql-server-ver17"
+        scope: "syntax"
+        version_scope: "SQL Server 2025 documentation set"
+  PostgreSQL:
+    official_docs:
+      - title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+        scope: "semantics"
+        version_scope: "PostgreSQL 18"
+    release_notes:
+      - title: "PostgreSQL 18.3 Release Notes"
+        url: "https://www.postgresql.org/docs/release/18.3/"
+        scope: "admin"
+        version_scope: "PostgreSQL 18.3"
+    supporting: []
+  Oracle:
+    official_docs:
+      - title: "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning Concepts"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-concepts.html"
+        scope: "semantics"
+        version_scope: "Oracle AI Database 26ai"
+      - title: "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning for Availability, Manageability, and Performance"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-availability.html"
+        scope: "admin"
+        version_scope: "Oracle AI Database 26ai"
+    release_notes:
+      - title: "Oracle AI Database 26ai Documentation Library"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/books.html"
+        scope: "admin"
+        version_scope: "Oracle AI Database 26ai"
+    supporting:
+      - title: "Partitions, Views, and Other Schema Objects"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/partitions-views-and-other-schema-objects.html"
+        scope: "semantics"
+        version_scope: "Oracle AI Database 26ai"
+  MySQL:
+    official_docs:
+      - title: "MySQL 8.4 Reference Manual: Overview of Partitioning in MySQL"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-overview.html"
+        scope: "semantics"
+        version_scope: "MySQL 8.4"
+      - title: "MySQL 8.4 Reference Manual: Partition Pruning"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-pruning.html"
+        scope: "performance"
+        version_scope: "MySQL 8.4"
+      - title: "MySQL 8.4 Reference Manual: Partitioning Limitations Relating to Storage Engines"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-limitations-storage-engines.html"
+        scope: "semantics"
+        version_scope: "MySQL 8.4"
+      - title: "MySQL 8.4 Reference Manual: Partition Management"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-management.html"
+        scope: "admin"
+        version_scope: "MySQL 8.4"
+    release_notes:
+      - title: "MySQL 8.4 Release Notes"
+        url: "https://dev.mysql.com/doc/relnotes/mysql/8.4/en/"
+        scope: "admin"
+        version_scope: "MySQL 8.4"
+    supporting: []
+  ANSI95:
+    official_docs: []
+    supporting:
+      - title: "Meta-Ebene: ANSI bleibt in dieser Episode bewusst ohne frei verfuegbare normative Primaerquelle"
+        url: ""
+        scope: "semantics"
+        version_scope: "nur Meta-Hinweis"
+
+claims_register:
+  - claim_id: "C1"
+    claim: "PostgreSQL beschreibt eine partitionierte Tabelle als virtuelle Tabelle; die Daten liegen physisch in den Partitionen."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N1", "N2", "N9"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+    confidence: "high"
+    article_section: "6. Deep Dive: PostgreSQL als fuehrendes System"
+
+  - claim_id: "C2"
+    claim: "PostgreSQL nennt Inheritance und UNION ALL views als alternative Methoden zur Datenteilung, weist aber darauf hin, dass diese nicht einige der Performance-Vorteile der eingebauten deklarativen Partitionierung haben."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N2", "N3"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+    confidence: "high"
+    article_section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+
+  - claim_id: "C3"
+    claim: "PostgreSQL hebt hervor, dass Partitioning durch den schnellen Weg des Droppens oder Detachens ganzer Partitionen gegenueber breiten DELETE-Operationen helfen kann."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N5"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+    confidence: "high"
+    article_section: "10. Die Hauptstrategien sauber eingeordnet"
+
+  - claim_id: "C4"
+    claim: "PostgreSQL warnt, dass eine grosse Anzahl von Partitionen zu laengeren Planungszeiten und hoeherem Speicherverbrauch fuehren kann."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N10"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+    confidence: "high"
+    article_section: "4. Wovon die Wahl abhaengt"
+
+  - claim_id: "C5"
+    claim: "SQL Server partitioniert Tabellen und Indizes ueber Partition Functions und Partition Schemes; Partitionierung ist dort Teil der physischen Struktur und Administration."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N2"]
+    supported_by:
+      - system: "SQLServer"
+        source_title: "Partitioned tables and indexes"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/partitions/partitioned-tables-and-indexes?view=sql-server-ver17"
+      - system: "SQLServer"
+        source_title: "CREATE PARTITION FUNCTION (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-partition-function-transact-sql?view=sql-server-ver17"
+    confidence: "high"
+    article_section: "Systemvergleich auf einen Blick"
+
+  - claim_id: "C6"
+    claim: "SQL Server bevorzugt fuer lokal partitionierte Daten auf demselben Server partitioned tables and indexes; partitioned views sind eine UNION ALL-View ueber mehrere Member-Tabellen."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N1", "N2", "N7"]
+    supported_by:
+      - system: "SQLServer"
+        source_title: "CREATE VIEW (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql?view=sql-server-ver17"
+      - system: "SQLServer"
+        source_title: "Partitioned tables and indexes"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/partitions/partitioned-tables-and-indexes?view=sql-server-ver17"
+    confidence: "high"
+    article_section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+
+  - claim_id: "C7"
+    claim: "SQL Server dokumentiert zusaetzlichen Verwaltungs- und Speicherbedarf bei vielen Partitionen; ausserdem muessen eindeutige Indizes auf partitionierten Tabellen den Partition Key enthalten."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N8"]
+    supported_by:
+      - system: "SQLServer"
+        source_title: "Partitioned tables and indexes"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/partitions/partitioned-tables-and-indexes?view=sql-server-ver17"
+    confidence: "high"
+    article_section: "8. Welche Rolle Indizes, Constraints, Routing, Logging und Betrieb spielen"
+
+  - claim_id: "C8"
+    claim: "Oracle positioniert Partitioning als Technik fuer Manageability, Performance und Availability und betont die hohe Unabhaengigkeit einzelner Partitionen."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N2"]
+    supported_by:
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning Concepts"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-concepts.html"
+    confidence: "high"
+    article_section: "Systemvergleich auf einen Blick"
+
+  - claim_id: "C9"
+    claim: "Oracle unterscheidet lokale und globale Indizes deutlich; lokale Indizes stuetzen Partition Independence und Maintenance, globale Indizes bringen haertere Folgekosten mit."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N8"]
+    supported_by:
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning for Availability, Manageability, and Performance"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-availability.html"
+      - system: "Oracle"
+        source_title: "Partitioning Concepts"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-concepts.html"
+    confidence: "high"
+    article_section: "8. Welche Rolle Indizes, Constraints, Routing, Logging und Betrieb spielen"
+
+  - claim_id: "C10"
+    claim: "MySQL beschreibt Partitionierung als horizontale Partitionierung einer Tabelle und ihrer Indizes in mehrere physische Teile."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N1", "N2"]
+    supported_by:
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual: Overview of Partitioning in MySQL"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-overview.html"
+    confidence: "high"
+    article_section: "1. Was horizontale Partitionierung hier bedeutet"
+
+  - claim_id: "C11"
+    claim: "MySQL Partition Pruning begrenzt den Zugriff nur dann auf relevante Partitionen, wenn der WHERE-Ausdruck auf die Partitionsgrenzen reduziert werden kann."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N5"]
+    supported_by:
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual: Partition Pruning"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-pruning.html"
+    confidence: "high"
+    article_section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+
+  - claim_id: "C12"
+    claim: "Partitionierte InnoDB-Tabellen in MySQL 8.4 unterstuetzen keine Foreign Keys; das ist ein harter Architekturkontrast zu den anderen drei Systemen."
+    evidence_level: "docs_based"
+    origin_note_ids: ["N8"]
+    supported_by:
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Reference Manual: Partitioning Limitations Relating to Storage Engines"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-limitations-storage-engines.html"
+    confidence: "high"
+    article_section: "8. Welche Rolle Indizes, Constraints, Routing, Logging und Betrieb spielen"
+
+  - claim_id: "C13"
+    claim: "Die sichtbare Versionsbasis fuer diese Episode ist SQL Server 2025, PostgreSQL 18.3, Oracle AI Database 26ai und MySQL 8.4."
+    evidence_level: "docs_based"
+    origin_note_ids: []
+    supported_by:
+      - system: "SQLServer"
+        source_title: "SQL Server 2025 release notes"
+        url: "https://learn.microsoft.com/en-us/sql/sql-server/sql-server-2025-release-notes?view=sql-server-ver17"
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18.3 Release Notes"
+        url: "https://www.postgresql.org/docs/release/18.3/"
+      - system: "Oracle"
+        source_title: "Oracle AI Database 26ai Documentation Library"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/books.html"
+      - system: "MySQL"
+        source_title: "MySQL 8.4 Release Notes"
+        url: "https://dev.mysql.com/doc/relnotes/mysql/8.4/en/"
+    confidence: "high"
+    article_section: "Versions- und Geltungsbereich"
+
+  - claim_id: "C14"
+    claim: "Native horizontale Partitionierung ist ueber alle vier Systeme dort am staerksten, wo eine logische Tabelle erhalten bleiben soll und derselbe Schluessel sowohl Pruning als auch Wartung oder Lifecycle auf Teilmengen traegt."
+    evidence_level: "inference_based"
+    origin_note_ids: ["N3", "N5"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+      - system: "SQLServer"
+        source_title: "Partitioned tables and indexes"
+        url: "https://learn.microsoft.com/en-us/sql/relational-databases/partitions/partitioned-tables-and-indexes?view=sql-server-ver17"
+      - system: "Oracle"
+        source_title: "Partitioning Concepts"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-concepts.html"
+      - system: "MySQL"
+        source_title: "Overview of Partitioning in MySQL"
+        url: "https://dev.mysql.com/doc/refman/8.4/en/partitioning-overview.html"
+    confidence: "medium"
+    article_section: "2. Warum die intuitive Sicht zu kurz greift"
+
+  - claim_id: "C15"
+    claim: "Mehrere Tabellen sind meist kein Ersatz fuer native Partitionierung, sondern ein eigenes Architekturmodell mit Kosten fuer Routing, UNION-Reporting, Migrationsgleichlauf und Schema-Governance."
+    evidence_level: "inference_based"
+    origin_note_ids: ["N4", "N7", "N8"]
+    supported_by:
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+      - system: "SQLServer"
+        source_title: "CREATE VIEW (Transact-SQL)"
+        url: "https://learn.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql?view=sql-server-ver17"
+    confidence: "medium"
+    article_section: "7. Die wichtigste praktische Unterscheidung"
+
+  - claim_id: "C16"
+    claim: "Mehrere Tabellen koennen eine robuste Form sein, wenn Datenraeume wirklich getrennt sein sollen, etwa wegen Ownership, Security, Retention oder Deployment."
+    evidence_level: "inference_based"
+    origin_note_ids: ["N6"]
+    supported_by:
+      - system: "Oracle"
+        source_title: "Partitioning Concepts"
+        url: "https://docs.oracle.com/en/database/oracle/oracle-database/26/vldbg/partition-concepts.html"
+      - system: "PostgreSQL"
+        source_title: "PostgreSQL 18: Table Partitioning"
+        url: "https://www.postgresql.org/docs/18/ddl-partitioning.html"
+    confidence: "medium"
+    article_section: "10. Die Hauptstrategien sauber eingeordnet"
+
+quality_gates:
+  - "Mindestens eine offizielle Quelle pro relevantem System"
+  - "Versionsbezug jeder Quelle ist dokumentiert"
+  - "Zentrale Claims sind im claims_register hinterlegt"
+  - "Jeder Claim traegt einen Evidenz-Level"
+  - "Notizgetriebene Claims sind als Input-Herkunft markiert, aber nicht mit Notizen selbst belegt"

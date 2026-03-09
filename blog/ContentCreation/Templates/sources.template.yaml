@@ -1,0 +1,68 @@
+metadata:
+  topic_slug: ""
+  as_of_date: "YYYY-MM-DD"
+  maintained_by: ""
+  notes: ""
+  notes_input_path: "blog/<topic-slug>/notes.md"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: ""
+    include: false
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: ""
+    include: false
+  Oracle:
+    product: "Oracle Database"
+    version: ""
+    include: false
+  MySQL:
+    product: "MySQL"
+    version: ""
+    include: false
+
+sources:
+  SQLServer:
+    official_docs:
+      - title: ""
+        url: ""
+        scope: "syntax | semantics | performance | admin"
+        version_scope: ""
+    release_notes: []
+    supporting: []
+  PostgreSQL:
+    official_docs: []
+    release_notes: []
+    supporting: []
+  Oracle:
+    official_docs: []
+    release_notes: []
+    supporting: []
+  MySQL:
+    official_docs: []
+    release_notes: []
+    supporting: []
+  ANSI95:
+    official_docs: []
+    supporting: []
+
+claims_register:
+  - claim_id: "C1"
+    claim: ""
+    evidence_level: "docs_based"
+    origin_note_ids: []
+    supported_by:
+      - system: ""
+        source_title: ""
+        url: ""
+    confidence: "high"
+    article_section: ""
+
+quality_gates:
+  - "Mindestens eine offizielle Quelle pro relevantem System"
+  - "Versionsbezug jeder Quelle ist dokumentiert"
+  - "Zentrale Claims sind im claims_register hinterlegt"
+  - "Jeder Claim traegt einen Evidenz-Level"
+  - "Notizgetriebene Claims sind als Input-Herkunft markiert, aber nicht mit Notizen selbst belegt"

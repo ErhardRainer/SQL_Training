@@ -1,0 +1,82 @@
+metadata:
+  topic_slug: "update-with-join"
+  generated_at: "2026-03-08"
+  article_readme: "blog/update-with-join/README.md"
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+
+blog_to_training:
+  block_title: "Dialektspezifische Schulungsunterlagen"
+  insert_after_heading: "Versions- und Geltungsbereich"
+  targets:
+    - system: "SQLServer"
+      path: "T-SQL/08_Update/08_Update.md"
+      label: "T-SQL - UPDATE Uebersicht"
+      relation: "dialect_specific_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/03_JOIN/03_Join.md"
+      label: "T-SQL - JOIN Uebersicht"
+      relation: "dialect_specific_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/13_Merge/13_Merge.md"
+      label: "T-SQL - MERGE Uebersicht"
+      relation: "dialect_specific_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/19_Transaktions/19_Transactions.md"
+      label: "T-SQL - Transaktionen"
+      relation: "dialect_specific_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/60_IsolationLevels/60_IsolationLevels.md"
+      label: "T-SQL - Isolation Levels"
+      relation: "dialect_specific_training"
+      exists: true
+
+blog_to_blog:
+  block_title: "Verwandte Themen"
+  insert_before_heading: "12. Fazit"
+  targets: []
+
+training_backlinks:
+  block_title: "Verwandte Langform-Artikel"
+  targets:
+    - path: "T-SQL/README.md"
+      insert_after_heading: "## Spezial-Kapitel (60+)"
+      backlink_label: "Blog - Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+      backlink_target: "blog/update-with-join/README.md"
+      exists: true
+    - path: "PostgreSQL/README.md"
+      insert_after_heading: "# PostgreSQL"
+      backlink_label: "Blog - Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+      backlink_target: "blog/update-with-join/README.md"
+      exists: true
+    - path: "Oracle/README.md"
+      insert_after_heading: "# Oracle"
+      backlink_label: "Blog - Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+      backlink_target: "blog/update-with-join/README.md"
+      exists: true
+    - path: "MySQL/README.md"
+      insert_after_heading: "# MySQL"
+      backlink_label: "Blog - Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+      backlink_target: "blog/update-with-join/README.md"
+      exists: true
+
+validation:
+  require_existing_targets: true
+  require_relative_links: true
+  fail_if_missing: false
+  report_path: "blog/update-with-join/link-report.md"
+
+quality_gates:
+  - "Blog verlinkt auf passende Trainingsunterlagen"
+  - "Trainingsunterlagen verlinken zurueck auf den Blog-Artikel"
+  - "Verwandte Blog-Themen werden nur gesetzt, wenn semantisch passend"
+  - "Alle relativen Pfade werden vor Finalisierung validiert"

@@ -1,0 +1,102 @@
+metadata:
+  topic_slug: "index_disable_rebuild_drop_create"
+  generated_at: "2026-03-09"
+  article_readme: "blog/index_disable_rebuild_drop_create/README.md"
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+
+blog_to_training:
+  available_block_title: "Verfuegbare Schulungsunterlagen im Repository"
+  missing_dialects_block_title: "Weitere Dialekte in dieser Episode"
+  insert_after_heading: "Methodischer Status"
+  targets:
+    - system: "SQLServer"
+      path: "T-SQL/26_Indexes_Basics/26_Indexes_Basics.md"
+      label: "T-SQL - Index Basics"
+      relation: "dialect_specific_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/16_DataIntegrity_Constraints/16_DataIntegrity_Constraints.md"
+      label: "T-SQL - Data Integrity Constraints"
+      relation: "supporting_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/30_BulkLoad_BCP_BULKINSERT/30_BulkLoad_BCP_BULKINSERT.md"
+      label: "T-SQL - Bulk Load und Export"
+      relation: "supporting_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/64_PerformanceTuning_Advanced/64_PerformanceTuning_Advanced.md"
+      label: "T-SQL - Performance Tuning Advanced"
+      relation: "supporting_training"
+      exists: true
+    - system: "SQLServer"
+      path: "T-SQL/65_Partitioning/65_Partitioning.md"
+      label: "T-SQL - Partitionierung"
+      relation: "supporting_training"
+      exists: true
+
+blog_to_blog:
+  episode_dialects_without_training:
+    - "PostgreSQL"
+    - "Oracle"
+    - "MySQL"
+  missing_dialects_note: "PostgreSQL, Oracle und MySQL werden in dieser Episode fachlich mitbehandelt. Eigene themenspezifische Trainingskapitel in diesen Root-Ordnern folgen spaeter."
+  block_title: "Verwandte Themen"
+  insert_before_heading: "Fazit"
+  targets:
+    - path: "blog/update-with-join/README.md"
+      label: "Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+      relation: "related_problem_class"
+      exists: true
+    - path: "blog/partitionierung/README.md"
+      label: "Partitionierung: Wann mehrere Partitionen wirklich helfen - und wann nicht"
+      relation: "related_operational_strategy"
+      exists: true
+
+training_backlinks:
+  block_title: "Verwandte Langform-Artikel"
+  targets:
+    - path: "T-SQL/README.md"
+      insert_after_heading: "Verwandte Langform-Artikel"
+      backlink_label: "Blog - Index Disable + Rebuild vs. Drop + Create: Wann welche Strategie sinnvoll ist"
+      backlink_target: "blog/index_disable_rebuild_drop_create/README.md"
+      exists: true
+    - path: "PostgreSQL/README.md"
+      insert_after_heading: "Verwandte Langform-Artikel"
+      backlink_label: "Blog - Index Disable + Rebuild vs. Drop + Create: Wann welche Strategie sinnvoll ist"
+      backlink_target: "blog/index_disable_rebuild_drop_create/README.md"
+      exists: true
+    - path: "Oracle/README.md"
+      insert_after_heading: "Verwandte Langform-Artikel"
+      backlink_label: "Blog - Index Disable + Rebuild vs. Drop + Create: Wann welche Strategie sinnvoll ist"
+      backlink_target: "blog/index_disable_rebuild_drop_create/README.md"
+      exists: true
+    - path: "MySQL/README.md"
+      insert_after_heading: "Verwandte Langform-Artikel"
+      backlink_label: "Blog - Index Disable + Rebuild vs. Drop + Create: Wann welche Strategie sinnvoll ist"
+      backlink_target: "blog/index_disable_rebuild_drop_create/README.md"
+      exists: true
+
+render_rules:
+  suppress_empty_blog_to_blog: false
+  suppress_empty_available_training_block: false
+  suppress_empty_missing_dialects_block: false
+
+validation:
+  require_existing_targets: true
+  require_relative_links: true
+  fail_if_missing: false
+  report_path: "blog/index_disable_rebuild_drop_create/link-report.md"
+
+quality_gates:
+  - "Blog verlinkt auf passende Trainingsunterlagen"
+  - "Leere optionale Linkbloecke werden unterdrueckt"
+  - "Trainingsunterlagen verlinken zurueck auf den Blog-Artikel"
+  - "Verwandte Blog-Themen werden nur gesetzt, wenn semantisch passend"
+  - "Alle relativen Pfade werden vor Finalisierung validiert"

@@ -1,0 +1,352 @@
+metadata:
+  topic_slug: "partitionierung"
+  generated_at: "2026-03-08"
+  pipeline_mode: "article_only"
+  based_on:
+    episode: "blog/partitionierung/episode.yaml"
+    sources: "blog/partitionierung/sources.yaml"
+    insights: "blog/partitionierung/demo/insights.yaml (not generated in this run)"
+
+anchor_story:
+  title: "Die Partitionen sind da, der Gewinn aber nicht"
+  symptom: "Die Tabelle ist monatsweise partitioniert, doch das Reporting scannt weiter fast alles, und der monatliche Purge bleibt ein teures Delete statt eines schnellen Wartungspfads."
+  scenario: "Das Team hat nach Volumen partitioniert, nicht nach echten Filter- und Lebenszyklusmustern. Die Fachabfragen filtern auf customer_id statt auf sale_date, und niemand hat vorab geklaert, ob das System ueberhaupt wenige Partitionen ausschliessen kann."
+  evidence_level: "inference_based"
+  source_refs:
+    - "C13"
+    - "C14"
+  article_usage:
+    section: "1. Was das Problem eigentlich ist"
+    style: "inline"
+
+syntax_surface:
+  SQLServer:
+    snippet: "CREATE PARTITION FUNCTION pf_salesdate (date) AS RANGE RIGHT FOR VALUES ('2026-01-01', '2026-02-01');\nCREATE PARTITION SCHEME ps_salesdate AS PARTITION pf_salesdate ALL TO ([PRIMARY]);"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C1"
+  PostgreSQL:
+    snippet: "CREATE TABLE measurement (logdate date NOT NULL, city_id int NOT NULL) PARTITION BY RANGE (logdate);\nCREATE TABLE measurement_y2026m01 PARTITION OF measurement FOR VALUES FROM ('2026-01-01') TO ('2026-02-01');"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C5"
+  Oracle:
+    snippet: "CREATE TABLE sales_interval (id number, sale_date date)\nPARTITION BY RANGE (sale_date)\nINTERVAL (NUMTOYMINTERVAL(1, 'MONTH'))\n( PARTITION p_before_2026 VALUES LESS THAN (DATE '2026-01-01') );"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C7"
+  MySQL:
+    snippet: "CREATE TABLE sales_range (id bigint not null, sale_date date not null)\nPARTITION BY RANGE (TO_DAYS(sale_date)) (\n  PARTITION p202601 VALUES LESS THAN (TO_DAYS('2026-02-01')),\n  PARTITION pmax VALUES LESS THAN MAXVALUE\n);"
+    evidence_level: "docs_based"
+    source_refs:
+      - "C9"
+
+dialect_min_examples:
+  SQLServer:
+    snippet: "SELECT *\nFROM dbo.sales\nWHERE sale_date >= '2026-01-01'\n  AND sale_date < '2026-02-01';"
+    focus: "Sargierbarer Bereichsfilter als Voraussetzung fuer Partition Elimination."
+    error_case: "WHERE YEAR(sale_date) = 2026 wirkt lesbar, passt aber nicht zur Partitionierungsidee."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C2"
+  PostgreSQL:
+    snippet: "SELECT *\nFROM measurement\nWHERE logdate >= DATE '2026-01-01'\n  AND logdate < DATE '2026-02-01';"
+    focus: "Declarative Partitioning ueber den Parent mit sauberem Bereichsfilter."
+    error_case: "Zu viele Partitionen oder ein Filter ausserhalb des Partition Keys kosten Planung und Speicher."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C5"
+      - "C6"
+  Oracle:
+    snippet: "SELECT *\nFROM sales_interval\nWHERE sale_date >= DATE '2026-01-01'\n  AND sale_date < DATE '2026-02-01';"
+    focus: "Range- oder Interval-Partitionierung mit klarer Zeitgrenze."
+    error_case: "Global index maintenance kann den scheinbar einfachen Wartungsvorteil relativieren."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C7"
+      - "C8"
+  MySQL:
+    snippet: "SELECT *\nFROM sales_range\nWHERE sale_date >= '2026-01-01'\n  AND sale_date < '2026-02-01';"
+    focus: "Partition Pruning braucht einen Ausdruck, der die Partitionsgrenzen wirklich nutzbar macht."
+    error_case: "FK-nahe InnoDB-Designs koennen an Partitionierungsgrenzen scheitern."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C10"
+      - "C11"
+
+dialect_preflight_blocks:
+  - id: "DP1"
+    intent: "Pruefen, ob typische Reads entlang des Partition Keys laufen"
+    systems:
+      SQLServer:
+        snippet: "SELECT COUNT(*) AS candidate_rows\nFROM dbo.sales\nWHERE sale_date >= '2026-01-01'\n  AND sale_date < '2026-02-01';"
+        natural_form: "Erst den nativen Bereichsfilter pruefen, dann ueber Plan oder Partitionsdiagnose bestaetigen."
+        idiomatic_solution: "Datumsbereich mit offener Obergrenze statt Funktionsfilter."
+        protection_pattern: "Partition Key nicht in YEAR(), CONVERT() oder andere Ausdrucke einpacken."
+        safe_pattern_note: "Die Leselogik muss zur Partition Function passen."
+        pitfall: "Ein guter Index allein ersetzt keine passende Partition Elimination."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C2"
+      PostgreSQL:
+        snippet: "EXPLAIN SELECT *\nFROM measurement\nWHERE logdate >= DATE '2026-01-01'\n  AND logdate < DATE '2026-02-01';"
+        natural_form: "Ueber den Parent gehen, aber mit Bounds filtern, die Declarative Partitioning wirklich nutzen kann."
+        idiomatic_solution: "Datumsbereich klar auf dem Partition Key formulieren."
+        protection_pattern: "Nicht zuerst die Child-Tabellen manuell ansteuern, wenn der Parent die natuerliche Oberflaeche ist."
+        safe_pattern_note: "Das System darf wenige Partitionen sehen, nicht die gesamte Familie."
+        pitfall: "Zu viele Partitionen schlagen schon vor der eigentlichen Ausfuehrung auf Planung und Speicher durch."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C5"
+          - "C6"
+      Oracle:
+        snippet: "SELECT COUNT(*)\nFROM sales_interval\nWHERE sale_date >= DATE '2026-01-01'\n  AND sale_date < DATE '2026-02-01';"
+        natural_form: "Auf saubere Bereichsbedingungen und passende Indexwahl achten."
+        idiomatic_solution: "Zeitachsen natuerlich als Range- oder Interval-Muster modellieren."
+        protection_pattern: "Lokale und globale Indexwirkung vorab getrennt durchdenken."
+        safe_pattern_note: "Pruning und Indexstrategie muessen zueinander passen."
+        pitfall: "Die Partitionierung ist nicht automatisch robust, wenn globale Indizes spaeter jede Maintenance verteuern."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C7"
+          - "C8"
+      MySQL:
+        snippet: "EXPLAIN PARTITIONS\nSELECT *\nFROM sales_range\nWHERE sale_date >= '2026-01-01'\n  AND sale_date < '2026-02-01';"
+        natural_form: "Mit EXPLAIN PARTITIONS gegen die echten Filter pruefen, nicht nur gegen die DDL-Idee."
+        idiomatic_solution: "Einfache Range-Bounds und einfacher Partitionsausdruck."
+        protection_pattern: "Komplexe Ausdrucke im Partitionsausdruck vermeiden."
+        safe_pattern_note: "Pruning muss sichtbar wenige Partitionen uebrig lassen."
+        pitfall: "Partitionierung hilft nicht, wenn der Ausdruck oder die Abfragegrenze die Partitionslogik verdeckt."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C10"
+
+  - id: "DP2"
+    intent: "Pruefen, ob der Datenlebenszyklus echte Partition Operations rechtfertigt"
+    systems:
+      SQLServer:
+        snippet: "ALTER PARTITION FUNCTION pf_salesdate()\nSPLIT RANGE ('2026-03-01');"
+        natural_form: "Vor dem naechsten Zeitfenster neue Grenze vorbereiten und den Switch-Pfad technisch pruefen."
+        idiomatic_solution: "Leere Randpartition plus strukturgleiche Staging-Tabelle."
+        protection_pattern: "Check-Constraints und aligned indexes vor jedem SWITCH pruefen."
+        safe_pattern_note: "Sliding Window ist eine Wartungsstrategie, keine spontane Notmassnahme."
+        pitfall: "Ein unvorbereiteter Grenzsplit im Stressfenster laesst den vermeintlichen Vorteil schnell verschwinden."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C4"
+      PostgreSQL:
+        snippet: "ALTER TABLE measurement DETACH PARTITION measurement_y2025m12;"
+        natural_form: "Detach oder Drop als Wartungspfad gegen grossvolumige Deletes abwaegen."
+        idiomatic_solution: "Partitionen frueh anlegen und spaeter gezielt abhaengen."
+        protection_pattern: "Bounds und Benennungen so halten, dass die Betriebsroutine nicht ratet."
+        safe_pattern_note: "Eine gute Partitionierung vereinfacht Purge und Archivierung sichtbar."
+        pitfall: "Wenn jede Retention-Aktion trotzdem ueber alle Partitionen denkt, war das Modell nicht klar genug."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C5"
+      Oracle:
+        snippet: "ALTER TABLE sales_range EXCHANGE PARTITION p2026_01 WITH TABLE sales_stage;"
+        natural_form: "Exchange als Betriebshebel nur mit vorbereiteter Index- und Constraint-Strategie einsetzen."
+        idiomatic_solution: "Zeitfenster, Exchange-Pfad und Indexverhalten zusammen planen."
+        protection_pattern: "Lokale gegen globale Indexfolgen vorab abwaegen."
+        safe_pattern_note: "Oracle belohnt disziplinierte Wartungsmodelle, nicht improvisierte DDL."
+        pitfall: "Ohne Indexstrategie wird Exchange schnell vom Feature zur Last."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C7"
+          - "C8"
+      MySQL:
+        snippet: "ALTER TABLE sales_range TRUNCATE PARTITION p202501;"
+        natural_form: "Pruefen, ob Truncate, Reorganize oder Exchange Partition den Lebenszyklus wirklich erleichtern."
+        idiomatic_solution: "Einfache Range-Partitionierung mit klaren Retention-Schritten."
+        protection_pattern: "Storage-Engine- und FK-Grenzen vorab lesen."
+        safe_pattern_note: "Nicht jede MySQL-Tabelle wird durch Partitionierung wartbarer."
+        pitfall: "Engine-Grenzen erst nach dem Design zu lesen, ist ein klassischer Teamfehler."
+        evidence_level: "docs_based"
+        source_refs:
+          - "C9"
+          - "C11"
+
+dialect_safety_patterns:
+  SQLServer:
+    snippet: "CREATE TABLE dbo.sales_stage ( ... );\nALTER TABLE dbo.sales_stage WITH CHECK ADD CONSTRAINT ck_sales_stage_2026m01 CHECK (sale_date >= '2026-01-01' AND sale_date < '2026-02-01');"
+    purpose: "Den Staging- oder Switch-Pfad auf eine einzige Zielpartition absichern."
+    idiomatic_role: "Switch-ready vorbereitete Arbeitsmenge."
+    pitfall_avoided: "Versehentliches Einswitchen einer Datenmenge ausserhalb der Zielgrenze."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C4"
+  PostgreSQL:
+    snippet: "CREATE TABLE measurement_y2026m02\n  PARTITION OF measurement\n  FOR VALUES FROM ('2026-02-01') TO ('2026-03-01');"
+    purpose: "Naechste Zeitpartition vorab anlegen, statt den Betrieb bei Eintreffen neuer Daten zu improvisieren."
+    idiomatic_role: "Betriebsvorbereitung fuer deklarative Partitionierung."
+    pitfall_avoided: "Spontane Lastspitzen und hektische DDL waehrend des Produktivlaufs."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C5"
+  Oracle:
+    snippet: "CREATE INDEX sales_local_ix ON sales_interval (sale_date) LOCAL;"
+    purpose: "Wartungsnahe Indexstrategie sichtbar machen."
+    idiomatic_role: "Lokaler Index als natuerliches Wartungsmuster fuer Partition Operations."
+    pitfall_avoided: "Spaet erkannte globale Indexkosten bei Maintenance."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C8"
+  MySQL:
+    snippet: "/* Vor der Einfuehrung: FK- und Storage-Engine-Grenzen gegen das Design pruefen */\nEXPLAIN PARTITIONS SELECT * FROM sales_range WHERE sale_date >= '2026-01-01' AND sale_date < '2026-02-01';"
+    purpose: "Vor dem Entwurf pruefen, ob Engine-Grenzen und Pruning-Nutzen ueberhaupt zur Tabelle passen."
+    idiomatic_role: "Fruehe Architekturpruefung statt spaeter Notkorrektur."
+    pitfall_avoided: "Partitionierung auf einer Tabelle, die wegen Engine-Grenzen oder query-blindem Design nie sauber profitiert."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C10"
+      - "C11"
+
+historical_contrast_snippets: []
+
+micro_examples:
+  - id: "MX1"
+    class: "robust"
+    title: "Monatsgrenzen plus echte Monatsfilter"
+    purpose: "Zeigen, wann Partitionierung sowohl fuer Reads als auch fuer Retention natuerlich wird."
+    forward_reference_hint: "Die formalen Risikoklassen folgen spaeter in Abschnitt 3 des Artikels."
+    snippet: "Partition Key: sale_date pro Monat\nHauptabfragen: WHERE sale_date >= :from AND sale_date < :to\nBetrieb: neue Periode anlegen, alte Periode archivieren oder abhaengen"
+    evidence_level: "inference_based"
+    source_refs:
+      - "C13"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX2"
+    class: "risky"
+    title: "Zeitpartitionierung, aber die echten Filterschaeden liegen woanders"
+    purpose: "Den Hauptfehlerfall sichtbar machen: Partitionierung ohne passende Zugriffsmuster."
+    forward_reference_hint: "Diese Form landet spaeter in den Klassen risky oder avoid."
+    snippet: "Partition Key: sale_date\nHauptabfragen: WHERE customer_id = :id\nFolge: fast jede wichtige Query bleibt partitionierungsblind"
+    evidence_level: "inference_based"
+    source_refs:
+      - "C13"
+      - "C14"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX3"
+    class: "prepared_source"
+    title: "Vorbereiteter Wartungspfad statt heroisches Delete"
+    purpose: "Den empfohlenen Wechsel von row-by-row Wartung zu vorbereiteten Partition Operations markieren."
+    forward_reference_hint: "Die robuste Form wird spaeter in den Strategien konkretisiert."
+    snippet: "Neue Periode vorbereiten -> Daten laden oder einspielen -> alte Periode switchen, detachen, exchangen oder truncaten"
+    evidence_level: "inference_based"
+    source_refs:
+      - "C4"
+      - "C5"
+      - "C9"
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+
+strategy_snippets:
+  - id: "SS1"
+    strategy: "sliding_window_sqlserver"
+    target_risk_class: "robust"
+    snippet: "ALTER PARTITION FUNCTION pf_salesdate() SPLIT RANGE ('2026-03-01');\n-- Daten nur fuer Februar 2026 in dbo.sales_stage bereitstellen\nALTER TABLE dbo.sales_stage SWITCH TO dbo.sales PARTITION 2;\n-- Alte Periode danach ausswitchen oder archivieren"
+    operational_caveat: "Die Staging-Tabelle muss strukturgleich sein; Check-Constraint, Indexausrichtung und Terminierung des Monatsfensters muessen vorher stimmen."
+    evidence_level: "docs_based"
+    source_refs:
+      - "C4"
+    article_usage:
+      section: "10. Die Hauptstrategien sauber eingeordnet"
+      style: "code"
+
+comparison_tables:
+  - id: "CT1"
+    title: "Partitionierung auf einen Blick"
+    dimensions:
+      - "System"
+      - "Natuerliche Leitidee"
+      - "Pruning-Story"
+      - "Wartungshebel"
+      - "Typischer Kipppunkt"
+    rows:
+      - system: "SQLServer"
+        natuerliche_leitidee: "Partition Function plus Scheme, oft mit Sliding Window"
+        pruning_story: "Stark bei sargierbaren Filtern auf dem Partition Key"
+        wartungshebel: "SWITCH, Split, Merge, aligned indexes"
+        typischer_kipppunkt: "Falscher Key oder nicht alignede Indexstruktur"
+      - system: "PostgreSQL"
+        natuerliche_leitidee: "Declarative Partitioning ueber Parent und Child-Tabellen"
+        pruning_story: "Pruning ueber passende Bounds, aber Planner-Kosten zaehlen mit"
+        wartungshebel: "ATTACH, DETACH, DROP PARTITION"
+        typischer_kipppunkt: "Zu viele Partitionen mit wachsender Planungslast"
+      - system: "Oracle"
+        natuerliche_leitidee: "Breite Partitioning-Disziplin fuer Wartung und Performance"
+        pruning_story: "Pruning plus lokale oder globale Indexstrategie"
+        wartungshebel: "Exchange, Interval, lokale oder globale Indexpfade"
+        typischer_kipppunkt: "Globale Indexfolgen nicht mitgeplant"
+      - system: "MySQL"
+        natuerliche_leitidee: "Einfachere Partitionierungsformen mit engeren Engine-Grenzen"
+        pruning_story: "Hilft nur bei wirklich passendem Partitionsausdruck"
+        wartungshebel: "REORGANIZE, TRUNCATE, EXCHANGE PARTITION"
+        typischer_kipppunkt: "Engine- oder FK-Grenzen zu spaet gelesen"
+    article_usage:
+      section: "Systemvergleich auf einen Blick"
+      style: "table"
+
+warning_boxes:
+  - id: "WB1"
+    title: "Die haeufigste Produktionsfalle"
+    message: "Partitioniere keine grosse Tabelle nur deshalb, weil sie gross ist. Wenn Query-Muster und Lebenszyklus nicht auf dem Partition Key liegen, bleiben Pruning-Gewinn und Wartungsgewinn schwach, waehrend Metadaten-, Planungs- und Betriebsaufwand steigen."
+    severity: "high"
+    evidence_level: "inference_based"
+    source_refs:
+      - "C13"
+      - "C14"
+
+anti_pattern_blocks:
+  - id: "AP1"
+    anti_pattern: "Jede Monatsgrenze als eigene Partition, obwohl die kritischen Queries fast nur ueber customer_id, status oder freie Suche laufen."
+    robust_form: "Nur dann nach Monat partitionieren, wenn Monatsfilter, Retention oder Ladefenster wirklich entlang derselben Zeitachse arbeiten; sonst zuerst Index- und Query-Design korrigieren."
+    rationale: "Partitionierung ersetzt weder Datenmodellierung noch sargierbare Zugriffspfade."
+    evidence_level: "inference_based"
+    source_refs:
+      - "C13"
+      - "C14"
+
+signature_visual:
+  format: "ascii"
+  title: "Leselogik vs. Wartungslogik"
+  purpose: "Den Kernnutzen von Partitionierung in zwei getrennten, aber idealerweise deckungsgleichen Pfaden sichtbar machen."
+  body: "Leselogik:   WHERE sale_date im Fenster  -> wenige Partitionen lesen -> weniger unnoetiges I/O\nWartungslogik: neue Periode vorbereiten -> Daten einspielen -> alte Periode detach, switch oder drop\nKernfrage: Nutzen beide Pfade denselben Partition Key, oder lebt nur die DDL davon?"
+  evidence_level: "inference_based"
+  source_refs:
+    - "C13"
+  article_usage:
+    section: "7. Die wichtigste praktische Unterscheidung"
+    style: "diagram"
+
+decision_visual:
+  format: "mermaid"
+  title: "Soll die Tabelle wirklich partitioniert werden?"
+  body: "flowchart TD\n    A[Klarer Datenlebenszyklus?] -->|Nein| B[Nur ueber Query-Muster weiterpruefen]\n    A -->|Ja| C[Wichtige Queries filtern auf dem Partition Key?]\n    C -->|Ja| D[Pruning und Wartung koennen zusammenwirken]\n    C -->|Nein| E[Maintenance-first oder keine Partitionierung]\n    D --> F[Partitionszahl und Indexfolgen tragbar?]\n    E --> F\n    F -->|Nein| G[Design vereinfachen oder verwerfen]\n    F -->|Ja| H[robust oder conditionally_safe]"
+  evidence_level: "inference_based"
+  source_refs:
+    - "C13"
+    - "C14"
+
+quality_gates:
+  - "Mindestens eine Ankergeschichte oder ein konkretes Fehlersymptom ist vorhanden"
+  - "Mindestens ein robustes Micro-Beispiel ist vorhanden"
+  - "Mindestens ein riskantes Micro-Beispiel ist vorhanden"
+  - "Mindestens eine sichere Alternativstrategie mit vorbereiteter Quelle ist vorhanden"
+  - "Dialect-aware Preflight-Bloecke sind pro relevanten Dialekt vorhanden oder bewusst begrenzt"
+  - "Pro relevantem Dialekt ist ein natuerliches Sicherheits- oder Vorbereitungs-Muster vorbereitet"
+  - "Pro behandeltem System ist ein minimales Beispiel mit Fokus und Fehlerfall vorbereitet"
+  - "Keine historische Kontrastversion ist aktiv gewichtet; darum bleibt der Block leer"
+  - "Empfohlene Strategien besitzen minimale Code-Skelette"
+  - "Mindestens eine Vergleichstabelle ist vorhanden"
+  - "Mindestens ein Warnhinweis ist vorhanden"
+  - "Mindestens ein Anti-Pattern-vs.-robuste-Form-Block ist vorhanden"
+  - "Eine visuelle Darstellung des Entscheidungsmodells ist vorhanden"
+  - "Eine zweite merkfaehige Hauptvisualisierung ist vorhanden"
+  - "Syntax-Oberflaechen bleiben kurz"
+  - "Evidenz-Level sind pro Snippet dokumentiert"

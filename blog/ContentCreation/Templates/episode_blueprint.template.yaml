@@ -1,0 +1,455 @@
+article:
+  title: ""
+  slug: ""
+  topic_number: 0
+  as_of_date: "YYYY-MM-DD"
+  status: "draft"   # draft | reviewed | approved | published
+  language: "de"
+  series: "SQL-Mastery: Entfessle die Macht der Daten"
+  leading_system: "" # SQLServer | PostgreSQL | Oracle | MySQL
+  canonical_label: ""
+  thesis: ""
+  summary_goal: ""
+  audience:
+    - "Fortgeschrittene SQL-Anwender"
+    - "DBA"
+    - "Data Engineers"
+  tone:
+    intro_dialog: "humorous_but_not_banal"
+    body: "technical_precise"
+    ending: "respectful_reconciliation"
+
+workflow:
+  allowed_phases:
+    - "01_episode_yaml_builder"
+    - "01a_sources_research"
+    - "02_episode_yaml_validator"
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "05a_micro_examples_builder"
+    - "06_article_writer"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+    - "09_crosslink_planning"
+    - "10_crosslink_integration"
+    - "11_link_validation"
+    - "12_self_review"
+    - "13_external_review"
+    - "14_finalize_article"
+    - "final"
+  pipeline_mode: "full"   # full | article_only
+  current_phase: "01_episode_yaml_builder"
+  target_phase: "12_self_review"
+  skip_steps: []
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: ""
+    include: false
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: ""
+    include: false
+  Oracle:
+    product: "Oracle Database"
+    version: ""
+    include: false
+  MySQL:
+    product: "MySQL"
+    version: ""
+    include: false
+  ANSI95:
+    product: "SQL Standard"
+    version: "nur dort, wo fachlich relevant"
+    include: true
+
+repository_paths:
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+  article_readme: "blog/<topic-slug>/README.md"
+  episode_yaml: "blog/<topic-slug>/episode.yaml"
+  demo_spec: "blog/<topic-slug>/demo/demo_spec.yaml"
+  insights: "blog/<topic-slug>/demo/insights.yaml"
+  micro_examples: "blog/<topic-slug>/micro_examples.yaml"
+  sources: "blog/<topic-slug>/sources.yaml"
+  notes_md: "blog/<topic-slug>/notes.md"
+  crosslinks_plan: "blog/<topic-slug>/crosslinks_plan.yaml"
+
+author_notes:
+  source_path: "blog/<topic-slug>/notes.md"
+  use_if_present: true
+  note_items:
+    - id: "N1"
+      summary: ""
+      priority: "must_cover"   # must_cover | should_cover | optional_context | out_of_scope
+      planned_section: ""
+      planned_artifact: ""     # article_body | sources | micro_examples | code_examples | crosslinks
+      handling: "integrate"    # integrate | defer | omit_with_reason
+      rationale: ""
+
+evidence_model:
+  allowed_levels:
+    - "docs_based"
+    - "inference_based"
+    - "demo_based"
+    - "executed_test_based"
+    - "benchmark_based"
+  available_levels: []
+  wording_rules:
+    docs_based: "dokumentationsbasiert formulieren"
+    inference_based: "vorsichtig und als Ableitung markieren"
+    demo_based: "an konkreten Beispielen belegen"
+    executed_test_based: "operativ belastbar formulieren"
+    benchmark_based: "leistungsbezogene Aussagen zulassen"
+
+render_rules:
+  suppress_empty_related_blog_articles: true
+  suppress_empty_training_blocks: true
+  suppress_absent_benchmarks: true
+  suppress_absent_demo_results: true
+  suppress_empty_method_status_lines: true
+  suppress_internal_pipeline_terms_in_body: true
+
+presentation:
+  persona_mode: "intro_outro_only"   # intro_outro_only | transition_asides
+  reader_guide_position: "before_visible_metadata"   # before_visible_metadata | after_visible_metadata
+  toc_position: "after_scope_before_heavy_blocks"   # after_scope_before_heavy_blocks
+  pre_toc_zone_style: "compact"   # compact | collapsible
+  allowed_pre_toc_blocks:
+    - "reader_guide_or_short_tldr"
+    - "versions_and_scope"
+    - "method_status"
+    - "leading_system_rationale"
+    - "training_links"
+    - "dialect_availability_note"
+  standalone_sections_must_appear_in_toc: true
+  persona_entry_position: "before_first_main_section"   # after_title | before_first_main_section
+  require_comparison_table: true
+  require_warning_box: true
+  require_anti_pattern_block: true
+  require_decision_visual: true
+  require_signature_visual: true
+  require_min_examples_per_treated_system: true
+  require_explicit_error_case: true
+  require_anchor_failure_story: true
+  require_historical_contrast_snippets: true
+  require_strategy_code_for_recommended_patterns: true
+  require_risk_class_cross_references: true
+  require_forward_reference_for_early_class_labels: true
+  require_operational_caveats_in_strategy_code: true
+  avoid_adjacent_framework_duplication: true
+  require_dialect_aware_prechecks: true
+  require_dialect_native_safety_patterns: true
+  require_practical_observations: true
+  allow_controlled_expert_judgment: true
+  framing_goal: "same_problem_four_database_cultures"
+
+systems:
+  SQLServer:
+    role: "none"       # lead | contrast_strong | contrast | exkurs_relevant | hint | none
+    reason: ""
+  PostgreSQL:
+    role: "none"
+    reason: ""
+  Oracle:
+    role: "none"
+    reason: ""
+  MySQL:
+    role: "none"
+    reason: ""
+  ANSI95:
+    role: "meta"
+    reason: "Trennt Standard, Problemklasse und Produktauspraegung."
+
+chapters:
+  - id: 1
+    title: "Einstieg mit Dialog"
+    purpose: "Thema eroeffnen und Unterschiede andeuten"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 2
+    title: "Leserleitfaden"
+    purpose: "Lesepfade nach Zielgruppe, Systeminteresse und Tiefe"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 3
+    title: "TL;DR gesamt und pro System"
+    purpose: "Schnelle Orientierung"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 4
+    title: "Was das Problem eigentlich ist"
+    purpose: "Problemklasse praezisieren und von blosser Syntax loesen"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 5
+    title: "Warum die intuitive Sicht zu kurz greift"
+    purpose: "Das Thema entbanalisieren"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 6
+    title: "Welche internen Klassen es gibt"
+    purpose: "Robuste, bedingt sichere, riskante und zu vermeidende Varianten unterscheiden"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 7
+    title: "Wovon Verhalten, Risiko und Kosten abhaengen"
+    purpose: "Einflussfaktoren systematisch zerlegen"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 8
+    title: "Was intern eigentlich passiert"
+    purpose: "Logische, ausfuehrungstechnische und schreibende Ebene trennen"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 9
+    title: "Deep Dive des fuehrenden Systems"
+    purpose: "Hauptdarstellung des fuehrenden Systems"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 10
+    title: "Die wichtigste praktische Unterscheidung"
+    purpose: "Robust vs. bedingt sicher vs. riskant vs. vermeiden"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 11
+    title: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+    purpose: "Technische Kosten- und Sicherheitsdimension"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 12
+    title: "Vor jeder produktiven Umsetzung: technische Vorpruefung"
+    purpose: "Checkliste vor der eigentlichen Operation"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 13
+    title: "Die Hauptstrategien sauber eingeordnet"
+    purpose: "Direkte Umsetzung, vorbereitete Quelle, Staging, Alternativen"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 14
+    title: "Ein praxisnahes Entscheidungsmodell"
+    purpose: "Schrittweise zur passenden Strategie"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 15
+    title: "Fazit"
+    purpose: "Zentrale Fachthese verdichten"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 16
+    title: "Kurzform fuer die Praxis"
+    purpose: "Komprimierte Handlungsregel"
+    lead_system: ""
+    systems:
+      SQLServer: { mode: "none", depth: 0 }
+      PostgreSQL: { mode: "none", depth: 0 }
+      Oracle: { mode: "none", depth: 0 }
+      MySQL: { mode: "none", depth: 0 }
+      ANSI95: { mode: "none", depth: 0 }
+
+risk_classes:
+  robust:
+    description: ""
+    examples: []
+    refinements: []
+  conditionally_safe:
+    description: ""
+    examples: []
+    refinements: []
+  risky:
+    description: ""
+    examples: []
+    refinements: []
+  avoid:
+    description: ""
+    examples: []
+    refinements: []
+
+preflight_checks:
+  - id: "P1"
+    question: ""
+    generic_intent: ""
+    query_pattern: ""
+    purpose: ""
+    expected_signal: ""
+    per_system:
+      SQLServer:
+        natural_form: ""
+        protection_pattern: ""
+        idiomatic_solution: ""
+        safe_pattern: ""
+        working_style_note: ""
+        pitfall: ""
+      PostgreSQL:
+        natural_form: ""
+        protection_pattern: ""
+        idiomatic_solution: ""
+        safe_pattern: ""
+        working_style_note: ""
+        pitfall: ""
+      Oracle:
+        natural_form: ""
+        protection_pattern: ""
+        idiomatic_solution: ""
+        safe_pattern: ""
+        working_style_note: ""
+        pitfall: ""
+      MySQL:
+        natural_form: ""
+        protection_pattern: ""
+        idiomatic_solution: ""
+        safe_pattern: ""
+        working_style_note: ""
+        pitfall: ""
+
+decision_model:
+  - step: 1
+    question: ""
+    action_if_yes: ""
+    action_if_no: ""
+
+signature_visual:
+  preferred_form: ""   # joined_update_lifecycle | raw_to_prepared_to_write | read_vs_write_logic
+  purpose: ""
+  key_message: ""
+  anchor_section: ""
+
+crosslinks:
+  training_targets:
+    SQLServer: []
+    PostgreSQL: []
+    Oracle: []
+    MySQL: []
+  related_blog_articles: []
+  backlink_targets: []
+
+ending:
+  style: "respectful_reconciliation"
+  goal: ""
+  participants: []
+  max_words: 220
+
+quality_gates:
+  - "Keine kuenstliche Gleichverteilung"
+  - "Fuehrendes System bleibt Erkenntnisachse"
+  - "Keine erfundene Syntax"
+  - "Keine erfundenen Interna"
+  - "Standard und Implementierung sauber trennen"
+  - "Narrative Elemente bleiben knapp"
+  - "Keine Redundanz"
+  - "Kurzform fuer die Praxis enthalten"
+  - "Workflow-Metadaten fuer den Artikelheader sind vorbereitet"
+  - "Methodischer Status und Evidenzmodell sind vorbereitet"
+  - "Render-Regeln fuer leere optionale Bereiche sind gesetzt"
+  - "Praesentationsregeln fuer Vergleichstabelle, Warnblock, Anti-Pattern-Block und Entscheidungsvisualisierung sind gesetzt"
+  - "Minimale Dialektbeispiele und expliziter Fehlerfall sind vorbereitet"
+  - "Inhaltsverzeichnis-Regeln, Persona-Platzierung und Ankergeschichte sind vorbereitet"
+  - "Historische Kontrast-Snippets, Strategie-Code und Risikoklassen-Querverweise sind vorbereitet"
+  - "Dialect-aware Vorpruefungen und Systemidiome sind vorbereitet"
+  - "Praxisbeobachtungen und kontrollierte fachliche Urteilssaetze sind vorbereitet"
+  - "Dialekt-native Sicherheitsmuster und Datenbankkulturen sind vorbereitet"
+  - "Eine zusaetzliche merkfaehige Hauptvisualisierung ist vorbereitet"
+  - "Author notes sind strukturiert uebernommen und spaeter verfolgbar"
+
+sources_expected:
+  - "Offizielle Syntax-Referenz des fuehrenden Systems"
+  - "Offizielle Syntax-Referenzen relevanter Kontrastsysteme"
+  - "Release-/Versionsdokumentation fuer die genannte Version"

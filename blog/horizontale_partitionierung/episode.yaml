@@ -1,0 +1,693 @@
+article:
+  title: "Horizontale Partitionierung: eine partitionierte Tabelle oder mehrere Tabellen?"
+  slug: "horizontale_partitionierung"
+  topic_number: 61
+  as_of_date: "2026-03-09"
+  status: "reviewed"
+  language: "de"
+  series: "SQL-Mastery: Entfessle die Macht der Daten"
+  leading_system: "PostgreSQL"
+  canonical_label: "Horizontale Partitionierung"
+  thesis: "Horizontale Partitionierung ist stark, wenn eine logische Tabelle erhalten bleiben soll und native Partitionierung Pruning, Wartung und Lebenszyklus auf Teilmengen erlaubt. Mehrere physisch getrennte Tabellen sind dagegen ein eigenes Architekturmodell und werden erst dann robust, wenn Trennung, Routing, Governance und Reporting bewusst gewollt sind."
+  summary_goal: "Der Artikel soll die Architekturfrage zwischen nativer horizontaler Partitionierung und manuell getrennten Tabellen in vier Datenbankkulturen einordnen."
+  audience:
+    - "Fortgeschrittene SQL-Anwender"
+    - "DBA"
+    - "Data Engineers"
+    - "Architekten fuer Datenplattformen"
+  tone:
+    intro_dialog: "humorous_but_not_banal"
+    body: "technical_precise"
+    ending: "respectful_reconciliation"
+
+workflow:
+  allowed_phases:
+    - "01_episode_yaml_builder"
+    - "01a_sources_research"
+    - "02_episode_yaml_validator"
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "05a_micro_examples_builder"
+    - "06_article_writer"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+    - "09_crosslink_planning"
+    - "10_crosslink_integration"
+    - "11_link_validation"
+    - "12_self_review"
+    - "13_external_review"
+    - "14_finalize_article"
+    - "final"
+  pipeline_mode: "article_only"
+  current_phase: "12_self_review"
+  target_phase: "12_self_review"
+  skip_steps:
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2025 (17.x)"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18.3"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS"
+    include: true
+  ANSI95:
+    product: "SQL Standard"
+    version: "nur als Meta-Ebene zur Trennung von Problemklasse, Produktsyntax und Produktsemantik"
+    include: true
+
+repository_paths:
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+  article_readme: "blog/horizontale_partitionierung/README.md"
+  episode_yaml: "blog/horizontale_partitionierung/episode.yaml"
+  demo_spec: "blog/horizontale_partitionierung/demo/demo_spec.yaml"
+  insights: "blog/horizontale_partitionierung/demo/insights.yaml"
+  micro_examples: "blog/horizontale_partitionierung/micro_examples.yaml"
+  sources: "blog/horizontale_partitionierung/sources.yaml"
+  notes_md: "blog/horizontale_partitionierung/notes.md"
+  crosslinks_plan: "blog/horizontale_partitionierung/crosslinks_plan.yaml"
+
+author_notes:
+  source_path: "blog/horizontale_partitionierung/notes.md"
+  use_if_present: true
+  note_items:
+    - id: "N1"
+      summary: "Die Kernfrage lautet nicht nur Partitionierung oder nicht, sondern eine partitionierte Tabelle gegen mehrere physisch getrennte Tabellen."
+      priority: "must_cover"
+      planned_section: "1. Was horizontale Partitionierung hier bedeutet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Das ist die eigentliche Architekturfrage der Episode."
+    - id: "N2"
+      summary: "Native Partitionierung soll als eine logische Tabelle mit Teilobjekten sichtbar werden; mehrere Tabellen sind ein anderes Modell."
+      priority: "must_cover"
+      planned_section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Diese Trennung ist fachlich zentral."
+    - id: "N3"
+      summary: "Die Leitthese soll betonen, dass mehrere Tabellen nicht automatisch Partitionierung von Hand sind."
+      priority: "must_cover"
+      planned_section: "2. Warum die intuitive Sicht zu kurz greift"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Der Artikel braucht einen klaren Gegenakzent zum Performance-Reflex."
+    - id: "N4"
+      summary: "Logische Einheit, physische Verteilung, Routing, Pruning, Wartung, Archivierung und Code-Komplexitaet muessen getrennt werden."
+      priority: "must_cover"
+      planned_section: "4. Wovon die Wahl abhaengt"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Diese Ebenentrennung verhindert eine zu flache Darstellung."
+    - id: "N5"
+      summary: "Eine partitionierte Tabelle ist sinnvoll, wenn fachlich eine Entitaet bleibt und Queries ueber das Gesamtobjekt laufen, aber Lebenszyklus und Wartung Teilmengen nutzen."
+      priority: "must_cover"
+      planned_section: "7. Die wichtigste praktische Unterscheidung"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Das ist die robuste Kernform des Artikels."
+    - id: "N6"
+      summary: "Mehrere Tabellen sind sinnvoll, wenn Trennung fachlich gewollt ist, mit verschiedenen Besitzern, Sicherheits- oder Retention-Regeln."
+      priority: "must_cover"
+      planned_section: "10. Die Hauptstrategien sauber eingeordnet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Der Artikel soll native Partitionierung nicht als alleinige Loesung darstellen."
+    - id: "N7"
+      summary: "Die Kernwarnung lautet: Mehrere Tabellen sind oft kein Performance-Konzept, sondern ein Modellierungsentscheid mit Folgekosten fuer Query-, ETL- und Anwendungslogik."
+      priority: "must_cover"
+      planned_section: "7. Die wichtigste praktische Unterscheidung"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Diese Warnung braucht einen sichtbaren Platz als Produktionshinweis."
+    - id: "N8"
+      summary: "Unterfragen zu DDL, Indizes, Constraints, Reporting, ETL und Deployment sollen explizit in die Tiefenlogik einfliessen."
+      priority: "must_cover"
+      planned_section: "8. Welche Rolle Indizes, Constraints, Routing, Logging und Betrieb spielen"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die praktischen Folgekosten muessen konkret werden."
+    - id: "N9"
+      summary: "PostgreSQL oder Oracle sind als Fuehrungssystem fachlich besonders passend; PostgreSQL betont die logische Parent-Table-Idee am klarsten."
+      priority: "must_cover"
+      planned_section: "Warum PostgreSQL in dieser Episode fuehrt"
+      planned_artifact: "sources"
+      handling: "integrate"
+      rationale: "Die Fuehrungsentscheidung soll aus dokumentierter Produktlogik kommen."
+    - id: "N10"
+      summary: "Risikoklassen, Hybridmodelle, ORM- und Migrationsfolgen sowie praktische Denkfehler sollen sichtbar werden."
+      priority: "should_cover"
+      planned_section: "3. Welche internen Klassen es gibt"
+      planned_artifact: "micro_examples"
+      handling: "integrate"
+      rationale: "Der Artikel soll nicht nur DDL vergleichen."
+
+evidence_model:
+  allowed_levels:
+    - "docs_based"
+    - "inference_based"
+    - "demo_based"
+    - "executed_test_based"
+    - "benchmark_based"
+  available_levels:
+    - "docs_based"
+    - "inference_based"
+  wording_rules:
+    docs_based: "dokumentationsbasiert formulieren"
+    inference_based: "vorsichtig und als Ableitung markieren"
+    demo_based: "nicht verfuegbar in diesem Lauf"
+    executed_test_based: "nicht verfuegbar in diesem Lauf"
+    benchmark_based: "nicht verfuegbar in diesem Lauf"
+
+render_rules:
+  suppress_empty_related_blog_articles: true
+  suppress_empty_training_blocks: true
+  suppress_absent_benchmarks: true
+  suppress_absent_demo_results: true
+  suppress_empty_method_status_lines: true
+  suppress_internal_pipeline_terms_in_body: true
+
+presentation:
+  persona_mode: "intro_outro_only"
+  reader_guide_position: "after_visible_metadata"
+  toc_position: "after_scope_before_heavy_blocks"
+  pre_toc_zone_style: "compact"
+  allowed_pre_toc_blocks:
+    - "versions_and_scope"
+    - "method_status"
+    - "reader_guide_or_short_tldr"
+    - "leading_system_rationale"
+    - "training_links"
+    - "dialect_availability_note"
+  standalone_sections_must_appear_in_toc: true
+  persona_entry_position: "before_first_main_section"
+  require_comparison_table: true
+  require_warning_box: true
+  require_anti_pattern_block: true
+  require_decision_visual: true
+  require_signature_visual: true
+  require_min_examples_per_treated_system: true
+  require_explicit_error_case: true
+  require_anchor_failure_story: true
+  require_historical_contrast_snippets: false
+  require_strategy_code_for_recommended_patterns: true
+  require_risk_class_cross_references: true
+  require_forward_reference_for_early_class_labels: true
+  require_operational_caveats_in_strategy_code: true
+  avoid_adjacent_framework_duplication: true
+  require_dialect_aware_prechecks: true
+  require_dialect_native_safety_patterns: true
+  require_practical_observations: true
+  allow_controlled_expert_judgment: true
+  framing_goal: "same_problem_four_database_cultures"
+
+systems:
+  SQLServer:
+    role: "contrast_strong"
+    reason: "SQL Server ist hier ein starker Kontrastpartner, weil Microsoft einerseits native partitioned tables and indexes klar beschreibt und andererseits partitioned views fuer mehrere physische Tabellen kennt. Genau dieser Doppelblick schaerft die Architekturfrage."
+  PostgreSQL:
+    role: "lead"
+    reason: "PostgreSQL fuehrt, weil die Dokumentation die partitionierte Tabelle besonders explizit als virtuelle Root-Tabelle mit echten Partitionen beschreibt und zugleich alternative Methoden wie Inheritance und UNION ALL Views als andere Form mit anderen Eigenschaften einordnet."
+  Oracle:
+    role: "contrast_strong"
+    reason: "Oracle zeigt die reifste Enterprise-Partitionierungsdisziplin und macht sichtbar, wie stark lokale oder globale Indizes, Exchange-Operationen und Partition Independence die Wahl zwischen einer Tabelle und mehreren Tabellen beeinflussen."
+  MySQL:
+    role: "contrast"
+    reason: "MySQL ist fachlich wichtig, weil native horizontale Partitionierung dort klar als Teilung einer Tabelle modelliert wird, die Engine- und FK-Grenzen aber frueh zeigen, wann mehrere Tabellen oder sogar eine einzige nicht partitionierte Tabelle robuster sein koennen."
+  ANSI95:
+    role: "meta"
+    reason: "ANSI bleibt Meta-Ebene und trennt Problemklasse, Produktsyntax und Produktsemantik."
+
+chapters:
+  - id: 1
+    title: "Einstieg mit Dialog"
+    purpose: "Die Architekturfrage zwischen einer logischen Tabelle und mehreren physischen Tabellen eroefnen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "lead", depth: 2 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 2
+    title: "Leserleitfaden"
+    purpose: "Lesepfade nach Architekturfrage, Dialektinteresse und Betriebstiefe anbieten"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 3
+    title: "TL;DR gesamt und pro System"
+    purpose: "Die Kernthese und die Systemrollen frueh verdichten"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 1 }
+      PostgreSQL: { mode: "lead", depth: 2 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 4
+    title: "Was horizontale Partitionierung hier bedeutet"
+    purpose: "Die Problemklasse von der blossen Tabellenteilung loesen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 5
+    title: "Warum die intuitive Sicht zu kurz greift"
+    purpose: "Den Reflex grosse Tabelle gleich viele Tabellen oder Partitionierung aufloesen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 6
+    title: "Welche internen Klassen es gibt"
+    purpose: "Robuste, bedingt sichere, riskante und zu vermeidende Architekturformen unterscheiden"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 7
+    title: "Wovon die Wahl abhaengt"
+    purpose: "Logische Einheit, Routing, Wartung, Reporting und Governance systematisch zerlegen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast_strong", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 8
+    title: "Was intern passiert: eine Tabelle gegen viele Tabellen"
+    purpose: "Engine-gesteuertes Routing und Pruning gegen anwendungs- oder view-gesteuertes Routing stellen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast_strong", depth: 3 }
+      PostgreSQL: { mode: "lead", depth: 4 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 9
+    title: "Deep Dive des fuehrenden Systems"
+    purpose: "Declarative Partitioning, virtuelle Root-Tabelle, Routing und Alternativen in PostgreSQL vertiefen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 1 }
+      PostgreSQL: { mode: "deep_dive", depth: 4 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 10
+    title: "Die wichtigste praktische Unterscheidung"
+    purpose: "Eine logische Tabelle mit Teilmengen gegen bewusst getrennte Datenraeume abgrenzen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast_strong", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 11
+    title: "Welche Rolle Indizes, Constraints, Routing, Logging und Betrieb spielen"
+    purpose: "Indexregeln, FK-Grenzen, Schema-Drift, Deployment und Betriebsfolgen einordnen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast_strong", depth: 3 }
+      PostgreSQL: { mode: "lead", depth: 2 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 3 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 12
+    title: "Vor jeder produktiven Umsetzung: technische Vorpruefung"
+    purpose: "Dialektbewusste Pruefpatterns fuer Pruning, Schema-Drift und Lifecycle zeigen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 3 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 3 }
+      MySQL: { mode: "contrast", depth: 3 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 13
+    title: "Die Hauptstrategien sauber eingeordnet"
+    purpose: "Keine Partitionierung, native Partitionierung, getrennte Tabellen und Hybridformen vergleichen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 2 }
+      PostgreSQL: { mode: "lead", depth: 4 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 14
+    title: "Ein praxisnahes Entscheidungsmodell"
+    purpose: "Aus logischer Einheit, Lebenszyklus und Governance zur passenden Form fuehren"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 1 }
+      PostgreSQL: { mode: "lead", depth: 3 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 15
+    title: "Fazit"
+    purpose: "Kernthese verdichten: Einheit erhalten oder Trennung ehrlich bekennen"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "contrast", depth: 1 }
+      PostgreSQL: { mode: "lead", depth: 2 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 16
+    title: "Kurzform fuer die Praxis"
+    purpose: "Kompakte Handlungsregel fuer Architektur- und Betriebsentscheidungen geben"
+    lead_system: "PostgreSQL"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "lead", depth: 2 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+risk_classes:
+  robust:
+    description: "Die logische Form und die technische Form stimmen ueberein: entweder eine logische Tabelle bleibt durch native Partitionierung erhalten, oder getrennte Tabellen spiegeln echte fachliche Trennung mit klarer Governance."
+    examples:
+      - "Zeitpartitionierte Orders-Tabelle mit gemeinsamen Reports und planbarem Lifecycle"
+      - "Regional getrennte Tabellen mit unterschiedlichen Sicherheits- oder Retention-Regeln"
+    refinements:
+      - "native_logical_unity"
+      - "explicit_data_domains"
+  conditionally_safe:
+    description: "Das Modell kann tragfaehig sein, braucht aber disziplinierte Governance, moderate Partitions- oder Tabellanzahl und klare Reporting- oder Routing-Regeln."
+    examples:
+      - "Native Partitionierung mit starkem Wartungsnutzen, aber nur teilweisem Query-Nutzen"
+      - "Mehrere Tabellen mit gemeinsamer Reporting-View und strikt automatisierten Migrationsregeln"
+    refinements:
+      - "maintenance_first"
+      - "governed_multi_table"
+  risky:
+    description: "Die Architektur ist technisch moeglich, aber Routing, Union-Logik, Schema-Drift oder schwacher Pruning-Nutzen erzeugen schnell mehr Kosten als Gewinn."
+    examples:
+      - "Jahrestabellen nur wegen Volumen"
+      - "Native Partitionierung mit zu vielen kleinen Partitionen"
+    refinements:
+      - "manual_routing_overhead"
+      - "misaligned_partition_key"
+  avoid:
+    description: "Die gewaehlt Form verschiebt ungeloste Probleme nur in andere Schichten und sollte so nicht eingefuehrt werden."
+    examples:
+      - "Mehrere Tabellen als Performance-Reflex ohne fachliche Trennung und ohne Governance"
+      - "Native Partitionierung als Ersatz fuer fehlende Indizes oder schlechte Praedikate"
+    refinements:
+      - "size_panic_split"
+      - "index_substitute"
+
+preflight_checks:
+  - id: "P1"
+    question: "Bleibt fachlich eine einzige Entitaet erhalten, oder sollen wirklich getrennte Datenraeume entstehen?"
+    generic_intent: "Die Architekturfrage vor der DDL klaeren"
+    query_pattern: "Reporting-, DML-, Security- und Retention-Anforderungen auf eine gemeinsame oder getrennte Datenoberflaeche abbilden"
+    purpose: "Zwischen nativer Partitionierung, mehreren Tabellen und einer normalen Einzeltabelle unterscheiden"
+    expected_signal: "Es ist klar, wer Routing, Reporting und Governance spaeter tragen soll"
+    per_system:
+      SQLServer:
+        natural_form: "Partitioned table fuer eine logische Tabelle, partitioned view nur dann, wenn mehrere Basistabellen fachlich schon gesetzt sind"
+        protection_pattern: "Lokale Partitioned Views nicht als Default fuer Daten auf demselben Server waehlen"
+        idiomatic_solution: "Ein gemeinsames Objekt bevorzugen"
+        safe_pattern: "Eine Tabelle mit nativer Partitionierung statt VIEW plus UNION ALL"
+        working_style_note: "SQL Server gibt zwei Antworten auf zwei verschiedene Probleme"
+        pitfall: "Mehrere Tabellen plus View verschieben DDL und Governance in die Architektur"
+      PostgreSQL:
+        natural_form: "Erst klarmachen, ob der Parent die natuerliche Oberflaeche bleiben soll"
+        protection_pattern: "Declarative Partitioning nicht mit Inheritance- oder UNION-ALL-Architektur verwechseln"
+        idiomatic_solution: "Wenn eine Entitaet bleibt, ueber den Parent modellieren"
+        safe_pattern: "Virtuelle Root-Tabelle mit echten Partitionen"
+        working_style_note: "PostgreSQL beschreibt genau diesen Unterschied besonders klar"
+        pitfall: "Alternative Methoden aus Flexibilitaet waehlen, obwohl nur eine Tabelle gemeint ist"
+      Oracle:
+        natural_form: "Native Partitionierung fuer eine Tabelle nutzen; mehrere Tabellen nur mit bewusst anderer Besitz- oder Sicherheitslogik"
+        protection_pattern: "Systempartitionierung oder app-gesteuerte Zielpartitionen nicht mit der Standardform verwechseln"
+        idiomatic_solution: "Eine Tabelle mit passender Partitionierungsstrategie"
+        safe_pattern: "Range-, List- oder Interval-Partitionierung als DDL des einen Objekts"
+        working_style_note: "Oracle trennt stark zwischen transparenter Partitionierung und Sonderformen"
+        pitfall: "Manuelle Objektfamilien bauen, obwohl die Daten als eine Tabelle betrieben werden sollen"
+      MySQL:
+        natural_form: "Pruefen, ob eine Tabelle mit simpler Partitionierung robuster ist als eine Familienarchitektur aus Jahrestabellen"
+        protection_pattern: "Engine-Grenzen frueh lesen"
+        idiomatic_solution: "Einfaches gemeinsames Objekt bevorzugen"
+        safe_pattern: "RANGE COLUMNS fuer eine Tabelle statt Jahr-fuer-Jahr-Tabellen ohne starken Fachgrund"
+        working_style_note: "MySQLs engere Grenzen machen mehrere Tabellen nicht automatisch besser"
+        pitfall: "Von FK- oder Engine-Grenzen direkt in eine teure Tabellenfamilie zu kippen"
+
+  - id: "P2"
+    question: "Traegt derselbe Schluessel sowohl Pruning als auch Lifecycle-Operationen?"
+    generic_intent: "Partition Key oder Tabellenschnitt gegen echte Read- und Wartungsmuster pruefen"
+    query_pattern: "Typische WHERE-Praedikate, Reporting-Fenster, Archivierung und Purge gegen die geplante Achse halten"
+    purpose: "Query-Nutzen und Wartungsnutzen gemeinsam oder getrennt bewerten"
+    expected_signal: "Der gewaehlte Schnitt ist nicht nur optisch plausibel, sondern operativ tragfaehig"
+    per_system:
+      SQLServer:
+        natural_form: "Sargierbare Bereichsfilter und spaetere SWITCH-Pfade zusammen pruefen"
+        protection_pattern: "Partition Key nicht in YEAR(), CONVERT() oder andere Ausdrucke einpacken"
+        idiomatic_solution: "Range-Filter plus geplanter Partition Function- und Scheme-Pfad"
+        safe_pattern: "Datumsfenster mit offener Obergrenze und vorbereiteter Randpartition"
+        working_style_note: "Pruning und Wartung leben in SQL Server von derselben Disziplin"
+        pitfall: "Eine Partition Function hilft nicht, wenn die echten Queries den Key fachlich gar nicht benutzen"
+      PostgreSQL:
+        natural_form: "EXPLAIN gegen den Parent fahren und echte Bounds pruefen"
+        protection_pattern: "Partition Pruning nur dort erwarten, wo Filtersyntax und Partition Key zueinander passen"
+        idiomatic_solution: "Zeit- oder Bereichsachsen ueber den Parent sauber formulieren"
+        safe_pattern: "Parent-Query mit klaren Grenzen und vorab angelegten Partitionen"
+        working_style_note: "PostgreSQL belohnt die eine logische Tabelle dann, wenn Reads und Lifecycle dieselbe Achse teilen"
+        pitfall: "Zu viele oder schlecht passende Partitionen machen den Parent teuer"
+      Oracle:
+        natural_form: "Pruning, Indexwirkung und Exchange- oder Drop-Pfade zusammen denken"
+        protection_pattern: "Indexwahl nicht von der Partitionswahl abkoppeln"
+        idiomatic_solution: "Zeitachsen als Range- oder Interval-Partitionen und Maintenance zusammen planen"
+        safe_pattern: "Pruning-freundlicher Key plus lokale Indexstrategie"
+        working_style_note: "Oracle macht dieselbe Achse fuer Query und Wartung besonders sichtbar"
+        pitfall: "Guter Partition Key, aber globale Indexfolgen zerstoeren den Betriebsnutzen"
+      MySQL:
+        natural_form: "Mit EXPLAIN PARTITIONS gegen echte WHERE-Muster pruefen"
+        protection_pattern: "Partitionsausdruck schlicht halten"
+        idiomatic_solution: "Range- oder List-Grenzen waehlen, die in der Praxis wieder auftauchen"
+        safe_pattern: "Einfache Bereichslogik statt komplexer Ausdrucke"
+        working_style_note: "In MySQL muss der Nutzen direkt an den Grenzen ablesbar sein"
+        pitfall: "Komplexe Partitionsausdruecke machen spaeter jede Erklaerbarkeit schwer"
+
+  - id: "P3"
+    question: "Wenn mehrere Tabellen erwogen werden: Kann Schema-Drift, Routing-Luecke und Reporting-Unvollstaendigkeit aktiv geprueft werden?"
+    generic_intent: "Den groessten Multi-Table-Fallstrick vor dem Bau sichtbar machen"
+    query_pattern: "Metadaten aller betroffenen Tabellen vergleichen und auf fehlende Familienmitglieder oder Spaltenabweichungen pruefen"
+    purpose: "Governance-Aufwand messen, bevor aus Trennung eine Dauerlast wird"
+    expected_signal: "Die Tabellenfamilie bleibt ueber Deployment-Zyklen hinweg kontrollierbar"
+    per_system:
+      SQLServer:
+        natural_form: "sys.tables und sys.columns fuer die ganze Tabellenfamilie abfragen"
+        protection_pattern: "View- und Tabellenfamilien nicht ohne wiederholbare Metadatenpruefung betreiben"
+        idiomatic_solution: "Vor jeder neuen Jahrestabelle Spaltenvertrag und CHECK-Logik automatisiert vergleichen"
+        safe_pattern: "Spaltensummen, Indexvertrag und Routing-View gemeinsam pruefen"
+        working_style_note: "Partitioned Views werden erst mit CHECK-Disziplin und Metadata-Checks belastbar"
+        pitfall: "Ein fehlendes Tabellenmitglied oder eine abweichende Spalte frisst den Governance-Gewinn sofort auf"
+      PostgreSQL:
+        natural_form: "information_schema und pg_catalog gegen die ganze Tabellenfamilie laufen lassen"
+        protection_pattern: "Alternative Methoden nur mit expliziter Metadatenhygiene fahren"
+        idiomatic_solution: "Bei mehreren Tabellen eine automatisierte Strukturpruefung und eine bewusst gepflegte Reporting-Schicht vorsehen"
+        safe_pattern: "Spaltenzaehlung und Objektliste fuer alle Orders-Tabellen vor jedem Release"
+        working_style_note: "Gerade weil PostgreSQL sehr flexibel ist, muss Governance sichtbar geplant werden"
+        pitfall: "Vererbungs- oder View-Konstrukte wirken leichtgewichtig, bis Migrationen asynchron laufen"
+      Oracle:
+        natural_form: "USER_TABLES und USER_TAB_COLUMNS gegen die Tabellenfamilie pruefen"
+        protection_pattern: "Mehrere Tabellen nur mit bewusstem Betriebshandbuch und DDL-Gleichlauf"
+        idiomatic_solution: "Wenn Trennung fachlich real ist, Strukturvertrag und Reporting-Objekte gemeinsam versionieren"
+        safe_pattern: "Tabellenfamilie nur mit Metadata-Check und klaren Besitzerregeln"
+        working_style_note: "Oracle-Features nehmen viel Wartung aus nativer Partitionierung heraus"
+        pitfall: "Trennung ohne Governance fuehrt schnell zu stiller Drift"
+      MySQL:
+        natural_form: "information_schema.columns ueber die ganze Tabellenfamilie aggregieren"
+        protection_pattern: "Jahrestabellen nicht ohne automatische Familienpruefung und View- oder Query-Vertrag betreiben"
+        idiomatic_solution: "Vor jedem neuen Mitglied Spaltenzahl, Schluessel und Naming abgleichen"
+        safe_pattern: "Metadata-Check zuerst, dann erst Routing- oder Reporting-Code"
+        working_style_note: "MySQL verzeiht einfache Modelle eher als improvisierte Familienarchitekturen"
+        pitfall: "Die scheinbar einfache Tabellenkopie wird ohne Governance schnell unuebersichtlich"
+
+  - id: "P4"
+    question: "Passen Index-, Constraint-, Sicherheits- und Betriebsregeln zur gewaehlten Form?"
+    generic_intent: "Technische Nebenbedingungen vor der Entscheidung sichtbar machen"
+    query_pattern: "Unique-Regeln, FK-Beziehungen, lokale oder globale Indizes und Wartungsfenster gemeinsam pruefen"
+    purpose: "Spaete Ueberraschungen bei Maintenance, Reporting und Deployment vermeiden"
+    expected_signal: "Die gewaehlt Architektur kollidiert nicht mit den haertesten Plattformregeln"
+    per_system:
+      SQLServer:
+        natural_form: "Partition Key in Unique-Design und aligned indexes frueh mitdenken"
+        protection_pattern: "Bei partitioned views die CHECK-Logik und die UPDATE-Regeln mitlesen"
+        idiomatic_solution: "Ein Objekt bevorzugen, solange kein echter Grund fuer Member-Tabellen existiert"
+        safe_pattern: "Native Partitionierung mit sauberem Indexvertrag"
+        working_style_note: "SQL Server macht Unterschiede zwischen nativer Partitionierung und View-Familien sehr konkret"
+        pitfall: "Nicht alignede oder fachlich widerspruechliche Regeln zerstoeren den Betriebsnutzen"
+      PostgreSQL:
+        natural_form: "Partitionierte Tabellen gegen Parent- und Child-Indexlogik sowie FK- und Update-Verhalten pruefen"
+        protection_pattern: "Nicht nur den Parent, sondern die Partitionsfamilie operativ mitdenken"
+        idiomatic_solution: "Wenn eine Entitaet bleibt, die Parent-Oberflaeche ernst nehmen"
+        safe_pattern: "Deklarative Partitionierung mit bewusstem Partitions- und Indexvertrag"
+        working_style_note: "Das Routing in PostgreSQL nimmt Schreiblogik ab, aber nicht die Verantwortung fuer gute Grenzen"
+        pitfall: "Zu viele Partitionen oder schwache Indexhygiene machen den Parent teuer"
+      Oracle:
+        natural_form: "Lokale gegen globale Indizes, Partition Independence und Exchange-Strategien gemeinsam pruefen"
+        protection_pattern: "Globale Indexfolgen vor dem ersten Wartungsfenster dokumentieren"
+        idiomatic_solution: "Lokale Indizes fuer wartungsnahe Muster bevorzugen"
+        safe_pattern: "Native Partitionierung mit bewusstem Index- und Availability-Plan"
+        working_style_note: "Oracle gibt viel Macht, aber jede Machtentscheidung bleibt betriebliche Verpflichtung"
+        pitfall: "Mehrere Tabellen als Ausweichform zu bauen, obwohl eigentlich nur die Indexfrage ungeklaert war"
+      MySQL:
+        natural_form: "FK-Grenzen, Unique-Key-Regeln und Engine-Einschraenkungen vorab lesen"
+        protection_pattern: "Keine Architektur aufsetzen, die spaeter an dokumentierten InnoDB-Grenzen scheitert"
+        idiomatic_solution: "Einfache Partitionierung oder bewusst einfache Einzeltabelle, wenn FKs zentral bleiben"
+        safe_pattern: "Eng an den dokumentierten Limits bleiben und Rueckfallpfad offen halten"
+        working_style_note: "Die robustere Form in MySQL ist oft die einfacher zu erklaerende"
+        pitfall: "Aus einem dokumentierten Limit reflexhaft eine grosse Tabellenfamilie zu bauen"
+
+decision_model:
+  - step: 1
+    question: "Bleibt fachlich eine einzige Entitaet erhalten?"
+    action_if_yes: "Native Partitionierung oder eine normale Einzeltabelle bleiben die primaeren Kandidaten."
+    action_if_no: "Mehrere Tabellen duerfen fachlich im Rennen bleiben."
+  - step: 2
+    question: "Teilen wichtige Reads und Lifecycle-Operationen denselben Schluessel?"
+    action_if_yes: "Native Partitionierung wird zu einer starken Option."
+    action_if_no: "Nicht automatisch partitionieren; ggf. Einzeltabelle oder bewusst getrennte Tabellen waehlen."
+  - step: 3
+    question: "Sind Besitz, Sicherheit, Retention oder Deployment-Regeln bewusst unterschiedlich?"
+    action_if_yes: "Mehrere Tabellen koennen robust sein, wenn Governance explizit mitgeplant wird."
+    action_if_no: "Mehrere Tabellen wirken eher wie manueller Overhead ohne starken Fachgrund."
+  - step: 4
+    question: "Kann Routing, Reporting und Schema-Gleichlauf automatisiert und geprueft werden?"
+    action_if_yes: "Eine Multi-Table-Architektur bleibt conditionally_safe oder robust, je nach Trennschaerfe."
+    action_if_no: "Der Fall kippt in risky oder avoid."
+  - step: 5
+    question: "Passen Plattformregeln fuer Indizes, FKs und Maintenance zur gewaehlten Form?"
+    action_if_yes: "Die Architektur kann produktiv geplant werden."
+    action_if_no: "Vorher vereinfachen oder die Entscheidung revidieren."
+
+signature_visual:
+  preferred_form: "logical_table_vs_manual_routing"
+  purpose: "Den Unterschied zwischen engine-gesteuerter Partitionierung und anwendungs- oder view-gesteuertem Routing merkfaehig machen."
+  key_message: "Eine partitionierte Tabelle behaelt die logische Einheit; mehrere Tabellen verschieben Verantwortung fuer Routing, Governance und Reporting in Architektur und Betrieb."
+  anchor_section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+
+crosslinks:
+  training_targets:
+    SQLServer:
+      - "T-SQL/65_Partitioning/65_Partitioning.md"
+      - "T-SQL/22_Views_Schemata/22_Views_Schemata.md"
+      - "T-SQL/16_DataIntegrity_Constraints/16_DataIntegrity_Constraints.md"
+      - "T-SQL/26_Indexes_Basics/26_Indexes_Basics.md"
+      - "T-SQL/75_SSVEPatterns_for_ETL/75_SSVEPatterns_for_ETL.md"
+    PostgreSQL: []
+    Oracle: []
+    MySQL: []
+  related_blog_articles:
+    - "blog/partitionierung/README.md"
+  backlink_targets:
+    - "T-SQL/README.md"
+    - "PostgreSQL/README.md"
+    - "Oracle/README.md"
+    - "MySQL/README.md"
+
+ending:
+  style: "respectful_reconciliation"
+  goal: "Die Persona soll verdichten, dass die Wahl nicht zwischen moderner und alter Syntax, sondern zwischen einer logischen Einheit und bewusst getrennten Datenraeumen liegt."
+  participants:
+    - "Sam"
+    - "Pete"
+    - "Ora"
+    - "My"
+    - "Mutter ANSI-95"
+  max_words: 220
+
+quality_gates:
+  - "Keine kuenstliche Gleichverteilung"
+  - "Fuehrendes System bleibt Erkenntnisachse"
+  - "Keine erfundene Syntax"
+  - "Keine erfundenen Interna"
+  - "Standard und Implementierung sauber trennen"
+  - "Narrative Elemente bleiben knapp"
+  - "Keine Redundanz"
+  - "Kurzform fuer die Praxis enthalten"
+  - "Workflow-Metadaten fuer den Artikelheader sind vorbereitet"
+  - "Methodischer Status und Evidenzmodell sind vorbereitet"
+  - "Render-Regeln fuer leere optionale Bereiche sind gesetzt"
+  - "Praesentationsregeln fuer Vergleichstabelle, Warnblock, Anti-Pattern-Block und Entscheidungsvisualisierung sind gesetzt"
+  - "Minimale Dialektbeispiele und expliziter Fehlerfall sind vorbereitet"
+  - "Inhaltsverzeichnis-Regeln, Persona-Platzierung und Ankergeschichte sind vorbereitet"
+  - "Historische Kontrast-Snippets sind nicht aktiv geplant und werden deshalb nicht erzwungen"
+  - "Strategie-Code und Risikoklassen-Querverweise sind vorbereitet"
+  - "Dialect-aware Vorpruefungen und Systemidiome sind vorbereitet"
+  - "Praxisbeobachtungen und kontrollierte fachliche Urteilssaetze sind vorbereitet"
+  - "Dialekt-native Sicherheitsmuster und Datenbankkulturen sind vorbereitet"
+  - "Eine zusaetzliche merkfaehige Hauptvisualisierung ist vorbereitet"
+  - "Author notes sind strukturiert uebernommen und spaeter verfolgbar"
+
+sources_expected:
+  - "PostgreSQL 18 Documentation: Table Partitioning"
+  - "PostgreSQL 18.3 Release Notes"
+  - "Microsoft Learn: Partitioned tables and indexes"
+  - "Microsoft Learn: CREATE PARTITION FUNCTION (Transact-SQL)"
+  - "Microsoft Learn: CREATE VIEW (Transact-SQL), Abschnitt Partitioned views"
+  - "Microsoft Learn: SQL Server 2025 release notes"
+  - "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning Concepts"
+  - "Oracle AI Database 26ai VLDB and Partitioning Guide: Partitioning for Availability, Manageability, and Performance"
+  - "Oracle AI Database 26ai Documentation Library"
+  - "MySQL 8.4 Reference Manual: Overview of Partitioning in MySQL"
+  - "MySQL 8.4 Reference Manual: Partition Pruning"
+  - "MySQL 8.4 Reference Manual: Partition Management"
+  - "MySQL 8.4 Reference Manual: Partitioning Limitations Relating to Storage Engines"
+  - "MySQL 8.4 Release Notes"

@@ -1,0 +1,340 @@
+metadata:
+  topic_slug: "horizontale_partitionierung"
+  generated_at: "2026-03-09"
+  pipeline_mode: "article_only"
+  based_on:
+    episode: "blog/horizontale_partitionierung/episode.yaml"
+    sources: "blog/horizontale_partitionierung/sources.yaml"
+    insights: "blog/horizontale_partitionierung/demo/insights.yaml (not generated in this run)"
+
+anchor_story:
+  title: "Die 2026er Daten sind da, aber im Reporting fehlen sie"
+  symptom: "Das Team hat orders_2024, orders_2025 und orders_2026 als getrennte Tabellen gebaut. Das gemeinsame Reporting laeuft weiter ueber eine UNION-ALL-View, in der die neue Tabelle noch nicht eingetragen ist. Die Januarzahlen wirken plausibel, sind aber zu niedrig."
+  scenario: "Die eigentliche Entitaet ist weiterhin eine Orders-Tabelle. Durch die Tabellenfamilie wandern Routing, View-Pflege und Schema-Gleichlauf aus der Datenbankstruktur in Deployments, ETL und Anwendungscode."
+  evidence_level: "inference_based"
+  source_refs:
+    - "C15"
+    - "C16"
+  article_usage:
+    section: "1. Was horizontale Partitionierung hier bedeutet"
+    style: "inline"
+
+syntax_surface:
+  SQLServer:
+    snippet: "CREATE PARTITION FUNCTION pf_order_date (date) AS RANGE RIGHT FOR VALUES ('2026-01-01', '2026-04-01');\nCREATE PARTITION SCHEME ps_order_date AS PARTITION pf_order_date ALL TO ([PRIMARY]);"
+    evidence_level: "docs_based"
+    source_refs: ["C5"]
+  PostgreSQL:
+    snippet: "CREATE TABLE orders (order_id bigint, order_date date not null) PARTITION BY RANGE (order_date);\nCREATE TABLE orders_2026_q1 PARTITION OF orders FOR VALUES FROM ('2026-01-01') TO ('2026-04-01');"
+    evidence_level: "docs_based"
+    source_refs: ["C1"]
+  Oracle:
+    snippet: "CREATE TABLE orders (\n  order_id number,\n  order_date date not null\n)\nPARTITION BY RANGE (order_date)\n(\n  PARTITION p_2026_q1 VALUES LESS THAN (DATE '2026-04-01')\n);"
+    evidence_level: "docs_based"
+    source_refs: ["C8"]
+  MySQL:
+    snippet: "CREATE TABLE orders (\n  order_id bigint not null,\n  order_date date not null\n)\nPARTITION BY RANGE COLUMNS(order_date) (\n  PARTITION p2026q1 VALUES LESS THAN ('2026-04-01')\n);"
+    evidence_level: "docs_based"
+    source_refs: ["C10"]
+
+dialect_min_examples:
+  SQLServer:
+    snippet: "CREATE VIEW orders_all AS\nSELECT order_id, order_date FROM dbo.orders_2025\nUNION ALL\nSELECT order_id, order_date FROM dbo.orders_2026;"
+    focus: "SQL Server macht den Unterschied zwischen einer Tabellenfamilie per partitioned view und nativer Partitionierung besonders greifbar."
+    error_case: "Partitioned views sind eine andere Architektur; fuer lokale Daten auf demselben Server bevorzugt Microsoft partitioned tables and indexes."
+    evidence_level: "docs_based"
+    source_refs: ["C6"]
+  PostgreSQL:
+    snippet: "SELECT *\nFROM orders\nWHERE order_date >= DATE '2026-01-01'\n  AND order_date < DATE '2026-04-01';"
+    focus: "Die Abfrage laeuft ueber den Parent und laesst die Partitionsfamilie wie eine Tabelle erscheinen."
+    error_case: "Inheritance- oder UNION-ALL-Alternativen bleiben eine andere Form und verlieren laut Doku einige Vorteile der deklarativen Partitionierung."
+    evidence_level: "docs_based"
+    source_refs: ["C1", "C2"]
+  Oracle:
+    snippet: "SELECT *\nFROM orders\nWHERE order_date >= DATE '2026-01-01'\n  AND order_date < DATE '2026-04-01';"
+    focus: "Auch in Oracle bleibt aus Anwendungssicht ein Tabellenobjekt erhalten, waehrend Partitionen intern getrennt sind."
+    error_case: "Wer globale Indexfolgen ignoriert, verlaesst die einfache Standardform."
+    evidence_level: "docs_based"
+    source_refs: ["C8", "C9"]
+  MySQL:
+    snippet: "EXPLAIN PARTITIONS\nSELECT *\nFROM orders\nWHERE order_date >= '2026-01-01'\n  AND order_date < '2026-04-01';"
+    focus: "MySQL zeigt direkt, ob der Filter wirklich nur wenige Partitionen anspricht."
+    error_case: "FK-starke InnoDB-Modelle kollidieren dokumentiert mit partitionierten Tabellen."
+    evidence_level: "docs_based"
+    source_refs: ["C11", "C12"]
+
+dialect_preflight_blocks:
+  - id: "DP1"
+    intent: "Pruefen, ob dieselbe Entitaet ueber eine logische Tabellenoberflaeche bleiben soll"
+    systems:
+      SQLServer:
+        snippet: "SELECT name FROM sys.views WHERE name LIKE 'orders%';"
+        natural_form: "Pruefen, ob bereits eine View-Familie als Ersatz fuer ein gemeinsames Objekt entstanden ist."
+        idiomatic_solution: "Bei einer einzigen Entitaet eher native Partitionierung als View-Familie waehlen."
+        protection_pattern: "Partitioned Views nicht als Default auf demselben Server einsetzen."
+        safe_pattern_note: "Ein Objekt fuer DML und Reporting ist meist wartbarer."
+        pitfall: "View-Routing wirkt leicht, produziert aber eigene Governance-Last."
+        evidence_level: "inference_based"
+        source_refs: ["C6", "C15"]
+      PostgreSQL:
+        snippet: "EXPLAIN\nSELECT *\nFROM orders\nWHERE order_date >= DATE '2026-01-01'\n  AND order_date < DATE '2026-04-01';"
+        natural_form: "Den Parent als natuerliche Oberflaeche pruefen."
+        idiomatic_solution: "Wenn der Parent die natuerliche Query-Oberflaeche bleibt, passt deklarative Partitionierung."
+        protection_pattern: "UNION-ALL-Alternativen nur mit starkem Fachgrund verwenden."
+        safe_pattern_note: "Eine logische Tabelle bleibt fuer Anwendung und Reporting stabiler."
+        pitfall: "Alternative Methoden wegen vermeintlicher Flexibilitaet einzusetzen."
+        evidence_level: "docs_based"
+        source_refs: ["C1", "C2"]
+      Oracle:
+        snippet: "EXPLAIN PLAN FOR\nSELECT *\nFROM orders\nWHERE order_date >= DATE '2026-01-01'\n  AND order_date < DATE '2026-04-01';"
+        natural_form: "Pruning und Indexwirkung gemeinsam betrachten."
+        idiomatic_solution: "Wenn Anwendung und Reporting ein Objekt erwarten, native Partitionierung bevorzugen."
+        protection_pattern: "App-gesteuerte Sonderformen nicht mit der Standardform vermischen."
+        safe_pattern_note: "Das Tabellenobjekt soll fuer die Anwendung eins bleiben."
+        pitfall: "Mehrere Tabellen aus Bequemlichkeit, obwohl Partitionierung dieselbe Aufgabe tragen koennte."
+        evidence_level: "inference_based"
+        source_refs: ["C8", "C9"]
+      MySQL:
+        snippet: "EXPLAIN PARTITIONS\nSELECT *\nFROM orders\nWHERE order_date >= '2026-01-01'\n  AND order_date < '2026-04-01';"
+        natural_form: "Pruning an echten Filtern pruefen, bevor eine Tabellenfamilie entsteht."
+        idiomatic_solution: "Einfache Tabelle oder einfache Partitionierung gegen Jahrestabellen abwaegen."
+        protection_pattern: "Engine-Grenzen zuerst lesen."
+        safe_pattern_note: "Die einfachere Form gewinnt oft."
+        pitfall: "Aus einem dokumentierten Limit direkt eine komplexe Tabellenfamilie bauen."
+        evidence_level: "docs_based"
+        source_refs: ["C10", "C11", "C12"]
+    article_usage:
+      section: "9. Vor jeder produktiven Umsetzung: technische Vorpruefung"
+      style: "per_system_blocks"
+
+  - id: "DP2"
+    intent: "Schema-Drift in einer Tabellenfamilie sichtbar machen"
+    systems:
+      SQLServer:
+        snippet: "SELECT t.name, COUNT(*) AS column_count\nFROM sys.tables t\nJOIN sys.columns c ON c.object_id = t.object_id\nWHERE t.name LIKE 'orders[_]20%'\nGROUP BY t.name;"
+        natural_form: "Mit sys.tables und sys.columns die ganze Familienstruktur pruefen."
+        idiomatic_solution: "Vor jedem Release Spaltenvertrag und Tabellenliste automatisch vergleichen."
+        protection_pattern: "View, Member-Tabellen und Check-Constraints gemeinsam versionieren."
+        safe_pattern_note: "Wer mehrere Tabellen waehlt, braucht messbare Governance."
+        pitfall: "Die neue Tabelle existiert, aber die Reporting-Schicht weiss noch nichts davon."
+        evidence_level: "inference_based"
+        source_refs: ["C15"]
+      PostgreSQL:
+        snippet: "SELECT table_name, COUNT(*) AS column_count\nFROM information_schema.columns\nWHERE table_schema = 'public'\n  AND table_name LIKE 'orders\\_20%' ESCAPE '\\'\nGROUP BY table_name;"
+        natural_form: "Spaltenzaehlung ueber die ganze Familie laufen lassen."
+        idiomatic_solution: "Mehrere Tabellen nur mit automatisierter Strukturpruefung und klarer Reporting-Schicht betreiben."
+        protection_pattern: "Nicht auf rein manuelle Namenskonventionen verlassen."
+        safe_pattern_note: "Flexible Alternativen muessen dieselbe Disziplin tragen wie native Partitionierung."
+        pitfall: "Asynchrone Migrationen erzeugen stille Drift."
+        evidence_level: "inference_based"
+        source_refs: ["C15"]
+      Oracle:
+        snippet: "SELECT table_name, COUNT(*) AS column_count\nFROM user_tab_columns\nWHERE table_name LIKE 'ORDERS\\_20%' ESCAPE '\\'\nGROUP BY table_name;"
+        natural_form: "USER_TAB_COLUMNS fuer den Familienvergleich nutzen."
+        idiomatic_solution: "Wenn die Trennung fachlich real ist, den Strukturvertrag aktiv pruefen."
+        protection_pattern: "Reporting-Objekte und DDL-Zyklen gemeinsam pflegen."
+        safe_pattern_note: "Mehrere Tabellen sind nur dann sauber, wenn ihre Unabhaengigkeit nicht in Drift kippt."
+        pitfall: "Trennung behaupten, aber gemeinsame Reports ohne gemeinsame Governance fahren."
+        evidence_level: "inference_based"
+        source_refs: ["C15", "C16"]
+      MySQL:
+        snippet: "SELECT table_name, COUNT(*) AS column_count\nFROM information_schema.columns\nWHERE table_schema = DATABASE()\n  AND table_name LIKE 'orders\\_20%' ESCAPE '\\'\nGROUP BY table_name;"
+        natural_form: "information_schema ueber die ganze Tabellenfamilie aggregieren."
+        idiomatic_solution: "Vor jedem neuen Familienmitglied Struktur und Schluessel automatisiert vergleichen."
+        protection_pattern: "Nicht von Tabellennamen auf Gleichheit schliessen."
+        safe_pattern_note: "Wenn mehrere Tabellen sein muessen, dann nur mit frueher Drift-Pruefung."
+        pitfall: "Ein Copy-and-paste-Startpunkt fuehrt schnell zu unterschiedlichen Tabellen."
+        evidence_level: "inference_based"
+        source_refs: ["C15"]
+    article_usage:
+      section: "9. Vor jeder produktiven Umsetzung: technische Vorpruefung"
+      style: "per_system_blocks"
+
+dialect_safety_patterns:
+  SQLServer:
+    snippet: "CREATE VIEW dbo.orders_all AS\nSELECT order_id, order_date FROM dbo.orders_2025\nUNION ALL\nSELECT order_id, order_date FROM dbo.orders_2026;\n-- Jede Member-Tabelle braucht einen klaren Wertebereich per CHECK-Constraint."
+    purpose: "Wenn mehrere Tabellen fachlich schon gesetzt sind, die SQL-Server-eigene Schutzlogik fuer partitioned views sichtbar machen."
+    idiomatic_role: "Conditionally-safe Multi-Table-Muster mit CHECK-Disziplin."
+    pitfall_avoided: "Member-Tabellen ohne sauberen Wertebereich als scheinbar gleichwertige Partitionierungsform zu behandeln."
+    evidence_level: "docs_based"
+    source_refs: ["C6"]
+  PostgreSQL:
+    snippet: "CREATE TABLE orders (\n  order_id bigint,\n  order_date date not null\n) PARTITION BY RANGE (order_date);\n\nCREATE TABLE orders_2026_q2\n  PARTITION OF orders\n  FOR VALUES FROM ('2026-04-01') TO ('2026-07-01');"
+    purpose: "Die Standardform fuer eine logische Tabelle knapp und belastbar zeigen."
+    idiomatic_role: "Robustes natives Muster."
+    pitfall_avoided: "Eine Entitaet vorschnell in manuelle Tabellenfamilien aufzuspalten."
+    evidence_level: "docs_based"
+    source_refs: ["C1", "C14"]
+  Oracle:
+    snippet: "CREATE INDEX orders_order_date_ix\nON orders (order_date)\nLOCAL;"
+    purpose: "Lokale Indexstrategie als natuerliches Wartungs- und Availability-Muster sichtbar machen."
+    idiomatic_role: "Wartungsnahe native Schutzform."
+    pitfall_avoided: "Partitionierung einfuehren, ohne die Indexfolgen fuer Maintenance mitzudenken."
+    evidence_level: "docs_based"
+    source_refs: ["C9"]
+  MySQL:
+    snippet: "/* Vor der Einfuehrung: zuerst dokumentierte FK- und Engine-Grenzen pruefen */\nEXPLAIN PARTITIONS\nSELECT *\nFROM orders\nWHERE order_date >= '2026-01-01'\n  AND order_date < '2026-04-01';"
+    purpose: "Die sichere Vorarbeit fuer MySQL sichtbar machen: Grenzen lesen und Pruning nachweisen."
+    idiomatic_role: "Fruehe Architekturpruefung statt spaete Tabellenfamilie."
+    pitfall_avoided: "Aus nicht geprueften Limits direkt eine teure Ausweicharchitektur zu bauen."
+    evidence_level: "docs_based"
+    source_refs: ["C11", "C12"]
+
+historical_contrast_snippets: []
+
+micro_examples:
+  - id: "MX1"
+    class: "robust"
+    title: "Eine logische Orders-Tabelle, engine-seitig in Quartale aufgeteilt"
+    purpose: "Die Standardform fuer native horizontale Partitionierung frueh sichtbar machen."
+    forward_reference_hint: "Die formalen Risikoklassen folgen spaeter in Abschnitt 3 des Artikels."
+    snippet: "Ein Objekt fuer DML und Reporting -> Partition Key auf order_date -> Quartalsgrenzen -> alte Quartale als ganze Einheiten detach, switch, exchange oder truncate"
+    evidence_level: "inference_based"
+    source_refs: ["C14"]
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX2"
+    class: "risky"
+    title: "Jahrestabellen als Volumenreaktion"
+    purpose: "Den haeufigsten Fehlstart der Episode benennen."
+    forward_reference_hint: "Diese Form landet spaeter meist in risky oder avoid."
+    snippet: "orders_2024, orders_2025, orders_2026 plus UNION ALL fuer Reporting; jedes neue Jahr braucht neue DDL, neue Routing-Regeln und neue Governance"
+    evidence_level: "inference_based"
+    source_refs: ["C15"]
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX3"
+    class: "prepared_source"
+    title: "Getrennte Datenraeume nur mit ausdruecklicher Governance"
+    purpose: "Die saubere Ausnahme fuer mehrere Tabellen benennen."
+    forward_reference_hint: "Die robuste Ausnahme wird spaeter im Strategieteil eingeordnet."
+    snippet: "orders_eu und orders_us nur dann getrennt halten, wenn Security, Ownership oder Retention wirklich unterschiedlich sind und Reporting nicht so tut, als sei es heimlich doch nur eine Tabelle"
+    evidence_level: "inference_based"
+    source_refs: ["C16"]
+    article_usage:
+      section: "Drei Muster zur ersten Orientierung"
+      style: "inline"
+  - id: "MX4"
+    class: "risky"
+    title: "Stiller Datenverlust in der Reporting-View"
+    purpose: "Den wichtigsten Fehlerfall explizit zeigen."
+    forward_reference_hint: "Der Fehlerfall gehoert spaeter zur Klasse risky oder avoid."
+    snippet: "CREATE VIEW orders_all AS\nSELECT order_id, order_date FROM orders_2024\nUNION ALL\nSELECT order_id, order_date FROM orders_2025;\n-- orders_2026 wurde im Deployment angelegt, aber die View nicht erweitert."
+    evidence_level: "inference_based"
+    source_refs: ["C15"]
+    article_usage:
+      section: "4. Wovon die Wahl abhaengt"
+      style: "code"
+
+strategy_snippets:
+  - id: "SS1"
+    strategy: "native_partitioned_table_postgresql"
+    target_risk_class: "robust"
+    snippet: "CREATE TABLE orders (\n  order_id bigint not null,\n  order_date date not null,\n  customer_id bigint not null\n) PARTITION BY RANGE (order_date);\n\nCREATE TABLE orders_2026_q1\n  PARTITION OF orders\n  FOR VALUES FROM ('2026-01-01') TO ('2026-04-01');\n\n-- Die naechste Partition vor dem neuen Zeitraum anlegen.\n-- Alte Partition erst detachen oder archivieren, wenn das Quartal fachlich abgeschlossen ist."
+    operational_caveat: "Die Zeitfenster brauchen eine klare Terminierung; Deployment und Naming sollten idempotent sein, damit dieselbe Partition nicht doppelt oder zu spaet angelegt wird."
+    evidence_level: "docs_based"
+    source_refs: ["C1", "C3"]
+    article_usage:
+      section: "10. Die Hauptstrategien sauber eingeordnet"
+      style: "code"
+
+comparison_tables:
+  - id: "CT1"
+    title: "Eine partitionierte Tabelle gegen mehrere Tabellen"
+    dimensions: ["Kriterium", "Eine partitionierte Tabelle", "Mehrere Tabellen"]
+    rows:
+      - kriterium: "Logische Oberflaeche"
+        eine_partitionierte_tabelle: "Ein Objekt fuer DML, Reporting und Constraints"
+        mehrere_tabellen: "Mehrere Objekte; gemeinsames Reporting braucht View, UNION ALL oder App-Routing"
+      - kriterium: "Routing"
+        eine_partitionierte_tabelle: "Engine oder deklarative Regeln routen intern"
+        mehrere_tabellen: "Anwendung, ETL oder View-Design tragen das Routing"
+      - kriterium: "Lifecycle"
+        eine_partitionierte_tabelle: "Detach, Switch, Exchange, Drop oder Truncate auf Teilmengen moeglich"
+        mehrere_tabellen: "Trennung ist schon physisch da, aber Governance liegt ausserhalb der Partitionslogik"
+      - kriterium: "Schema-Governance"
+        eine_partitionierte_tabelle: "Ein DDL-Vertrag fuer die ganze Familie"
+        mehrere_tabellen: "Migrationen, Views und Rollen muessen ueber alle Tabellen gleichgezogen werden"
+      - kriterium: "Typischer Kipppunkt"
+        eine_partitionierte_tabelle: "Falscher Partition Key oder zu viele Partitionen"
+        mehrere_tabellen: "Schema-Drift, fehlende Tabellen im Reporting und Routing-Code"
+    article_usage:
+      section: "7. Die wichtigste praktische Unterscheidung"
+      style: "table"
+  - id: "CT2"
+    title: "Systemvergleich fuer die Architekturfrage"
+    dimensions: ["System", "Native Leitidee", "Kontrast zu mehreren Tabellen", "Typische Warnung"]
+    rows:
+      - system: "PostgreSQL"
+        native_leitidee: "Virtueller Parent mit echten Partitionen"
+        kontrast_zu_mehreren_tabellen: "Inheritance oder UNION ALL sind Alternativen, aber nicht dieselbe Standardform"
+        typische_warnung: "Zu viele Partitionen kosten Planung und Speicher"
+      - system: "SQLServer"
+        native_leitidee: "Partition Functions, Schemes und aligned indexes"
+        kontrast_zu_mehreren_tabellen: "Partitioned views zeigen explizit die alternative Tabellenfamilie"
+        typische_warnung: "Viele Partitionen und falscher Indexvertrag verteuern den Betrieb"
+      - system: "Oracle"
+        native_leitidee: "Partitioning als Manageability-, Availability- und Performance-Disziplin"
+        kontrast_zu_mehreren_tabellen: "Lokale oder globale Indizes entscheiden mit ueber die echte Robustheit"
+        typische_warnung: "Global index fallout nicht zu spaet erkennen"
+      - system: "MySQL"
+        native_leitidee: "Horizontale Teilung einer Tabelle mit engeren Limits"
+        kontrast_zu_mehreren_tabellen: "Einfaches Modell oft robuster als manuelle Tabellenfamilie"
+        typische_warnung: "FK- und Engine-Grenzen frueh lesen"
+    article_usage:
+      section: "Systemvergleich auf einen Blick"
+      style: "table"
+
+warning_boxes:
+  - id: "WB1"
+    title: "Die haeufigste Produktionsfalle"
+    message: "Wenn eine Entitaet fachlich eine Tabelle bleibt, aber das Team sie aus Groessenangst in Jahres- oder Monatstabellen aufspaltet, wandern Routing, UNION-Reporting, Migrationsgleichlauf und Schema-Governance aus der Datenbankstruktur in Deployments und Anwendungscode."
+    severity: "high"
+    evidence_level: "inference_based"
+    source_refs: ["C15"]
+
+anti_pattern_blocks:
+  - id: "AP1"
+    anti_pattern: "orders_2024, orders_2025 und orders_2026 nur deshalb bauen, weil die Orders-Tabelle gross geworden ist."
+    robust_form: "Wenn die Entitaet eine bleibt, eine normale Tabelle oder native Partitionierung nutzen; mehrere Tabellen nur bei echter Trennung von Ownership, Security, Retention oder Deployment."
+    rationale: "Die Tabellenfamilie loest kein Query- oder Indexproblem von selbst, sondern fuehrt neue Governance-Pflichten ein."
+    evidence_level: "inference_based"
+    source_refs: ["C14", "C15", "C16"]
+
+signature_visual:
+  format: "ascii"
+  title: "Eine Tabelle gegen viele Tabellen"
+  purpose: "Den Kernkonflikt der Episode als zwei verschiedene Verantwortungsmodelle zeigen."
+  body: "Eine logische Tabelle:\nAnwendung -> orders -> Engine routet in Partitionen -> Pruning und Lifecycle auf Teilmengen\n\nMehrere Tabellen:\nAnwendung oder ETL -> Routing-Regeln -> orders_2025 / orders_2026 / orders_archive -> UNION ALL, Reporting und Migration pro Tabelle\n\nKernfrage: Willst du Teilmengen innerhalb eines Objekts oder bewusst getrennte Datenraeume?"
+  evidence_level: "inference_based"
+  source_refs: ["C14", "C15"]
+  article_usage:
+    section: "5. Was intern passiert: eine Tabelle gegen viele Tabellen"
+    style: "diagram"
+
+decision_visual:
+  format: "mermaid"
+  title: "Welche Form ist hier robuster?"
+  body: "flowchart TD\n    A[Eine fachliche Entitaet?] -->|Ja| B[Reads und Lifecycle teilen einen Schluessel?]\n    A -->|Nein| C[Unterschiedliche Ownership, Security oder Retention?]\n    B -->|Ja| D[Native partitionierte Tabelle]\n    B -->|Nein| E[Normale Einzeltabelle oder sehr strenge Vorpruefung]\n    C -->|Ja| F[Mehrere Tabellen mit expliziter Governance]\n    C -->|Nein| G[Mehrere Tabellen waeren nur manueller Overhead]\n    D --> H[Pruefe Partitionszahl, Indizes und Betriebsfenster]\n    F --> I[Pruefe Routing, Reporting und Schema-Gleichlauf]\n    G --> J[risky oder avoid]"
+  evidence_level: "inference_based"
+  source_refs: ["C14", "C15", "C16"]
+
+quality_gates:
+  - "Mindestens eine Ankergeschichte oder ein konkretes Fehlersymptom ist vorhanden"
+  - "Mindestens ein robustes Micro-Beispiel ist vorhanden"
+  - "Mindestens ein riskantes Micro-Beispiel ist vorhanden"
+  - "Mindestens eine sichere Alternativstrategie mit vorbereiteter Quelle ist vorhanden"
+  - "Dialect-aware Preflight-Bloecke sind pro relevanten Dialekt vorhanden oder bewusst begrenzt"
+  - "Pro relevantem Dialekt ist ein natuerliches Sicherheits- oder Vorbereitungs-Muster vorbereitet"
+  - "Pro behandeltem System ist ein minimales Beispiel mit Fokus und Fehlerfall vorbereitet"
+  - "Keine historische Kontrastversion ist aktiv gewichtet; darum bleibt der Block leer"
+  - "Empfohlene Strategien besitzen minimale Code-Skelette"
+  - "Mindestens eine Vergleichstabelle ist vorhanden"
+  - "Mindestens ein Warnhinweis ist vorhanden"
+  - "Mindestens ein Anti-Pattern-vs.-robuste-Form-Block ist vorhanden"
+  - "Eine visuelle Darstellung des Entscheidungsmodells ist vorhanden"
+  - "Eine zweite merkfaehige Hauptvisualisierung ist vorhanden"
+  - "Syntax-Oberflaechen bleiben kurz"
+  - "Evidenz-Level sind pro Snippet dokumentiert"

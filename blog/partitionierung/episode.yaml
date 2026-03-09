@@ -1,0 +1,690 @@
+article:
+  title: "Partitionierung: Wann mehrere Partitionen wirklich helfen - und wann nicht"
+  slug: "partitionierung"
+  topic_number: 60
+  as_of_date: "2026-03-08"
+  status: "reviewed"
+  language: "de"
+  series: "SQL-Mastery: Entfessle die Macht der Daten"
+  leading_system: "SQLServer"
+  canonical_label: "Partitionierung"
+  thesis: "Partitionierung ist kein allgemeiner Performance-Turbo. Sie hilft vor allem dann, wenn Datenlebenszyklus, Wartung und Zugriffsmuster entlang des Partition Keys organisiert werden koennen; ohne diese Passung erzeugt sie schnell nur mehr Komplexitaet."
+  summary_goal: "Der Artikel soll Partitionierung als Problemklasse in vier Datenbankkulturen lesbar machen und sauber zwischen Wartungsnutzen, Pruning-Nutzen und Fehlanwendungen unterscheiden."
+  audience:
+    - "Fortgeschrittene SQL-Anwender"
+    - "DBA"
+    - "Data Engineers"
+    - "Architekten fuer Datenplattformen"
+  tone:
+    intro_dialog: "humorous_but_not_banal"
+    body: "technical_precise"
+    ending: "respectful_reconciliation"
+
+workflow:
+  allowed_phases:
+    - "01_episode_yaml_builder"
+    - "01a_sources_research"
+    - "02_episode_yaml_validator"
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "05a_micro_examples_builder"
+    - "06_article_writer"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+    - "09_crosslink_planning"
+    - "10_crosslink_integration"
+    - "11_link_validation"
+    - "12_self_review"
+    - "13_external_review"
+    - "14_finalize_article"
+    - "final"
+  pipeline_mode: "article_only"
+  current_phase: "12_self_review"
+  target_phase: "12_self_review"
+  skip_steps:
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2022 (16.x)"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS"
+    include: true
+  ANSI95:
+    product: "SQL Standard"
+    version: "nur als Meta-Ebene zur Trennung von Problemklasse und Produktsyntax"
+    include: true
+
+repository_paths:
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+  article_readme: "blog/partitionierung/README.md"
+  episode_yaml: "blog/partitionierung/episode.yaml"
+  demo_spec: "blog/partitionierung/demo/demo_spec.yaml"
+  insights: "blog/partitionierung/demo/insights.yaml"
+  micro_examples: "blog/partitionierung/micro_examples.yaml"
+  sources: "blog/partitionierung/sources.yaml"
+  notes_md: "blog/partitionierung/notes.md"
+  crosslinks_plan: "blog/partitionierung/crosslinks_plan.yaml"
+
+author_notes:
+  source_path: "blog/partitionierung/notes.md"
+  use_if_present: true
+  note_items:
+    - id: "N1"
+      summary: "Die Leitthese muss klar sagen, dass Partitionierung kein allgemeiner Performance-Turbo ist."
+      priority: "must_cover"
+      planned_section: "2. Warum die intuitive Sicht zu kurz greift"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Notiz liefert die Kernbotschaft des Artikels."
+    - id: "N2"
+      summary: "Der Artikel muss logische, physische, Optimizer-, operative und architektonische Ebene trennen."
+      priority: "must_cover"
+      planned_section: "1. Was das Problem eigentlich ist"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die mehrschichtige Struktur ist der fachliche Rahmen der Episode."
+    - id: "N3"
+      summary: "Partition Pruning, Elimination und die Voraussetzungen dafuer muessen sichtbar erklaert werden."
+      priority: "must_cover"
+      planned_section: "5. Was intern eigentlich passiert"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Dies ist die zentrale Stelle fuer den verbreiteten Performance-Mythos."
+    - id: "N4"
+      summary: "Wartung, Archivierung, Laden, Sliding Window und Partition Switch, Exchange oder Detach gehoeren in den operativen Teil."
+      priority: "must_cover"
+      planned_section: "10. Die Hauptstrategien sauber eingeordnet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Notiz benennt den eigentlichen Nutzenbereich der Technik."
+    - id: "N5"
+      summary: "Zu viele Partitionen, falscher Schluessel und Partitionierung als Ersatz fuer Indizierung muessen als Anti-Pattern erscheinen."
+      priority: "must_cover"
+      planned_section: "7. Die wichtigste praktische Unterscheidung"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Diese Punkte bilden die riskanten und zu vermeidenden Klassen."
+    - id: "N6"
+      summary: "Lokale vs. globale Indizes oder dialektspezifische Aequivalente sollen in die Systemunterschiede einfliessen."
+      priority: "should_cover"
+      planned_section: "8. Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Das Thema traegt fachlich, aber die Tiefe folgt den produktiven Abweichungen."
+    - id: "N7"
+      summary: "Interval-Partitionierung, explizite Bounds und Default- oder Spill-Fallen sollen als Kontrastpunkte vorkommen."
+      priority: "should_cover"
+      planned_section: "6. Deep Dive: SQL Server als fuehrendes System"
+      planned_artifact: "micro_examples"
+      handling: "integrate"
+      rationale: "Die Notiz hilft bei der Darstellung von Systemkulturen statt blossen Uebersetzungen."
+    - id: "N8"
+      summary: "Das Thema soll als Problemklasse in vier Datenbankkulturen wirken; MySQL bleibt bewusst Kontrastsystem mit Grenzen."
+      priority: "must_cover"
+      planned_section: "Systemvergleich auf einen Blick"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Episode soll keine kuenstliche Gleichverteilung erzeugen."
+    - id: "N9"
+      summary: "Eine praktische Vorpruefung vor Einfuehrung muss Query-Muster, Datenverteilung, Archivierungsbedarf und Maintenance-Fenster abdecken."
+      priority: "must_cover"
+      planned_section: "9. Vor jeder produktiven Umsetzung: technische Vorpruefung"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Notiz liefert die spaetere Dialekt-Checkliste."
+    - id: "N10"
+      summary: "Strategien sollen keine Partitionierung, einfache Bereichspartitionierung, Sliding Window und Hot-Cold- oder Archiv-Muster einschliessen."
+      priority: "must_cover"
+      planned_section: "10. Die Hauptstrategien sauber eingeordnet"
+      planned_artifact: "article_body"
+      handling: "integrate"
+      rationale: "Die Notiz liefert die operative Entscheidungsachse."
+
+evidence_model:
+  allowed_levels:
+    - "docs_based"
+    - "inference_based"
+    - "demo_based"
+    - "executed_test_based"
+    - "benchmark_based"
+  available_levels:
+    - "docs_based"
+    - "inference_based"
+  wording_rules:
+    docs_based: "dokumentationsbasiert formulieren"
+    inference_based: "vorsichtig und als Ableitung markieren"
+    demo_based: "nicht verfuegbar in diesem Lauf"
+    executed_test_based: "nicht verfuegbar in diesem Lauf"
+    benchmark_based: "nicht verfuegbar in diesem Lauf"
+
+render_rules:
+  suppress_empty_related_blog_articles: true
+  suppress_empty_training_blocks: true
+  suppress_absent_benchmarks: true
+  suppress_absent_demo_results: true
+  suppress_empty_method_status_lines: true
+  suppress_internal_pipeline_terms_in_body: true
+
+presentation:
+  persona_mode: "intro_outro_only"
+  reader_guide_position: "after_visible_metadata"
+  toc_position: "after_scope_before_heavy_blocks"
+  pre_toc_zone_style: "compact"
+  allowed_pre_toc_blocks:
+    - "versions_and_scope"
+    - "method_status"
+    - "reader_guide_or_short_tldr"
+    - "leading_system_rationale"
+    - "training_links"
+    - "dialect_availability_note"
+  standalone_sections_must_appear_in_toc: true
+  persona_entry_position: "before_first_main_section"
+  require_comparison_table: true
+  require_warning_box: true
+  require_anti_pattern_block: true
+  require_decision_visual: true
+  require_signature_visual: true
+  require_min_examples_per_treated_system: true
+  require_explicit_error_case: true
+  require_anchor_failure_story: true
+  require_historical_contrast_snippets: false
+  require_strategy_code_for_recommended_patterns: true
+  require_risk_class_cross_references: true
+  require_forward_reference_for_early_class_labels: true
+  require_operational_caveats_in_strategy_code: true
+  avoid_adjacent_framework_duplication: true
+  require_dialect_aware_prechecks: true
+  require_dialect_native_safety_patterns: true
+  require_practical_observations: true
+  allow_controlled_expert_judgment: true
+  framing_goal: "same_problem_four_database_cultures"
+
+systems:
+  SQLServer:
+    role: "lead"
+    reason: "SQL Server eignet sich hier als Fuehrungssystem, weil Partitionierung im Repository bereits fachlich vertieft vorliegt und weil die operative Achse aus Partition Function, Scheme, aligned indexes und Sliding-Window-Praxis den Kernkonflikt der Episode sehr klar macht."
+  PostgreSQL:
+    role: "contrast_strong"
+    reason: "PostgreSQL ist der naechste starke Kontrastpartner fuer deklarative Partitionierung, Partition Pruning und die Warnung vor zu vielen Partitionen."
+  Oracle:
+    role: "contrast_strong"
+    reason: "Oracle zeigt die reifste Enterprise-Tiefe mit Range-, List-, Hash-, Interval- und Reference-Partitioning sowie lokalen und globalen Indizes."
+  MySQL:
+    role: "contrast"
+    reason: "MySQL ist fachlich relevant, weil dieselbe Problemklasse dort mit einfacherer Oberflaeche, aber auch mit scharfen Grenzen und Storage-Engine-Einschraenkungen auftritt."
+  ANSI95:
+    role: "meta"
+    reason: "ANSI bleibt Meta-Ebene und trennt die Problemklasse von den produktspezifischen Formen."
+
+chapters:
+  - id: 1
+    title: "Einstieg mit Dialog"
+    purpose: "Thema eroeffnen und Partitionierung als mehr als nur Groessenreaktion positionieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 2
+    title: "Leserleitfaden"
+    purpose: "Lesepfade nach Betriebsinteresse, Architekturfrage und Dialektinteresse anbieten"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 3
+    title: "TL;DR gesamt und pro System"
+    purpose: "Schnelle Orientierung ueber Hauptthese und Systemrollen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 4
+    title: "Was das Problem eigentlich ist"
+    purpose: "Partitionierung als Kombination aus Leselogik, Wartungslogik und Lebenszyklussteuerung definieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 5
+    title: "Warum die intuitive Sicht zu kurz greift"
+    purpose: "Die Fehlgleichung grosse Tabelle gleich Partitionierung aufloesen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 6
+    title: "Welche internen Klassen es gibt"
+    purpose: "Robuste, bedingt sichere, riskante und zu vermeidende Partitionierungsformen unterscheiden"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 7
+    title: "Wovon Verhalten, Risiko und Kosten abhaengen"
+    purpose: "Query-Muster, Datenverteilung, Partition Key, Maintenance und Partitionsanzahl zerlegen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast_strong", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 8
+    title: "Was intern eigentlich passiert"
+    purpose: "Pruning, Routing, Maintenance und Metadatenkosten logisch trennen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 4 }
+      PostgreSQL: { mode: "contrast_strong", depth: 3 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 9
+    title: "Deep Dive des fuehrenden Systems"
+    purpose: "Partition Functions, Schemes, aligned indexes und Sliding Window im Fuehrungssystem vertiefen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "deep_dive", depth: 4 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 10
+    title: "Die wichtigste praktische Unterscheidung"
+    purpose: "Lesepfad entlang des Partition Keys von partitionierungsblinden Zugriffen unterscheiden"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 11
+    title: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+    purpose: "Lokale und globale Indexlogik, Unique-Regeln, MVCC, Undo und Locking einordnen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 12
+    title: "Vor jeder produktiven Umsetzung: technische Vorpruefung"
+    purpose: "Dialektbewusste Checkmuster fuer Query-Muster, Verteilung, Partitionsgrenzen und Betriebsfenster zeigen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 3 }
+      Oracle: { mode: "contrast", depth: 3 }
+      MySQL: { mode: "contrast", depth: 3 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 13
+    title: "Die Hauptstrategien sauber eingeordnet"
+    purpose: "Keine Partitionierung, einfache Zeitpartitionierung, Sliding Window und Hot-Cold-Muster vergleichen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 4 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 14
+    title: "Ein praxisnahes Entscheidungsmodell"
+    purpose: "Von Datenlebenszyklus, Query-Muster und Operationsbedarf zur passenden Klasse fuehren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 15
+    title: "Fazit"
+    purpose: "Kernthese verdichten und Wartungsnutzen gegen Scheinnutzen abgrenzen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 16
+    title: "Kurzform fuer die Praxis"
+    purpose: "Kurze Handlungsregel fuer die Einfuehrungsentscheidung"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+risk_classes:
+  robust:
+    description: "Klarer Partition Key, typische Queries filtern entlang dieses Keys, und Wartung oder Lebenszyklus profitieren direkt von Partitionen."
+    examples:
+      - "Faktentabelle mit Monatsgrenzen, haeufigen Datumsfiltern und planbaren Purge-Fenstern"
+      - "Archivfaehige Altpartitionen mit Switch-, Exchange- oder Detach-Muster"
+    refinements:
+      - "lifecycle_aligned"
+      - "pruning_aligned"
+  conditionally_safe:
+    description: "Partitionierung ist fachlich plausibel, aber Nutzen und Betriebsgewinn haengen an sauberer Vorpruefung, begrenzter Partitionszahl und passender Indexstrategie."
+    examples:
+      - "Grosse Tabelle mit gemischten Query-Mustern, aber klarem Loesch- oder Archivfenster"
+      - "Hot-Cold-Strategie mit wenigen grossen Partitionen und geplanter Nacharbeit an Indizes"
+    refinements:
+      - "maintenance_first"
+      - "mixed_access_patterns"
+  risky:
+    description: "Der Partition Key passt nur teilweise zu den realen Zugriffen oder die Partitionsgrenzen erzeugen mehr Metadaten- und Betriebsaufwand als Nutzen."
+    examples:
+      - "Viele Berichte filtern nicht auf den Partition Key"
+      - "Zu viele kleine Partitionen mit deutlicher Schieflast"
+    refinements:
+      - "misaligned_key"
+      - "overpartitioned"
+  avoid:
+    description: "Partitionierung wird hier als Ersatz fuer Datenmodellierung, Indizierung oder Query-Disziplin missbraucht und sollte in dieser Form nicht eingefuehrt werden."
+    examples:
+      - "Partitionierung nur wegen Tabellenvolumen ohne klares Wartungsmodell"
+      - "Partitionierung als Feigenblatt fuer schlechte Indizes oder unscharfe Filter"
+    refinements:
+      - "no_lifecycle_model"
+      - "index_substitute"
+
+preflight_checks:
+  - id: "P1"
+    question: "Filtern die wichtigsten Leseabfragen natuerlich auf dem geplanten Partition Key?"
+    generic_intent: "Pruning-Nutzen gegen partitionierungsblinde Zugriffsmuster pruefen"
+    query_pattern: "Top-Reads nach WHERE- und JOIN-Praedikaten inventarisieren und gegen den geplanten Partition Key halten"
+    purpose: "Leselogik entlang des Partition Keys nachweisen oder entkraeften"
+    expected_signal: "Ein substanzieller Teil der kritischen Abfragen nutzt den Partition Key direkt und sargierbar"
+    per_system:
+      SQLServer:
+        natural_form: "Plan- und DMV-nahe Pruefung der echten Filterpraedikate gegen die Partitionierungsspalte"
+        protection_pattern: "Range-Filter als offene Obergrenze formulieren und Funktionen auf der Partitionierungsspalte vermeiden"
+        idiomatic_solution: "Gezielte WHERE-Muster auf der Partitionierungsspalte plus Sichtpruefung der angesprochenen Partitionen"
+        safe_pattern: "Sargierbarer Datumsbereich statt YEAR- oder CONVERT-Filter"
+        working_style_note: "SQL Server belohnt saubere Bereichsfilter durch Partition Elimination, nicht bloss durch vorhandene Partitionen"
+        pitfall: "Nicht sargierbare Funktionen auf dem Partition Key machen den gehofften Nutzen unsichtbar"
+      PostgreSQL:
+        natural_form: "EXPLAIN-nahe Pruefung, ob Declarative Partitioning und Partition Pruning fuer die echten Filter greifen"
+        protection_pattern: "Bounds und Datentypen so waehlen, dass Praedikate der Partitionierung entsprechen"
+        idiomatic_solution: "Queries auf den Parent richten, aber Filter sauber auf dem Partition Key halten"
+        safe_pattern: "Nativer Datums- oder Bereichsfilter statt Ausdruck auf der Partitionierungsspalte"
+        working_style_note: "PostgreSQL warnt selbst davor, dass zu viele Partitionen Planung und Speicher verteuern koennen"
+        pitfall: "Partitionen helfen wenig, wenn die meisten Reads quer ueber alle Child-Tabellen laufen"
+      Oracle:
+        natural_form: "Optimizer-nahe Pruefung auf static oder dynamic partition pruning und auf passende lokale oder globale Indexpfade"
+        protection_pattern: "Partition Key und Query-Praedikat sauber typisiert halten"
+        idiomatic_solution: "Range- und Interval-Muster entlang klarer Zeitgrenzen entwerfen"
+        safe_pattern: "Explizite Bounds fuer planbare Wartung oder Interval fuer regelmaessigen Zeitfortschritt, je nach Betriebsmodell"
+        working_style_note: "Oracle verbindet Partitionswahl, Pruning und Indexstrategie staerker als viele Teams erwarten"
+        pitfall: "Global index maintenance kann den scheinbar einfachen Wartungsvorteil relativieren"
+      MySQL:
+        natural_form: "Pruefung, ob der Optimizer die Partitionen aus dem WHERE-Ausdruck tatsaechlich auf wenige Grenzen reduzieren kann"
+        protection_pattern: "Partitionierungsausdruck einfach und stabil halten"
+        idiomatic_solution: "Range- oder List-Muster mit klaren Grenzwerten statt komplexen Ausdruecken"
+        safe_pattern: "Schlichte Datums- oder numerische Bereichslogik fuer Partition Pruning"
+        working_style_note: "MySQL profitiert vor allem dann, wenn der Partitionsausdruck direkt in den typischen Filtern wieder auftaucht"
+        pitfall: "Wenn fast jede Query mehrere oder alle Partitionen liest, bleibt vor allem Verwaltungsaufwand uebrig"
+
+  - id: "P2"
+    question: "Gibt es einen klaren Lebenszyklus fuer Laden, Archivieren, Purgen oder Abhaengen ganzer Datenbereiche?"
+    generic_intent: "Wartungsnutzen statt blosses Volumendenken pruefen"
+    query_pattern: "Retention-Regeln, Ladefenster und Loeschfenster gegen den geplanten Partition Key mappen"
+    purpose: "Operativen Gewinn von Sliding Window, Exchange, Detach oder Truncate-Partition sichtbar machen"
+    expected_signal: "Die fachlichen Perioden decken sich mit realen Wartungsoperationen"
+    per_system:
+      SQLServer:
+        natural_form: "Pruefen, ob Partition Function, Scheme und Staging-Tabellen ein Switch-In oder Switch-Out sinnvoll tragen"
+        protection_pattern: "Leere Sicherheitspartitionen und identische Strukturen fuer Switch-Pfade vorsehen"
+        idiomatic_solution: "Sliding-Window-Modell mit vorbereiteter naechster und leerer Randpartition"
+        safe_pattern: "Neue Periode splitten, Daten einswitchen, alte Periode ausswitchen"
+        working_style_note: "SQL Server ist stark, wenn Lebenszyklus und Strukturvorgaben frueh geplant werden"
+        pitfall: "Switch scheitert schnell an nicht ausgerichteten Indizes oder unpassenden Check-Constraints"
+      PostgreSQL:
+        natural_form: "Pruefen, ob ATTACH und DETACH PARTITION den echten Betriebsfall besser tragen als Massen-DELETE"
+        protection_pattern: "Neue Partitionen vorab anlegen und alte gezielt abhaengen"
+        idiomatic_solution: "Zeitbasierte Declarative Partitioning-Struktur mit klaren Child-Grenzen"
+        safe_pattern: "Detach fuer Archivierung statt grosse DELETE-Wellen"
+        working_style_note: "PostgreSQL hebt den Wartungsvorteil groesserer Loeschvorgaenge ausdruecklich hervor"
+        pitfall: "Viele kleine Partitionen machen den laufenden Betrieb schwerer als das Purge-Problem"
+      Oracle:
+        natural_form: "Pruefen, ob Exchange Partition, Interval- oder Reference-Design den Datenlebenszyklus direkt abbildet"
+        protection_pattern: "Lokale und globale Indexfolgen fuer Wartungsoperationen bewusst einplanen"
+        idiomatic_solution: "Range- oder Interval-Partitionierung entlang der realen Zeitachsen"
+        safe_pattern: "Partition Exchange fuer schnelle Lade- oder Archivpfade nur mit passender Index- und Constraint-Strategie"
+        working_style_note: "Oracle ist besonders stark, wenn Partitionierung als Wartungsdisziplin und nicht nur als Query-Hoffnung verstanden wird"
+        pitfall: "Zu spaet geplante globale Indexabhaengigkeiten machen Maintenance teuer"
+      MySQL:
+        natural_form: "Pruefen, ob REORGANIZE, TRUNCATE PARTITION oder EXCHANGE PARTITION den Lebenszyklus wirklich vereinfachen"
+        protection_pattern: "Storage-Engine-Grenzen und FK-Einschraenkungen frueh lesen"
+        idiomatic_solution: "Klare Zeitfenster mit einfacher Range-Partitionierung"
+        safe_pattern: "Alte Partitionen gezielt truncaten oder reorganisieren statt breite DELETE-Laeufe"
+        working_style_note: "MySQL bietet Wartungshebel, aber mit engeren funktionalen Grenzen als Oracle oder SQL Server"
+        pitfall: "Storage-Engine- oder FK-Grenzen koennen das scheinbar einfache Design ausbremsen"
+
+  - id: "P3"
+    question: "Sind Partitionszahl, Verteilung und Metadatenkosten tragbar?"
+    generic_intent: "Overpartitioning und Schieflast vorab erkennen"
+    query_pattern: "Zeilen- und Groessenverteilung pro geplanter Partition, Prognose fuer 12 bis 24 Monate und Anzahl aktiver Partitionen erfassen"
+    purpose: "Zu viele kleine Partitionen und Schieflast als Betriebsrisiko markieren"
+    expected_signal: "Wenige bis maessig viele grosse Partitionen mit nachvollziehbarer Verteilung"
+    per_system:
+      SQLServer:
+        natural_form: "Partitionen, Zeilenzahlen und Speicherbedarf gegen Memory-Overhead und Verwaltungsgrenzen halten"
+        protection_pattern: "Partitionszahl konservativ waehlen und Filegroup-Zuordnung nur bei echtem Bedarf differenzieren"
+        idiomatic_solution: "Monatlich oder quartalsweise statt hyperfein, wenn die Queries das nicht erzwingen"
+        safe_pattern: "Zuerst am Lebenszyklus orientieren, erst dann an theoretischer Granularitaet"
+        working_style_note: "Microsoft dokumentiert zusaetzlichen Speicherbedarf und Verwaltungsaufwand bei sehr vielen Partitionen"
+        pitfall: "Viele tausend Partitionen erzeugen oft mehr Metadaten- und Memory-Kosten als fachlichen Nutzen"
+      PostgreSQL:
+        natural_form: "Planner-Kosten und Memory-Fussabdruck bei wachsender Zahl von Child-Tabellen einschaetzen"
+        protection_pattern: "Nur so fein partitionieren, wie Betriebs- und Query-Muster es rechtfertigen"
+        idiomatic_solution: "Moderate Partitionszahl mit klaren Bounds und konsistenten Benennungen"
+        safe_pattern: "Grenzen fuer aktive Partitionen frueh definieren"
+        working_style_note: "PostgreSQL nennt explizit laengere Planungszeiten und hoehere Memory-Nutzung als Folge vieler Partitionen"
+        pitfall: "Overpartitioning trifft zuerst den Planner, nicht unbedingt die Datenhaltung"
+      Oracle:
+        natural_form: "Partition Wise Operations, lokale Indizes und Verwaltungskosten gemeinsam betrachten"
+        protection_pattern: "Nur dort feiner werden, wo Lifecycle oder Pruning real profitieren"
+        idiomatic_solution: "Range plus Unterpartitionierung nur bei klarer fachlicher Begruendung"
+        safe_pattern: "Mehrdimensionale Modelle nur einsetzen, wenn sie echte Betriebsfaelle sauber trennen"
+        working_style_note: "Oracle kann sehr tief partitionieren, aber diese Reife verzeiht kein unmotiviertes Design"
+        pitfall: "Komplexe Composite-Strategien ohne klare Query- und Lifecycle-Muster kippen schnell in Designschuld"
+      MySQL:
+        natural_form: "Partitionszahl und Verteilung gegen einfache Verwaltungsroutinen und Optimizer-Nutzen abgleichen"
+        protection_pattern: "Grenzen schlicht halten und Subpartitionierung nur mit echter Notwendigkeit in Betracht ziehen"
+        idiomatic_solution: "Einfache Range- oder Key-Modelle mit kontrollierter Anzahl"
+        safe_pattern: "Verteilung erst messen, dann feinere Aufteilung ueberhaupt erwaegen"
+        working_style_note: "MySQLs nuetzliche Partitionierungsfaelle sind enger; ueberfeine Modelle zahlen selten zurueck"
+        pitfall: "Komplexere Modelle ohne klaren Pruning- oder Wartungsnutzen erzeugen nur Verwaltungsarbeit"
+
+  - id: "P4"
+    question: "Passen Index-, Constraint- und Sicherheitsmuster zur Partitionierungsstrategie?"
+    generic_intent: "Pruning-Nutzen und Wartungsoperationen gegen Nebenbedingungen absichern"
+    query_pattern: "Partition Key, Unique-Regeln, lokale oder globale Indizes und Maintenance-Operationen in einer Matrix pruefen"
+    purpose: "Technische Vertraege fuer die spaetere Produktion sichtbar machen"
+    expected_signal: "Partition Key, Indizes und Maintenance-Pfade stehen nicht gegeneinander"
+    per_system:
+      SQLServer:
+        natural_form: "Pruefen, ob eindeutige Indizes den Partition Key enthalten und ob alle fuer SWITCH relevanten Indizes aligned sind"
+        protection_pattern: "Indexdesign aus der Switch- und Elimination-Perspektive aufbauen"
+        idiomatic_solution: "Clustered oder heap-nahe Zielstruktur plus aligned nonclustered indexes bewusst planen"
+        safe_pattern: "Vor SWITCH die komplette Strukturgleichheit und Check-Logik pruefen"
+        working_style_note: "SQL Server koppelt Partitionierung und Wartung sehr stark an physische Ausrichtung"
+        pitfall: "Nicht aligned oder falsch eindeutige Indizes zerstoeren den gehofften Metadatenpfad"
+      PostgreSQL:
+        natural_form: "Lokale Indexpraxis auf den Partitionen mit Parent-Definition und echter Query-Nutzung zusammen betrachten"
+        protection_pattern: "Noetige Constraints und Child-Indizes nicht als spaete Nacharbeit behandeln"
+        idiomatic_solution: "Index- und Bounds-Design zusammen entwerfen"
+        safe_pattern: "Partitionierte Tabellen erst dann einfuehren, wenn auch die Kindobjekte operational mitgedacht sind"
+        working_style_note: "In PostgreSQL ist die Wartbarkeit der Partitionsfamilie wichtiger als ein schoenes Parent-DDL"
+        pitfall: "Parent-only-Denken blendet reale Arbeit auf den Partitionsobjekten aus"
+      Oracle:
+        natural_form: "Lokale und globale Indizes gegen Pruning, Maintenance und Constraint-Anforderungen abwaegen"
+        protection_pattern: "Global index fallout bei Partition Maintenance bewusst einplanen"
+        idiomatic_solution: "Local indexes fuer wartungsnahe Muster bevorzugen, globale nur mit klarem Query-Grund"
+        safe_pattern: "Partition Exchange nur mit vorbereiteter Index- und Constraint-Strategie"
+        working_style_note: "Oracle zeigt hier die tiefste Gestaltungsfreiheit und die groesste Verantwortung"
+        pitfall: "Global index maintenance wird oft erst nach dem ersten Wartungsfenster schmerzhaft sichtbar"
+      MySQL:
+        natural_form: "Storage-Engine-Limits, Partitionierungsausdruck und FK-Design gemeinsam pruefen"
+        protection_pattern: "Vor dem Entwurf die dokumentierten Partitionierungsgrenzen der Engine lesen"
+        idiomatic_solution: "Schlichte Partitionierung mit expliziter Rueckfallstrategie, wenn Engine-Limits dagegen sprechen"
+        safe_pattern: "FK-nahe Designs im Zweifel erst gegen die Partitionierungsgrenzen pruefen, dann entscheiden"
+        working_style_note: "MySQL verlangt hier weniger Heldentum und mehr fruehe Begrenzung"
+        pitfall: "Engine-Limits werden oft zu spaet gelesen und machen die Architektur dann teurer als die Tabelle selbst"
+
+decision_model:
+  - step: 1
+    question: "Gibt es einen klaren Datenlebenszyklus mit periodischem Laden, Archivieren oder Loeschen?"
+    action_if_yes: "Partitionierung bleibt im Rennen und wird als Wartungsstrategie bewertet."
+    action_if_no: "Partitionierung nur ueber Query-Muster und besondere Betriebsgruende weiterpruefen."
+  - step: 2
+    question: "Filtern die wichtigsten Queries regelmaessig und sargierbar auf dem geplanten Partition Key?"
+    action_if_yes: "Pruning-Nutzen ist plausibel und kann mit moderater Partitionszahl weiter verfolgt werden."
+    action_if_no: "Partitionierung ist hoechstens maintenance-first und darf nicht als Performance-Abkuerzung verkauft werden."
+  - step: 3
+    question: "Bleibt die Partitionszahl fuer Planung, Metadaten und Operationsfenster tragbar?"
+    action_if_yes: "Strategie kann in Richtung robust oder conditionally_safe gehen."
+    action_if_no: "Design vereinfachen oder auf Partitionierung verzichten."
+  - step: 4
+    question: "Sind Index-, Constraint- und Maintenance-Anforderungen je System sauber geklaert?"
+    action_if_yes: "Die Strategie kann produktiv geplant werden."
+    action_if_no: "Vorher technische Vorarbeit leisten; sonst bleibt der Fall risky."
+  - step: 5
+    question: "Ist der Hauptnutzen Wartung und Lebenszyklus, nicht nur eine diffuse Performance-Hoffnung?"
+    action_if_yes: "Einfaches Zeit- oder Bereichsmodell bevorzugen."
+    action_if_no: "Keine Partitionierung oder nur nach sehr strenger Pruning-Pruefung."
+
+signature_visual:
+  preferred_form: "read_vs_write_logic"
+  purpose: "Den Kernkonflikt zwischen Leselogik entlang des Partition Keys und Wartungslogik entlang des Datenlebenszyklus sichtbar machen."
+  key_message: "Partitionierung lohnt sich besonders dann, wenn derselbe Schluessel sowohl Queries als auch Wartung natuerlich organisiert."
+  anchor_section: "7. Die wichtigste praktische Unterscheidung"
+
+crosslinks:
+  training_targets:
+    SQLServer:
+      - "T-SQL/65_Partitioning/65_Partitioning.md"
+      - "T-SQL/26_Indexes_Basics/26_Indexes_Basics.md"
+      - "T-SQL/75_SSVEPatterns_for_ETL/75_SSVEPatterns_for_ETL.md"
+      - "T-SQL/78_ColumnstoreIndexes/78_ColumnstoreIndexes.md"
+      - "T-SQL/71_BackupRestore_Strategies/71_BackupRestore_Strategies.md"
+    PostgreSQL: []
+    Oracle: []
+    MySQL: []
+  related_blog_articles: []
+  backlink_targets:
+    - "T-SQL/README.md"
+    - "PostgreSQL/README.md"
+    - "Oracle/README.md"
+    - "MySQL/README.md"
+
+ending:
+  style: "respectful_reconciliation"
+  goal: "Die Persona soll die Kernthese verdichten: Partitionierung ist eine Disziplin fuer passende Zugriffsmuster und Wartungslogik, nicht ein Reflex auf Tabellenvolumen."
+  participants:
+    - "Sam"
+    - "Pete"
+    - "Ora"
+    - "My"
+    - "Mutter ANSI-95"
+  max_words: 220
+
+quality_gates:
+  - "Keine kuenstliche Gleichverteilung"
+  - "Fuehrendes System bleibt Erkenntnisachse"
+  - "Keine erfundene Syntax"
+  - "Keine erfundenen Interna"
+  - "Standard und Implementierung sauber trennen"
+  - "Narrative Elemente bleiben knapp"
+  - "Keine Redundanz"
+  - "Kurzform fuer die Praxis enthalten"
+  - "Workflow-Metadaten fuer den Artikelheader sind vorbereitet"
+  - "Methodischer Status und Evidenzmodell sind vorbereitet"
+  - "Render-Regeln fuer leere optionale Bereiche sind gesetzt"
+  - "Praesentationsregeln fuer Vergleichstabelle, Warnblock, Anti-Pattern-Block und Entscheidungsvisualisierung sind gesetzt"
+  - "Minimale Dialektbeispiele und expliziter Fehlerfall sind vorbereitet"
+  - "Inhaltsverzeichnis-Regeln, Persona-Platzierung und Ankergeschichte sind vorbereitet"
+  - "Historische Kontrast-Snippets sind nicht aktiv geplant und werden deshalb nicht erzwungen"
+  - "Strategie-Code und Risikoklassen-Querverweise sind vorbereitet"
+  - "Dialect-aware Vorpruefungen und Systemidiome sind vorbereitet"
+  - "Praxisbeobachtungen und kontrollierte fachliche Urteilssaetze sind vorbereitet"
+  - "Dialekt-native Sicherheitsmuster und Datenbankkulturen sind vorbereitet"
+  - "Eine zusaetzliche merkfaehige Hauptvisualisierung ist vorbereitet"
+  - "Author notes sind strukturiert uebernommen und spaeter verfolgbar"
+
+sources_expected:
+  - "Microsoft Learn: SQL Server 2022 Release Notes"
+  - "Microsoft Learn: Partitioned tables and indexes"
+  - "Microsoft Learn: CREATE PARTITION FUNCTION"
+  - "Microsoft Learn: CREATE PARTITION SCHEME"
+  - "PostgreSQL 18 Documentation: Table Partitioning"
+  - "PostgreSQL 18 Documentation: Release 18"
+  - "Oracle AI Database 26ai VLDB and Partitioning Guide"
+  - "Oracle Database 19c VLDB and Partitioning Guide"
+  - "MySQL 8.4 Reference Manual: Partitioning Overview"
+  - "MySQL 8.4 Reference Manual: Partition Management"
+  - "MySQL 8.4 Reference Manual: Partition Pruning"
+  - "MySQL 8.4 Reference Manual: Partitioning Limitations Relating to Storage Engines"

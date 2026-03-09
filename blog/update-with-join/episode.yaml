@@ -1,0 +1,408 @@
+article:
+  title: "Update with Join: Warum Kardinalitaet wichtiger ist als Syntax"
+  slug: "update-with-join"
+  topic_number: 1
+  as_of_date: "2026-03-08"
+  status: "reviewed"
+  language: "de"
+  series: "SQL-Mastery: Entfessle die Macht der Daten"
+  leading_system: "SQLServer"
+  canonical_label: "Update with Join"
+  thesis: "Join-basierte Updates sind nur dann robust, wenn pro Zielzeile eine fachlich und technisch eindeutige Quellzeile nachweisbar ist; die konkrete Produktsyntax ist nur die Oberflaeche."
+  summary_goal: "Der Artikel soll joined updates nach Kardinalitaetsvertrag, Schreibsemantik und operativem Risiko einordnen und die Unterschiede zwischen SQL Server, PostgreSQL, Oracle und MySQL ohne kuenstliche Gleichverteilung herausarbeiten."
+  audience:
+    - "Fortgeschrittene SQL-Anwender"
+    - "DBA"
+    - "Data Engineers"
+    - "Anwendungsentwickler mit Produktionsverantwortung"
+  tone:
+    intro_dialog: "humorous_but_not_banal"
+    body: "technical_precise"
+    ending: "respectful_reconciliation"
+
+workflow:
+  allowed_phases:
+    - "01_episode_yaml_builder"
+    - "01a_sources_research"
+    - "02_episode_yaml_validator"
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "06_article_writer"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+    - "09_crosslink_planning"
+    - "10_crosslink_integration"
+    - "11_link_validation"
+    - "12_self_review"
+    - "13_external_review"
+    - "14_finalize_article"
+    - "final"
+  pipeline_mode: "article_only"
+  current_phase: "12_self_review"
+  target_phase: "12_self_review"
+  skip_steps:
+    - "03_demo_spec_builder"
+    - "04_code_examples_generator"
+    - "05_insight_extraction"
+    - "07_code_examples_integrator"
+    - "08_insight_reintegration"
+
+version_scope:
+  SQLServer:
+    product: "Microsoft SQL Server"
+    version: "SQL Server 2022 (16.x), abgeglichen gegen Microsoft Learn und Build-/CU-Uebersicht bis CU23 vom 2026-01-29"
+    include: true
+  PostgreSQL:
+    product: "PostgreSQL"
+    version: "PostgreSQL 18, abgeglichen gegen Version-18-Dokumentation und Release-18-Meldung vom 2025-09-25"
+    include: true
+  Oracle:
+    product: "Oracle Database"
+    version: "Oracle AI Database 26ai fuer die aktuelle Direktsyntax; Oracle Database 19c als historische Kontrastfolie fuer die fruehere Update-Form ohne direkte Join-Oberflaeche"
+    include: true
+  MySQL:
+    product: "MySQL"
+    version: "MySQL 8.4 LTS, abgeglichen gegen Reference Manual und Release Notes 8.4.8"
+    include: true
+  ANSI95:
+    product: "SQL Standard"
+    version: "nur dort, wo fachlich relevant; keine frei zugaengliche Primarquelle in diesem Lauf eingebunden"
+    include: true
+
+repository_paths:
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+  article_readme: "blog/update-with-join/README.md"
+  episode_yaml: "blog/update-with-join/episode.yaml"
+  demo_spec: "blog/update-with-join/demo/demo_spec.yaml"
+  insights: "blog/update-with-join/demo/insights.yaml"
+  sources: "blog/update-with-join/sources.yaml"
+  crosslinks_plan: "blog/update-with-join/crosslinks_plan.yaml"
+
+systems:
+  SQLServer:
+    role: "lead"
+    reason: "Der Begriff 'Update with Join' verweist im Repo und in der Alltagssprache am direktesten auf T-SQL `UPDATE ... FROM`; zugleich formuliert die SQL-Server-Dokumentation die Determinismuswarnung besonders scharf."
+  PostgreSQL:
+    role: "contrast_strong"
+    reason: "PostgreSQL benutzt eine aehnliche `UPDATE ... FROM`-Oberflaeche, warnt aber explizit davor, dass bei Mehrfachtreffern nur eine nicht gut vorhersagbare Join-Zeile wirksam wird."
+  Oracle:
+    role: "contrast_strong"
+    reason: "Oracle ist fachlich wichtig, weil aktuelle Releases direkte Joins in `UPDATE` kennen, fruehere verbreitete Releases aber ueber Subquery-/MERGE-Muster arbeiteten; das macht die Problemklasse statt der Syntax sichtbar."
+  MySQL:
+    role: "contrast_strong"
+    reason: "MySQL modelliert das Thema ueber die Multi-Table-Update-Form und besitzt eigene Restriktionen und Betriebsrisiken, insbesondere bei FK-bezogenen Updates."
+  ANSI95:
+    role: "meta"
+    reason: "Trennt Problemklasse, Standardebene und Produktauspraegung; starke Produktbehauptungen werden jedoch nicht allein auf ANSI gestuetzt."
+
+chapters:
+  - id: 1
+    title: "Einstieg mit Dialog"
+    purpose: "Thema eroeffnen und die eigentliche Konfliktlinie auf Kardinalitaet statt Oberflaechensyntax ziehen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 2
+    title: "Leserleitfaden"
+    purpose: "Lesepfade nach Fuehrungssystem, Kontrastsystemen und Betriebstiefe bieten"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "hint", depth: 1 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 3
+    title: "TL;DR gesamt und pro System"
+    purpose: "Schnelle Orientierung ueber Robustheit und zentrale Unterschiede"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "contrast", depth: 1 }
+      Oracle: { mode: "contrast", depth: 1 }
+      MySQL: { mode: "contrast", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 4
+    title: "Was das Problem eigentlich ist"
+    purpose: "Problemklasse als Schreiboperation mit Join-Kardinalitaet und Wertquelle praezisieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 5
+    title: "Warum die intuitive Sicht zu kurz greift"
+    purpose: "Zeigen, warum 'einfach Join davorhaengen' fachlich nicht reicht"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 6
+    title: "Welche internen Klassen es gibt"
+    purpose: "Robuste, bedingt sichere, riskante und zu vermeidende Varianten unterscheiden"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast_strong", depth: 3 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 7
+    title: "Wovon Verhalten, Risiko und Kosten abhaengen"
+    purpose: "Kardinalitaet, Datenverteilung, Indexierung, Logging und Nebenlaeufigkeit systematisch zerlegen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 8
+    title: "Was intern eigentlich passiert"
+    purpose: "Trefferbildung, Schreibphase und betriebliche Nebenwirkungen auseinanderziehen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "deep_dive", depth: 4 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 9
+    title: "Deep Dive des fuehrenden Systems"
+    purpose: "SQL Server als Hauptachse mit Determinismus, Locking und Logging vertiefen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "deep_dive", depth: 4 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 10
+    title: "Die wichtigste praktische Unterscheidung"
+    purpose: "Robust vs. bedingt sicher vs. riskant vs. vermeiden operationalisieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast_strong", depth: 3 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 11
+    title: "Welche Rolle Indizes, Constraints, Logging und Locks spielen"
+    purpose: "Technische Kosten- und Sicherheitsdimension erklaeren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 4 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 12
+    title: "Vor jeder produktiven Umsetzung: technische Vorpruefung"
+    purpose: "Konkrete Checks vor einer produktiven Join-basierten Aenderung formulieren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast", depth: 2 }
+      MySQL: { mode: "contrast", depth: 2 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 13
+    title: "Die Hauptstrategien sauber eingeordnet"
+    purpose: "Direktes Join-Update, vorbereitete Quelle, Staging und Alternativen gegeneinander abwaegen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "contrast", depth: 2 }
+      Oracle: { mode: "contrast_strong", depth: 3 }
+      MySQL: { mode: "contrast_strong", depth: 3 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 14
+    title: "Ein praxisnahes Entscheidungsmodell"
+    purpose: "Schrittweise zur passenden Strategie fuehren"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 3 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+  - id: 15
+    title: "Fazit"
+    purpose: "Zentrale Fachthese verdichten"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "meta", depth: 1 }
+
+  - id: 16
+    title: "Kurzform fuer die Praxis"
+    purpose: "Komprimierte Handlungsregel fuer produktive Entscheidungen"
+    lead_system: "SQLServer"
+    systems:
+      SQLServer: { mode: "lead", depth: 2 }
+      PostgreSQL: { mode: "hint", depth: 1 }
+      Oracle: { mode: "hint", depth: 1 }
+      MySQL: { mode: "hint", depth: 1 }
+      ANSI95: { mode: "none", depth: 0 }
+
+risk_classes:
+  robust:
+    description: "Die Quelle liefert pro Zielzeile nachweisbar genau null oder eine relevante Quellzeile; die Eindeutigkeit ist fachlich und idealerweise durch Constraint oder vorbereitete Verdichtung abgesichert."
+    examples:
+      - "Lookup-Update mit garantiert eindeutiger Business-Key-Quelle"
+      - "Voraggregierte oder deduplizierte Staging-Menge mit dokumentiertem Regelwerk"
+    refinements:
+      - "constraint_proven"
+      - "staging_hardened"
+  conditionally_safe:
+    description: "Die Operation ist beherrschbar, aber nur unter dokumentierten Vorbedingungen wie Deduplikation, begrenztem Batchfenster oder klaren Konfliktregeln."
+    examples:
+      - "Deduplikation per vorbereiteter Zwischenmenge vor dem eigentlichen Update"
+      - "Batchweise Abarbeitung mit sauberer Wiederanlaufstrategie"
+    refinements:
+      - "dedupe_required"
+      - "batch_operated"
+  risky:
+    description: "Die Trefferbildung ist formal moeglich, aber Mehrfachtreffer, breite Locking-Auswirkungen oder undeutliche Wertquellen machen das Ergebnis oder den Betrieb unsicher."
+    examples:
+      - "Join-Update ohne nachweisbare 1:1-Kardinalitaet"
+      - "Grosses Produktiv-Update ohne Vorpruefung von Log, Replikation oder Sperrverhalten"
+    refinements:
+      - "multi_match_possible"
+      - "operationally_hot"
+  avoid:
+    description: "Die Operation sollte in dieser Form nicht produktiv verwendet werden, weil Semantik, Korrektheit oder Betriebsrisiko nicht mehr verantwortbar sind."
+    examples:
+      - "Blindes Join-Update mit bewusst tolerierten Mehrfachtreffern"
+      - "Mehrtabellen-Schreiboperation, wenn eine einspaltige Zielkorrektur mit vorbereiteter Quelle robuster waere"
+    refinements:
+      - "implicit_winner"
+      - "mixed_write_surface"
+
+preflight_checks:
+  - "Ist pro Zielzeile nachweisbar, wie viele Quellzeilen relevant sein duerfen?"
+  - "Ist die Quellmenge bereits dedupliziert oder aggregiert, falls fachlich mehrere Rohzeilen existieren?"
+  - "Welche Spalten stammen aus der Quelle und welche nur aus Ziel- oder Konstantlogik?"
+  - "Welche Unique Keys, Foreign Keys oder Indizes stützen die angenommene Kardinalitaet?"
+  - "Wie gross sind Logging-, Bloat-, Undo-, Replica- oder Temp-Effekte im Zielsystem?"
+  - "Welche Sessions oder Prozesse koennen waehrend des Updates konkurrieren?"
+  - "Gibt es Trigger, Historisierung, CDC, Replikation oder Auditmechanismen, die Nebenwirkungen erzeugen?"
+  - "Ist ein Ruecksetz- oder Wiederanlaufpfad definiert, falls die betroffene Zeilenmenge oder Dauer abweicht?"
+
+decision_model:
+  - step: 1
+    question: "Liefert die fachliche Regel pro Zielzeile maximal eine wirksame Quellzeile?"
+    action_if_yes: "Direktes Join-Update bleibt im Kandidatenkreis."
+    action_if_no: "Vor dem Update zwingend verdichten, deduplizieren oder auf Staging/Alternativmuster wechseln."
+  - step: 2
+    question: "Ist diese Eindeutigkeit technisch durch Constraint, Index oder vorbereitete Quelle sichtbar gemacht?"
+    action_if_yes: "Operation kann als robust oder bedingt sicher eingestuft werden."
+    action_if_no: "Einstufung mindestens conditionally_safe; starke Produktionsaussagen vermeiden."
+  - step: 3
+    question: "Traegt die Quelle nur zur Filterung bei oder liefert sie echte Schreibwerte?"
+    action_if_yes: "Bei echten Schreibwerten Kardinalitaetskonflikte besonders streng behandeln."
+    action_if_no: "Bei reiner Filterrolle dennoch Duplikate explizit pruefen, weil Produktsysteme unterschiedlich reagieren."
+  - step: 4
+    question: "Ist das Zielobjekt betriebsheiss oder gross genug, dass Locking, Log oder Replikation kritisch werden?"
+    action_if_yes: "Batching, Zeitfenster, Monitoring und Rollback-Pfad einplanen."
+    action_if_no: "Direkter Lauf bleibt moeglich, Vorpruefung aber nicht ueberspringen."
+  - step: 5
+    question: "Weicht das Produktsystem semantisch stark vom SQL-Server-Referenzpfad ab?"
+    action_if_yes: "Dialektspezifische Regeln vorrangig lesen und Muster anpassen."
+    action_if_no: "SQL-Server-zentrierte Argumentation kann mit begrenzter Kontrasttiefe uebernommen werden."
+  - step: 6
+    question: "Bleibt nach allen Pruefungen ein impliziter Gewinner bei Mehrfachtreffern moeglich?"
+    action_if_yes: "Variante als risky oder avoid einstufen."
+    action_if_no: "Variante kann als robust oder conditionally_safe dokumentiert werden."
+
+crosslinks:
+  training_targets:
+    SQLServer:
+      - "T-SQL/08_Update/08_Update.md"
+      - "T-SQL/03_JOIN/03_Join.md"
+      - "T-SQL/13_Merge/13_Merge.md"
+      - "T-SQL/19_Transaktions/19_Transactions.md"
+      - "T-SQL/60_IsolationLevels/60_IsolationLevels.md"
+    PostgreSQL:
+      - "PostgreSQL/README.md"
+    Oracle:
+      - "Oracle/README.md"
+    MySQL:
+      - "MySQL/README.md"
+  related_blog_articles: []
+  backlink_targets:
+    - "T-SQL/README.md"
+    - "PostgreSQL/README.md"
+    - "Oracle/README.md"
+    - "MySQL/README.md"
+
+ending:
+  style: "respectful_reconciliation"
+  goal: "Die Systeme sollen nicht gegeneinander ausgespielt werden; der Schluss betont, dass robuste Schreiblogik stets auf expliziter Kardinalitaet beruht."
+  participants:
+    - "Sam"
+    - "Pete"
+    - "Ora"
+    - "My"
+    - "Mutter ANSI-95"
+  max_words: 220
+
+quality_gates:
+  - "Keine kuenstliche Gleichverteilung"
+  - "Fuehrendes System bleibt Erkenntnisachse"
+  - "Keine erfundene Syntax"
+  - "Keine erfundenen Interna"
+  - "Standard und Implementierung sauber trennen"
+  - "Narrative Elemente bleiben knapp"
+  - "Keine Redundanz"
+  - "Kurzform fuer die Praxis enthalten"
+  - "Workflow-Metadaten fuer den Artikelheader sind vorbereitet"
+  - "article_only-Bypasses sind explizit ueber skip_steps dokumentiert"
+  - "Keine Beispiel-SQL im Artikel erzeugen"
+  - "Keine pseudo-validierten Aussagen aus nicht ausgefuehrten Demo-Schritten ableiten"
+
+sources_expected:
+  - "Microsoft Learn: UPDATE (Transact-SQL) mit FROM-Hinweisen fuer SQL Server 2022"
+  - "Microsoft Learn: Locking- und Row-Versioning-Dokumentation fuer SQL Server"
+  - "PostgreSQL 18 Dokumentation: SQL UPDATE"
+  - "PostgreSQL Release-18-Dokumentation oder Release-Meldung zur Versionseinordnung"
+  - "Oracle AI Database 26ai SQL Language Reference: UPDATE"
+  - "Oracle Database 19c SQL Language Reference: UPDATE oder Scalar Subquery als historische Gegenfolie"
+  - "Oracle 26 New Features oder AppDev SQL Changes fuer direkte Joins in UPDATE"
+  - "MySQL 8.4 Reference Manual: UPDATE Statement"
+  - "MySQL 8.4 Release Notes oder LTS-Dokumentation"
+  - "Offene Quellenluecke fuer ANSI/ISO frei zugaenglichen Primartext explizit notieren"

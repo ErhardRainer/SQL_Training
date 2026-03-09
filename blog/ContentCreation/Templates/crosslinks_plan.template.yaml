@@ -1,0 +1,100 @@
+metadata:
+  topic_slug: ""
+  generated_at: "YYYY-MM-DD"
+  article_readme: "blog/<topic-slug>/README.md"
+  blog_root: "blog"
+  dialect_roots:
+    SQLServer: "T-SQL"
+    PostgreSQL: "PostgreSQL"
+    Oracle: "Oracle"
+    MySQL: "MySQL"
+    SQLHana: "SQLHana"
+
+blog_to_training:
+  available_block_title: "Verfügbare Schulungsunterlagen im Repository"
+  missing_dialects_block_title: "Weitere Dialekte in dieser Episode"
+  insert_after_heading: "Methodischer Status"
+  targets:
+    - system: "SQLServer"
+      path: "T-SQL/.../README.md"
+      label: "T-SQL – ..."
+      relation: "dialect_specific_training"
+      exists: false
+    - system: "PostgreSQL"
+      path: "PostgreSQL/.../README.md"
+      label: "PostgreSQL – ..."
+      relation: "dialect_specific_training"
+      exists: false
+    - system: "Oracle"
+      path: "Oracle/.../README.md"
+      label: "Oracle – ..."
+      relation: "dialect_specific_training"
+      exists: false
+    - system: "MySQL"
+      path: "MySQL/.../README.md"
+      label: "MySQL – ..."
+      relation: "dialect_specific_training"
+      exists: false
+    - system: "SQLHana"
+      path: "SQLHana/.../README.md"
+      label: "SQLHana – ..."
+      relation: "dialect_specific_training"
+      exists: false
+
+blog_to_blog:
+  episode_dialects_without_training: []
+  missing_dialects_note: ""
+  block_title: "Verwandte Themen"
+  insert_before_heading: "Fazit"
+  targets:
+    - path: "blog/<other-topic>/README.md"
+      label: ""
+      relation: "related_problem_class"
+      exists: false
+
+training_backlinks:
+  block_title: "Verwandte Langform-Artikel"
+  targets:
+    - path: "T-SQL/.../README.md"
+      insert_after_heading: "Weiterführende Inhalte"
+      backlink_label: "<Blog-Artikel-Titel>"
+      backlink_target: "blog/<topic-slug>/README.md"
+      exists: false
+    - path: "PostgreSQL/.../README.md"
+      insert_after_heading: "Weiterführende Inhalte"
+      backlink_label: "<Blog-Artikel-Titel>"
+      backlink_target: "blog/<topic-slug>/README.md"
+      exists: false
+    - path: "Oracle/.../README.md"
+      insert_after_heading: "Weiterführende Inhalte"
+      backlink_label: "<Blog-Artikel-Titel>"
+      backlink_target: "blog/<topic-slug>/README.md"
+      exists: false
+    - path: "MySQL/.../README.md"
+      insert_after_heading: "Weiterführende Inhalte"
+      backlink_label: "<Blog-Artikel-Titel>"
+      backlink_target: "blog/<topic-slug>/README.md"
+      exists: false
+    - path: "SQLHana/.../README.md"
+      insert_after_heading: "Weiterführende Inhalte"
+      backlink_label: "<Blog-Artikel-Titel>"
+      backlink_target: "blog/<topic-slug>/README.md"
+      exists: false
+
+render_rules:
+  suppress_empty_blog_to_blog: true
+  suppress_empty_available_training_block: true
+  suppress_empty_missing_dialects_block: true
+
+validation:
+  require_existing_targets: true
+  require_relative_links: true
+  fail_if_missing: false
+  report_path: "outputs/<topic-slug>.link-report.md"
+
+quality_gates:
+  - "Blog verlinkt auf passende Trainingsunterlagen"
+  - "Leere optionale Linkblöcke werden unterdrückt"
+  - "Trainingsunterlagen verlinken zurück auf den Blog-Artikel"
+  - "Verwandte Blog-Themen werden nur gesetzt, wenn semantisch passend"
+  - "Alle relativen Pfade werden vor Finalisierung validiert"
