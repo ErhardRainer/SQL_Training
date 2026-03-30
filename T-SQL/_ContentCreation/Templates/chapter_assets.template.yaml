@@ -1,0 +1,27 @@
+chapter_assets:
+  chapter_markdown: ""
+  scanned_paths:
+    - path: ""
+      asset_type: "script_folder"
+      reuse_strategy: "adapt"
+      notes: ""
+
+  reusable_assets:
+    - path: ""
+      asset_type: "sql_script"
+      purpose: ""
+      notebook_targets:
+        - ""
+      reuse_strategy: "reuse_direct"
+      safety_level: "safe_demo_only"
+      notes: ""
+
+  operational_constraints:
+    - ""
+
+  crosslink_candidates:
+    - chapter_path: ""
+      reason: ""
+
+  missing_assets:
+    - ""

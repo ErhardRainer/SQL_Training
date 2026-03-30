@@ -1,0 +1,40 @@
+chapter:
+  topic_number: ""
+  chapter_slug: ""
+  chapter_title: ""
+  chapter_folder: ""
+  chapter_markdown: ""
+  work_mode: "full_chapter"
+  canonical_source_status: "parsed"
+  notes:
+    - ""
+
+global_references:
+  docs:
+    - title: ""
+      url: ""
+  videos:
+    - title: ""
+      url: ""
+  related_notebooks_seen:
+    - path: ""
+      role: "style_reference"
+      notes: ""
+
+notebooks:
+  - section_number: "2.1"
+    title: ""
+    short_description: ""
+    notebook_file: ""
+    docs:
+      - title: ""
+        url: ""
+    youtube:
+      - title: ""
+        url: ""
+    subtopics:
+      - ""
+    existing_file_state: "missing"
+    priority: "core"
+    notes:
+      - ""

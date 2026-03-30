@@ -1,0 +1,90 @@
+notebook:
+  notebook_file: ""
+  output_path: ""
+  section_number: "2.1"
+  title: ""
+  notebook_class: "query_lab"
+  difficulty: "intermediate"
+  generation_mode: "new"
+  title_card:
+    themengebiet: ""
+    kapitel: ""
+    kurzbeschreibung: ""
+    stand: "YYYY-MM-DD"
+
+sources:
+  chapter_markdown: ""
+  section_heading: ""
+  short_description_from_source: ""
+  docs:
+    - title: ""
+      url: ""
+  repo_assets:
+    - path: ""
+      role: "adapt"
+
+learning_contract:
+  thesis: ""
+  prerequisites:
+    - ""
+  typical_questions:
+    - ""
+  learning_goals:
+    - ""
+  out_of_scope:
+    - ""
+
+lab_profile:
+  setup_mode: "rebuild_demo_db"
+  database_strategy:
+    primary_database: ""
+    object_names:
+      - ""
+  environment_requirements:
+    - ""
+  safety_notes:
+    - ""
+  cleanup_strategy: ""
+  session_model: "single_session"
+
+section_plan:
+  intro_overview:
+    - ""
+  core_sections:
+    - id: "core_01"
+      title: ""
+      purpose: ""
+      requires_code: true
+  diagnostics_section:
+    include: true
+    title: "Query Optimizer/Analyzer & Ausfuehrungsplan"
+    focus:
+      - ""
+  best_practices_title: "Best Practices & Performance"
+  cleanup_section:
+    include: false
+    title: "Cleanup (optional)"
+
+optimizer_focus:
+  include_section: true
+  concepts:
+    - ""
+
+pitfalls:
+  - title: ""
+    bad_pattern: ""
+    correction_pattern: ""
+
+exercises:
+  count: 5
+  prompts:
+    - ""
+
+crosslinks:
+  should_include: true
+  candidates:
+    - chapter_path: ""
+      reason: ""
+
+quality_gates:
+  - ""

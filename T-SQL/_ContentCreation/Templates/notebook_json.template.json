@@ -1,0 +1,28 @@
+{
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {},
+      "source": "# <TITLE>\n\n**Themengebiet:** <THEMENGEBIET>  \n**Kapitel:** <KAPITEL>  \n**Kurzbeschreibung:** <KURZBESCHREIBUNG>  \n**Stand:** <YYYY-MM-DD>\n"
+    },
+    {
+      "cell_type": "code",
+      "metadata": {},
+      "execution_count": null,
+      "outputs": [],
+      "source": "-- T-SQL goes here\n"
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "SQL",
+      "display_name": "SQL",
+      "language": "sql"
+    },
+    "language_info": {
+      "name": "sql"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+}

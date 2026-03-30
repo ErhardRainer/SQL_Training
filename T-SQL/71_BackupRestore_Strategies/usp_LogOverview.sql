@@ -1,6 +1,8 @@
 USE BIMonitoring
 GO
 
+-- EXECUTE [log].[usp_LogOverview]
+
 /* =======================================================================
    Stored Procedure: [log].[usp_LogOverview]
    Writes results to persistent tables with SnapshotDate (no #temp tables)

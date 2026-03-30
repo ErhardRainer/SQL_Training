@@ -1,0 +1,182 @@
+notebook_file: ""
+
+metadata:
+  kernelspec_name: "SQL"
+  kernelspec_display_name: "SQL"
+  language: "sql"
+  nbformat: 4
+  nbformat_minor: 5
+
+cells:
+  - order: 1
+    cell_type: "markdown"
+    section_id: "title_card"
+    required: true
+    title: "Title Card"
+    intent: "Notebook-Titel und Metadaten fuer den Leser"
+    source_inputs:
+      - "notebook.title_card"
+
+  - order: 2
+    cell_type: "markdown"
+    section_id: "intro"
+    required: true
+    title: "Intro"
+    intent: "Fokus und typische Fragestellungen"
+    source_inputs:
+      - "learning_contract.thesis"
+      - "learning_contract.typical_questions"
+
+  - order: 3
+    cell_type: "markdown"
+    section_id: "contents"
+    required: true
+    title: "Contents"
+    intent: "Scanbare Inhaltsuebersicht"
+    source_inputs:
+      - "section_plan"
+
+  - order: 4
+    cell_type: "markdown"
+    section_id: "kernel_note"
+    required: true
+    title: "Kernel Note"
+    intent: "Hinweis auf SQL-Kernel und T-SQL-Zellen"
+    source_inputs:
+      - "metadata"
+
+  - order: 5
+    cell_type: "markdown"
+    section_id: "setup_intro"
+    required: true
+    title: "Setup Intro"
+    intent: "Setup oder Lab-Voraussetzungen erklaeren"
+    source_inputs:
+      - "lab_profile"
+      - "demo_assets.setup_cells"
+
+  - order: 6
+    cell_type: "code"
+    section_id: "setup_code"
+    required: true
+    title: "Setup Code"
+    intent: "Demo-Objekte oder sichere Beobachtungsbasis herstellen"
+    source_inputs:
+      - "demo_assets.setup_cells"
+
+  - order: 7
+    cell_type: "markdown"
+    section_id: "baseline_intro"
+    required: true
+    title: "Baseline Intro"
+    intent: "Daten sichten oder Ausgangszustand beschreiben"
+    source_inputs:
+      - "demo_assets.baseline_queries"
+
+  - order: 8
+    cell_type: "code"
+    section_id: "baseline_code"
+    required: true
+    title: "Baseline Code"
+    intent: "Ausgangszustand sichtbar machen"
+    source_inputs:
+      - "demo_assets.baseline_queries"
+
+  - order: 9
+    cell_type: "markdown"
+    section_id: "core_01"
+    required: true
+    title: "Core Section"
+    intent: "Fachlicher Hauptblock"
+    source_inputs:
+      - "section_plan.core_sections"
+
+  - order: 10
+    cell_type: "code"
+    section_id: "core_01_code"
+    required: true
+    title: "Core Section Code"
+    intent: "Runnables Beispiel fuer den Hauptblock"
+    source_inputs:
+      - "section_plan.core_sections"
+
+  - order: 11
+    cell_type: "markdown"
+    section_id: "diagnostics_intro"
+    required: true
+    title: "Diagnostics Intro"
+    intent: "Optimizer-, Plan- oder Diagnostikfokus"
+    source_inputs:
+      - "optimizer_focus"
+
+  - order: 12
+    cell_type: "code"
+    section_id: "diagnostics_code"
+    required: true
+    title: "Diagnostics Code"
+    intent: "Plan-, DMV- oder Mess-Query"
+    source_inputs:
+      - "optimizer_focus"
+
+  - order: 13
+    cell_type: "markdown"
+    section_id: "pitfalls_intro"
+    required: true
+    title: "Pitfalls"
+    intent: "Typische Fehlerbilder einleiten"
+    source_inputs:
+      - "pitfalls"
+
+  - order: 14
+    cell_type: "markdown"
+    section_id: "best_practices"
+    required: true
+    title: "Best Practices"
+    intent: "Robuste Arbeitsmuster zusammenfassen"
+    source_inputs:
+      - "quality_gates"
+
+  - order: 15
+    cell_type: "markdown"
+    section_id: "exercises"
+    required: true
+    title: "Exercises"
+    intent: "Aufgaben formulieren"
+    source_inputs:
+      - "exercises.prompts"
+
+  - order: 16
+    cell_type: "code"
+    section_id: "solutions"
+    required: true
+    title: "Solutions"
+    intent: "Loesungen als einzelne Codezellen"
+    source_inputs:
+      - "exercises.prompts"
+
+  - order: 17
+    cell_type: "markdown"
+    section_id: "crosslinks"
+    required: true
+    title: "Crosslinks"
+    intent: "Repo-interne Querverweise"
+    source_inputs:
+      - "crosslinks"
+
+  - order: 18
+    cell_type: "markdown"
+    section_id: "cleanup_intro"
+    required: false
+    title: "Cleanup Intro"
+    intent: "Optionales Cleanup erklaeren"
+    source_inputs:
+      - "lab_profile.cleanup_strategy"
+
+  - order: 19
+    cell_type: "code"
+    section_id: "cleanup_code"
+    required: false
+    title: "Cleanup Code"
+    intent: "Demo-Objekte optional entfernen"
+    source_inputs:
+      - "demo_assets.cleanup_cells"

@@ -1,0 +1,32 @@
+demo_assets:
+  notebook_file: ""
+  lab_profile: "query_lab"
+
+  setup_cells:
+    - id: "setup_main"
+      purpose: ""
+      destructive_scope: "demo_only"
+      sql_notes:
+        - ""
+
+  baseline_queries:
+    - id: "baseline_01"
+      purpose: ""
+
+  manual_steps:
+    - step: 1
+      action: ""
+      reason: ""
+
+  multi_session_blocks:
+    - label: "Session A"
+      purpose: ""
+      notes:
+        - ""
+
+  cleanup_cells:
+    - id: "cleanup_main"
+      purpose: ""
+
+  safeguards:
+    - ""

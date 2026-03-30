@@ -153,6 +153,9 @@
 - 📘 **Docs:**  
   - [Transaction Log – Architektur](https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-transaction-log-architecture-and-management)
 
+- 🛠️ **Script:**  
+  - [`ShrinkSimple.sql`](../26_Indexes_Basics/SQLScripts/ShrinkSimple.sql) (verschoben)
+
 ---
 
 ### 2.10 | DDL in Transaktionen & Sperrverhalten
