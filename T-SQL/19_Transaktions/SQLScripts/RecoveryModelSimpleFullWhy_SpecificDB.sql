@@ -1,3 +1,60 @@
+/*
+BEGIN:SQL-HEADER v1
+---
+sql_header: v1
+script_name: "RecoveryModelSimpleFullWhy_SpecificDB.sql"
+script_version: "1.0"
+script_type: "diagnostic-query"
+chapter: "19_Transaktions"
+
+purpose: >
+  Listet alle SIMPLE-Recovery-Datenbanken mit detaillierten Log-Statistiken
+  aus sys.dm_db_log_stats sowie einer deutschen Interpretation des
+  log_reuse_wait_desc-Wertes. Sortiert nach Log-Belegung absteigend, um
+  die dringendsten Faelle zuerst zu zeigen.
+
+parameters: []
+
+result_sets:
+  - name: "SimpleDBLogStats"
+    description: "Alle SIMPLE-Datenbanken mit Log-Groesse, Belegung, Reuse-Wait und Interpretation"
+
+dependencies:
+  - "sys.databases"
+  - "sys.dm_db_log_stats"
+
+safety:
+  level: "read-only"
+  writes_data: false
+
+documentation:
+  markdown_file: "T-SQL/19_Transaktions/SQLScripts/RecoveryModelSimpleFullWhy_SpecificDB.md"
+  sync_blocks:
+    - "SUMMARY_TABLE"
+    - "DEPENDENCIES_LIST"
+    - "VERSION_HISTORY_TABLE"
+    - "SQL_CODE"
+  mermaid:
+    mode: "ai-agent-from-sql"
+    source: "script-body"
+
+main_responsible:
+  name: "Erhard Rainer"
+  initials: "ER"
+
+version_history:
+  - version: "1.0"
+    date: "2026-04-21"
+    user: "ER"
+    description: "Erstversion"
+
+notes:
+  - "sys.dm_db_log_stats erfordert mindestens SQL Server 2016 SP2 / 2017"
+  - "Interpretationstexte sind Faustregeln; Details haengen vom konkreten Workload ab"
+---
+END:SQL-HEADER v1
+*/
+
 SELECT
     d.name AS DatabaseName,
     d.state_desc,

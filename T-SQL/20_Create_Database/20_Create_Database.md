@@ -64,6 +64,12 @@
 - 📘 **Docs:**  
   - [Manage File Size & Growth](https://learn.microsoft.com/en-us/sql/relational-databases/databases/change-the-size-of-a-database)
 
+- **Vertiefung:**  
+  - [Shrink einer SQL-Server-Datenbank](Shrink_Database.md) - technische Details, Risiken, sinnvolle Ausnahmen und Nacharbeiten.
+
+- **Praxisloesung:**  
+  - [DatabaseSizeGrowthMonitor](../72_SQLAgent_Jobs_Alerts/Solutions/DatabaseSizeGrowthMonitor/README.md) - taegliche Snapshots von Datenbank-, Datei- und Tabellengroessen mit Growth-Reports.
+
 ---
 
 ### 2.4 | Recovery Model & Backup-Strategie

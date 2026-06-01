@@ -1,3 +1,90 @@
+/*
+BEGIN:SQL-HEADER v1
+---
+sql_header: v1
+script_name: "SetDBSimple.sql"
+script_version: "1.0"
+script_type: "maintenance-script"
+chapter: "19_Transaktions"
+
+purpose: >
+  Setzt eine einzelne Datenbank bei Bedarf auf SIMPLE Recovery, fuehrt
+  CHECKPOINT aus und shrink die Log-Datei auf eine berechnete Zielgroesse.
+  Liefert drei Ergebnis-Sets: Zustand vor der Aktion, nach Recovery-Wechsel
+  und Checkpoint, sowie den finalen Zustand nach dem Shrink.
+
+parameters:
+  - name: "@DBName"
+    sql_type: "SYSNAME"
+    direction: "IN"
+    required: true
+    description: "Name der zu verarbeitenden Datenbank"
+  - name: "@ReserveAfterShrinkMB"
+    sql_type: "INT"
+    direction: "IN"
+    required: false
+    description: "Freier Puffer in MB, der nach dem Shrink in der Log-Datei verbleiben soll"
+  - name: "@MinimumTargetSizeMB"
+    sql_type: "INT"
+    direction: "IN"
+    required: false
+    description: "Absolute Untergrenze fuer die Zielgroesse der Log-Datei in MB"
+  - name: "@MinShrinkGainMB"
+    sql_type: "INT"
+    direction: "IN"
+    required: false
+    description: "Mindestersparnis in MB; bei weniger Potenzial wird kein Shrink ausgefuehrt"
+
+result_sets:
+  - name: "Before"
+    description: "Log-Zustand vor jeglicher Aktion"
+  - name: "AfterRecoveryChangeAndCheckpoint"
+    description: "Log-Zustand nach Recovery-Model-Wechsel und CHECKPOINT, inkl. berechneter Zielgroesse"
+  - name: "Final"
+    description: "Log-Zustand nach dem Shrink mit Zusammenfassung der durchgefuehrten Aktionen"
+
+dependencies:
+  - "DBCC SQLPERF(LOGSPACE)"
+  - "DBCC SHRINKFILE"
+  - "sys.databases"
+  - "sys.master_files"
+  - "sys.sp_executesql"
+  - "tempdb temporary tables"
+
+safety:
+  level: "destructive"
+  writes_data: true
+
+documentation:
+  markdown_file: "T-SQL/19_Transaktions/SQLScripts/SetDBSimple.md"
+  sync_blocks:
+    - "SUMMARY_TABLE"
+    - "PARAMETERS_TABLE"
+    - "DEPENDENCIES_LIST"
+    - "VERSION_HISTORY_TABLE"
+    - "SQL_CODE"
+  mermaid:
+    mode: "ai-agent-from-sql"
+    source: "script-body"
+
+main_responsible:
+  name: "Erhard Rainer"
+  initials: "ER"
+
+version_history:
+  - version: "1.0"
+    date: "2026-04-21"
+    user: "ER"
+    description: "Erstversion"
+
+notes:
+  - "Das Skript wechselt das Recovery Model dauerhaft auf SIMPLE; vor dem Einsatz auf FULL-Datenbanken Auswirkungen auf Backup-Strategie pruefen"
+  - "Nur Datenbanken mit genau einer Log-Datei werden geshrunkt"
+  - "Ein Shrink kann VLF-Fragmentierung erzeugen; anschliessend Log-Wachstum anpassen"
+---
+END:SQL-HEADER v1
+*/
+
 SET NOCOUNT ON;
 
 DECLARE @DBName                SYSNAME        = N'DeineDatenbank';
@@ -26,7 +113,7 @@ DECLARE @DidShrink             BIT = 0;
 
 IF DB_ID(@DBName) IS NULL
 BEGIN
-    THROW 50000, 'Die angegebene Datenbank existiert nicht.', 1;
+    ;THROW 50000, 'Die angegebene Datenbank existiert nicht.', 1;
 END;
 
 IF OBJECT_ID('tempdb..#LogSpace') IS NOT NULL

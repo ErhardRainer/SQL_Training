@@ -1,0 +1,35 @@
+# EH2_Beispiele_DELETE
+
+**Quelle:** `T-SQL\06_Delete\EH2_Beispiele_DELETE.ipynb`  
+**Generiert:** 2026-04-18 21:13:30  
+**Markdown-Zellen:** 5  
+**SQL-Zellen:** 1  
+
+---
+
+# DELETE
+
+![](data:image/png;base64,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)
+
+
+Beispiel 1: Löschen des Datensatzes mit der AddressID = 180
+
+
+Beispiel 2: Löschen aller DS, die bestimmte Kriterien (mittels inner join) erfüllen
+
+
+## INNER JOIN vs. IN vs. EXISTS - ein Performance Vergleich
+
+Welche Möglichkeit ist jetzt die Richtige? - Do Some Performance Test vgl. [https://wateroxconsulting.com/archives/10-minute-sql-filtered-delete-join-vs-sub-select-vs-exist/](https://wateroxconsulting.com/archives/10-minute-sql-filtered-delete-join-vs-sub-select-vs-exist/)
+
+siehe dazu eignenes SQL File - FAZIN "IN" ist die schnellste Methode
+
+
+## ganze Tabelle Löschen - DELETE vs. TRUNCATE
+
+![Delete and Truncate&quot; query in SQL - SQL Tutorial - Intellipaat](https://intellipaat.com/mediaFiles/2015/11/DSL-Delete.jpg)
+
+
+```sql
+Delete from [Person].[Address_BAK3]
+```

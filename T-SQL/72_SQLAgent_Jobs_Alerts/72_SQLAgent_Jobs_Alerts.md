@@ -144,6 +144,9 @@
 - 📘 **Docs:**  
   - [`sysjobactivity` / `sp_help_job`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-help-job-transact-sql)
 
+- **Solution:**  
+  - [DatabaseSizeGrowthMonitor](Solutions/DatabaseSizeGrowthMonitor/README.md) - taegliche DB-/Tabellengroessen-Snapshots per SQL Agent inklusive Growth-Reports.
+
 ---
 
 ### 2.11 | Ketten & Abhängigkeiten (Job Chaining)

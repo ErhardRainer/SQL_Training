@@ -189,6 +189,9 @@ Dieses Repository bietet eine strukturierte Einführung in T-SQL. Die Kapitel 00
 - **Präsentation:** [Vorlesung_Präsentation.pptx](https://github.com/ErhardRainer/SQL_Training/blob/main/T-SQL/Vorlesung_Pr%C3%A4sentation.pptx)
 
 ---
+
+
+---
 ## Anmerkung
 Hier sind die spezifischen Custom GPTs, die dabei zum Einsatz kamen:
 

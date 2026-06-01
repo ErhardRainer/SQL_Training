@@ -1,0 +1,377 @@
+{
+  "timestamp": "2026-04-18T21:13:30.325590",
+  "root_directory": "C:\\_Git\\GitHub\\SQL_Training",
+  "output_directory": "C:\\_Git\\GitHub\\SQL_Training\\_internal\\Jupyter2Markdown\\output",
+  "processed_files": [
+    {
+      "notebook": "T-SQL\\01_Normalformen\\Normalformen.ipynb",
+      "output": "T-SQL\\01_Normalformen\\Normalformen.md",
+      "markdown_cells": 10,
+      "sql_cells": 17,
+      "total_cells": 27,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_01_select_grundlagen.ipynb",
+      "output": "T-SQL\\02_Select\\02_01_select_grundlagen.md",
+      "markdown_cells": 24,
+      "sql_cells": 12,
+      "total_cells": 36,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_02_select_ausdruecke_case_cast.ipynb",
+      "output": "T-SQL\\02_Select\\02_02_select_ausdruecke_case_cast.md",
+      "markdown_cells": 33,
+      "sql_cells": 27,
+      "total_cells": 60,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_03_distinct_vs_groupby.ipynb",
+      "output": "T-SQL\\02_Select\\02_03_distinct_vs_groupby.md",
+      "markdown_cells": 34,
+      "sql_cells": 26,
+      "total_cells": 60,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_04_top_offset_fetch.ipynb.ipynb",
+      "output": "T-SQL\\02_Select\\02_04_top_offset_fetch.ipynb.md",
+      "markdown_cells": 31,
+      "sql_cells": 22,
+      "total_cells": 53,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_05_order_by_determinismus.ipynb",
+      "output": "T-SQL\\02_Select\\02_05_order_by_determinismus.md",
+      "markdown_cells": 31,
+      "sql_cells": 25,
+      "total_cells": 56,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_06_groupby_having.ipynb",
+      "output": "T-SQL\\02_Select\\02_06_groupby_having.md",
+      "markdown_cells": 37,
+      "sql_cells": 31,
+      "total_cells": 68,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_07_grouping_sets_rollup_cube.ipynb",
+      "output": "T-SQL\\02_Select\\02_07_grouping_sets_rollup_cube.md",
+      "markdown_cells": 42,
+      "sql_cells": 30,
+      "total_cells": 72,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\02_08_window_functions_over.ipynb",
+      "output": "T-SQL\\02_Select\\02_08_window_functions_over.md",
+      "markdown_cells": 25,
+      "sql_cells": 17,
+      "total_cells": 42,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\02_Select\\EH2_Beispiele_SELECT.ipynb",
+      "output": "T-SQL\\02_Select\\EH2_Beispiele_SELECT.md",
+      "markdown_cells": 19,
+      "sql_cells": 11,
+      "total_cells": 30,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\03_JOIN\\EH-Joins_internal.ipynb",
+      "output": "T-SQL\\03_JOIN\\EH-Joins_internal.md",
+      "markdown_cells": 11,
+      "sql_cells": 8,
+      "total_cells": 19,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\03_JOIN\\EH05-Transactions.ipynb",
+      "output": "T-SQL\\03_JOIN\\EH05-Transactions.md",
+      "markdown_cells": 11,
+      "sql_cells": 12,
+      "total_cells": 23,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\04_Where\\EH04-00 - Where Clause mit Like.ipynb",
+      "output": "T-SQL\\04_Where\\EH04-00 - Where Clause mit Like.md",
+      "markdown_cells": 9,
+      "sql_cells": 9,
+      "total_cells": 18,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\05_Funktionen\\EH04-01-00 numerische Funktionen.ipynb",
+      "output": "T-SQL\\05_Funktionen\\EH04-01-00 numerische Funktionen.md",
+      "markdown_cells": 19,
+      "sql_cells": 21,
+      "total_cells": 40,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\05_Funktionen\\EH04-01-01 Grad und Bogenmaß.ipynb",
+      "output": "T-SQL\\05_Funktionen\\EH04-01-01 Grad und Bogenmaß.md",
+      "markdown_cells": 1,
+      "sql_cells": 1,
+      "total_cells": 2,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\05_Funktionen\\EH04-01-02 Winkel-Funktionen.ipynb",
+      "output": "T-SQL\\05_Funktionen\\EH04-01-02 Winkel-Funktionen.md",
+      "markdown_cells": 6,
+      "sql_cells": 5,
+      "total_cells": 11,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\05_Funktionen\\EH04-01-03 Logarithmus & Exponentialfunktionen.ipynb",
+      "output": "T-SQL\\05_Funktionen\\EH04-01-03 Logarithmus & Exponentialfunktionen.md",
+      "markdown_cells": 4,
+      "sql_cells": 4,
+      "total_cells": 8,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\05_Funktionen\\Textfunktionen.ipynb",
+      "output": "T-SQL\\05_Funktionen\\Textfunktionen.md",
+      "markdown_cells": 29,
+      "sql_cells": 107,
+      "total_cells": 136,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\06_Delete\\EH2_Beispiele_DELETE.ipynb",
+      "output": "T-SQL\\06_Delete\\EH2_Beispiele_DELETE.md",
+      "markdown_cells": 5,
+      "sql_cells": 1,
+      "total_cells": 6,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\07_Insert\\EH2_Beispiele_INSERT.ipynb",
+      "output": "T-SQL\\07_Insert\\EH2_Beispiele_INSERT.md",
+      "markdown_cells": 6,
+      "sql_cells": 3,
+      "total_cells": 9,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\08_Update\\EH2_Beispiele_UPDATE.ipynb",
+      "output": "T-SQL\\08_Update\\EH2_Beispiele_UPDATE.md",
+      "markdown_cells": 5,
+      "sql_cells": 4,
+      "total_cells": 9,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\09_Set_Operations\\EH2_SET_OPERATIONS.ipynb",
+      "output": "T-SQL\\09_Set_Operations\\EH2_SET_OPERATIONS.md",
+      "markdown_cells": 7,
+      "sql_cells": 8,
+      "total_cells": 15,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\10_GroupBy_Aggregate\\10_01_groupby_grundlagen.ipynb",
+      "output": "T-SQL\\10_GroupBy_Aggregate\\10_01_groupby_grundlagen.md",
+      "markdown_cells": 30,
+      "sql_cells": 15,
+      "total_cells": 45,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\13_Merge\\EH05-Merge.ipynb",
+      "output": "T-SQL\\13_Merge\\EH05-Merge.md",
+      "markdown_cells": 9,
+      "sql_cells": 3,
+      "total_cells": 12,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\14_Pivot_Unpivot\\EH05-Pivot,Unpivot.ipynb",
+      "output": "T-SQL\\14_Pivot_Unpivot\\EH05-Pivot,Unpivot.md",
+      "markdown_cells": 7,
+      "sql_cells": 4,
+      "total_cells": 11,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\15_SearchInTables\\EH6-Search-in-tables.ipynb",
+      "output": "T-SQL\\15_SearchInTables\\EH6-Search-in-tables.md",
+      "markdown_cells": 10,
+      "sql_cells": 6,
+      "total_cells": 16,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_NULL.ipynb",
+      "output": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_NULL.md",
+      "markdown_cells": 7,
+      "sql_cells": 2,
+      "total_cells": 9,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_NULL_DEFAULT.ipynb",
+      "output": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_NULL_DEFAULT.md",
+      "markdown_cells": 6,
+      "sql_cells": 6,
+      "total_cells": 12,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_PADDING.ipynb",
+      "output": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_PADDING.md",
+      "markdown_cells": 5,
+      "sql_cells": 6,
+      "total_cells": 11,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_WARNINGS.ipynb",
+      "output": "T-SQL\\17_ANSI_NULL & Co\\EH3_ANSI_WARNINGS.md",
+      "markdown_cells": 5,
+      "sql_cells": 5,
+      "total_cells": 10,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\18_Cube_Rollup\\EH05-Cube,Rollup.ipynb",
+      "output": "T-SQL\\18_Cube_Rollup\\EH05-Cube,Rollup.md",
+      "markdown_cells": 5,
+      "sql_cells": 11,
+      "total_cells": 16,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\19_Transaktions\\EH05-Transactions.ipynb",
+      "output": "T-SQL\\19_Transaktions\\EH05-Transactions.md",
+      "markdown_cells": 11,
+      "sql_cells": 12,
+      "total_cells": 23,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\20_Create_Database\\Create_Database.ipynb",
+      "output": "T-SQL\\20_Create_Database\\Create_Database.md",
+      "markdown_cells": 13,
+      "sql_cells": 22,
+      "total_cells": 35,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\21_QUOTED_IDENTIFIER\\QUOTED_IDENTIFIER.ipynb",
+      "output": "T-SQL\\21_QUOTED_IDENTIFIER\\QUOTED_IDENTIFIER.md",
+      "markdown_cells": 9,
+      "sql_cells": 7,
+      "total_cells": 16,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\22_Views_Schemata\\22_14_metadata_dependencies_views_schema.ipynb",
+      "output": "T-SQL\\22_Views_Schemata\\22_14_metadata_dependencies_views_schema.md",
+      "markdown_cells": 16,
+      "sql_cells": 4,
+      "total_cells": 20,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\60_IsolationLevels\\EH05-IsolationLevels.ipynb",
+      "output": "T-SQL\\60_IsolationLevels\\EH05-IsolationLevels.md",
+      "markdown_cells": 1,
+      "sql_cells": 0,
+      "total_cells": 1,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\61_SubQuery_CTE_TMP\\Subquery vs cte vs tmp.ipynb",
+      "output": "T-SQL\\61_SubQuery_CTE_TMP\\Subquery vs cte vs tmp.md",
+      "markdown_cells": 4,
+      "sql_cells": 3,
+      "total_cells": 7,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\62_Row_Level_Security\\SQL-Row-Level-Security.ipynb",
+      "output": "T-SQL\\62_Row_Level_Security\\SQL-Row-Level-Security.md",
+      "markdown_cells": 29,
+      "sql_cells": 35,
+      "total_cells": 64,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\63_Collation_Case_Sensitive\\Case Sensitive und Case Insensitive Suche.ipynb",
+      "output": "T-SQL\\63_Collation_Case_Sensitive\\Case Sensitive und Case Insensitive Suche.md",
+      "markdown_cells": 21,
+      "sql_cells": 26,
+      "total_cells": 47,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\68_TemporalTables_CDC_CT\\Test_Replication.ipynb",
+      "output": "T-SQL\\68_TemporalTables_CDC_CT\\Test_Replication.md",
+      "markdown_cells": 3,
+      "sql_cells": 3,
+      "total_cells": 6,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\68_TemporalTables_CDC_CT\\TransactionLogFull_Replication.ipynb",
+      "output": "T-SQL\\68_TemporalTables_CDC_CT\\TransactionLogFull_Replication.md",
+      "markdown_cells": 43,
+      "sql_cells": 19,
+      "total_cells": 62,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\71_BackupRestore_Strategies\\SQL_Crash-Recovery_Startup.ipynb",
+      "output": "T-SQL\\71_BackupRestore_Strategies\\SQL_Crash-Recovery_Startup.md",
+      "markdown_cells": 1,
+      "sql_cells": 0,
+      "total_cells": 1,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\71_BackupRestore_Strategies\\SQL_LogBackup.ipynb",
+      "output": "T-SQL\\71_BackupRestore_Strategies\\SQL_LogBackup.md",
+      "markdown_cells": 18,
+      "sql_cells": 9,
+      "total_cells": 27,
+      "status": "success"
+    },
+    {
+      "notebook": "T-SQL\\82_Troubleshooting_Sessions_Requests\\82_Troubleshooting_Sessions_Requests.ipynb",
+      "output": "T-SQL\\82_Troubleshooting_Sessions_Requests\\82_Troubleshooting_Sessions_Requests.md",
+      "markdown_cells": 18,
+      "sql_cells": 8,
+      "total_cells": 26,
+      "status": "success"
+    }
+  ],
+  "errors": [
+    {
+      "notebook": "T-SQL\\02_Select\\02_02_select_ausdruecke_case_cast.ipynb.ipynb",
+      "error": "Fehler beim Lesen von C:\\_Git\\GitHub\\SQL_Training\\T-SQL\\02_Select\\02_02_select_ausdruecke_case_cast.ipynb.ipynb: Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "notebook": "T-SQL\\71_BackupRestore_Strategies\\SQL_Log.ipynb",
+      "error": "Fehler beim Lesen von C:\\_Git\\GitHub\\SQL_Training\\T-SQL\\71_BackupRestore_Strategies\\SQL_Log.ipynb: Expecting value: line 2 column 1 (char 1)"
+    }
+  ],
+  "statistics": {
+    "total_notebooks": 46,
+    "successful": 44,
+    "failed": 2,
+    "total_cells_extracted": 1277,
+    "markdown_cells": 670,
+    "sql_cells": 607
+  }
+}

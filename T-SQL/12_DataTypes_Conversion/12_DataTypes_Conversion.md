@@ -211,6 +211,8 @@
 
 - 📘 **Docs:**  
   - [String/Unicode Datentypen](https://learn.microsoft.com/en-us/sql/t-sql/data-types/char-and-varchar-transact-sql)
+  - [SQLScripts/SpaltenbreiteErmitteln.sql](SQLScripts/SpaltenbreiteErmitteln.sql) - analysiert die real genutzte maximale Zeichenlaenge je Spalte und berechnet optional eine passende Zielbreite (praktisch fuer Fabric-/Landing-Tabellen).
+  - [SQLScripts/UnicodeLengthAudit.sql](SQLScripts/UnicodeLengthAudit.sql) - vergleicht `LEN()`-, `DATALENGTH()`- und Kollations-/UTF-8-Indikatoren pro Textspalte und markiert moegliche Unicode-Risiken.
 
 ---
 
