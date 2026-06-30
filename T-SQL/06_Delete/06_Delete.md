@@ -248,6 +248,33 @@
 
 ---
 
+### 2.16 | Alle Tabellen einer Datenbank leeren (`TRUNCATE` vs. `DELETE`)
+> **Kurzbeschreibung:** Zwei Produktionsskripte leeren alle Benutzertabellen einer Datenbank – eines via `TRUNCATE TABLE` mit FK-Deaktivierung, eines via `DELETE FROM` mit topologischer Sortierung des FK-Graphen.
+
+Beide Skripte teilen denselben Sicherheitsrahmen (`@PreviewOnly = 1` als Default, explizites Approval-Token) und die gleichen Filteroptionen (`@SchemaFilter`, `@TableList`). Die grundlegenden Unterschiede:
+
+| Merkmal | `TRUNCATE`-Variante | `DELETE`-Variante |
+|---|---|---|
+| Logging | Minimal (Seitendeallokation) | Vollständig (jede Zeile) |
+| IDENTITY-Zähler | Wird zurückgesetzt | Bleibt erhalten |
+| DML-Trigger | Werden **nicht** ausgelöst | Werden ausgelöst |
+| FK-Strategie | Alle FKs deaktivieren → leeren → reaktivieren | Topologische Sortierung (Kind vor Elternteil) |
+| Rollback | Nur innerhalb des Skripts möglich | Vollständig über `@UseTransaction = 1` |
+| Zirkuläre FKs | Kein Problem | Landen am Ende, können Fehler auslösen |
+| Approval-Token | `TRUNCATE-ALL-CONFIRMED` | `DELETE-ALL-CONFIRMED` |
+
+- 📄 **Scripts:**
+  - [`SQLScripts/TruncateAllTablesInSchema.sql`](SQLScripts/TruncateAllTablesInSchema.sql) – `TRUNCATE` mit FK-Deaktivierung
+  - [`SQLScripts/DeleteAllTablesInSchema.sql`](SQLScripts/DeleteAllTablesInSchema.sql) – `DELETE FROM` mit FK-Graph-Sortierung
+
+- 📘 **Docs:**
+  - [`TRUNCATE TABLE`](https://learn.microsoft.com/en-us/sql/t-sql/statements/truncate-table-transact-sql)
+  - [`ALTER TABLE … NOCHECK CONSTRAINT`](https://learn.microsoft.com/en-us/sql/t-sql/statements/alter-table-transact-sql)
+  - [`sys.foreign_keys`](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-foreign-keys-transact-sql)
+  - [`sp_executesql`](https://learn.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-executesql-transact-sql)
+
+---
+
 ## 3 | Weiterführende Informationen
 
 - 📘 Microsoft Learn: [DELETE (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/delete-transact-sql)  
