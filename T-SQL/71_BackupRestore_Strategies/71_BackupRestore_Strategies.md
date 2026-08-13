@@ -131,6 +131,10 @@
 
 - 📓 **Notebook:**  
   [`08_09_page_restore_targeted.ipynb`](08_09_page_restore_targeted.ipynb)
+- 📄 **Praxis-Anleitung (SUSPECT-Datenbank reparieren):**  
+  [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich der Optionen bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824): vollständiger DB-Restore, gezielter Page Restore, sowie `DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS` als letzte Notlösung ohne Backup. Mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) zur automatisierten Ursachenanalyse.
+- 📄 **Praxis-Anleitung (Wiederherstellung über ein VM-/Disk-Backup):**  
+  [`SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md`](SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md) — zusätzliche Option, wenn kein SQL-natives Backup existiert, aber ein komplettes Backup der virtuellen Maschine/Disk vorhanden ist: unbeschädigte Datenbankdateien direkt aus dem gemounteten VM-Backup zurückkopieren, statt Daten per `REPAIR_ALLOW_DATA_LOSS` zu verlieren.
 - 🎥 **YouTube:**  
   - [Page Restore in SQL Server](https://www.youtube.com/results?search_query=sql+server+page+restore)
 - 📘 **Docs:**  

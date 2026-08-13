@@ -24,6 +24,8 @@ Eine SQL-Server-Datenbank durchläuft immer dann eine Crash-Recovery, wenn sie n
 In all diesen Fällen sieht man, dass eine Datenbank den Zustand **RECOVERING** annimmt. Laut Microsoft-Dokumentation bedeutet *RECOVERING*, dass die Datenbank gerade wiederhergestellt wird; dieser Zustand ist vorübergehend – sofern die Recovery erfolgreich verläuft, wechselt die DB anschließend automatisch auf ONLINE, andernfalls auf SUSPECT【18†L71-L79】. Während *RECOVERING* ist die Datenbank nicht für Benutzer zugänglich【18†L71-L78】. In der Systemtabelle `sys.databases` kann man den Status jeder Datenbank prüfen; ein Status von **RECOVERING** oder **RECOVERY_PENDING** (siehe unten) weist darauf hin, dass die DB noch im Wiederherstellungsprozess steckt【20†L350-L358】.  
 
 > **Hinweis:** Es gibt einen Unterschied zwischen dem Status **RECOVERING** und **RECOVERY_PENDING**【18†L75-L83】. *RECOVERING* bedeutet, dass die automatische Wiederherstellung läuft. *RECOVERY_PENDING* hingegen zeigt an, dass die Wiederherstellung zwar nötig ist, aber nicht gestartet werden kann – oft wegen eines fehlenden oder defekten Logfiles oder Ressourcenproblemen【18†L75-L83】. In diesem Fall muss der DBA zunächst die Ursache beheben, bevor SQL Server die Recovery fortsetzen (oder die DB als SUSPECT markieren) kann.  
+>
+> Um bei **SUSPECT**, **RECOVERY_PENDING** oder **EMERGENCY** gezielt der Ursache nachzugehen (fehlende/nicht erreichbare Datei, voller Datentraeger, Seitenkorruption, relevante Errorlog-Eintraege), siehe das Diagnose-Skript [SuspectDatabaseRootCauseCheck.sql](../../../../../T-SQL/71_BackupRestore_Strategies/SQLScripts/SuspectDatabaseRootCauseCheck.sql) (Doku: [SuspectDatabaseRootCauseCheck.md](../../../../../T-SQL/71_BackupRestore_Strategies/SQLScripts/SuspectDatabaseRootCauseCheck.md)). Ohne Parameter findet es betroffene Datenbanken automatisch selbst.  
 
 ## Was passiert während der Crash-Recovery? (Hintergrund)  
 Während der Recovery-Phase durchläuft SQL Server **drei Schritte**, um die Datenbank in einen konsistenten Zustand zu versetzen【10†L212-L220】【10†L224-L231】:  
@@ -69,6 +71,8 @@ In einem SQL Server mit vielen Datenbanken möchte ein DBA oft schnell herausfin
   FROM sys.databases  
   WHERE state_desc <> 'ONLINE';
   ```  
+
+  Eine fertige, dokumentierte Variante dieser Abfrage mit Klartext-Einordnung je Status (inkl. `SUSPECT` und `RECOVERY_PENDING`) findet sich im Skript [DatabaseStatusOverview.sql](../../../../../T-SQL/71_BackupRestore_Strategies/SQLScripts/DatabaseStatusOverview.sql) (siehe auch die zugehörige [Dokumentation](../../../../../T-SQL/71_BackupRestore_Strategies/SQLScripts/DatabaseStatusOverview.md)).
 
   Wenn hier eine Datenbank als **RECOVERING** erscheint, bedeutet dies, dass sie gerade im Recovery-Modus ist【20†L350-L358】. Eine neu startende Datenbank kann auch vorübergehend den Status **RESTORING** haben, was in diesem Kontext ähnlich zu interpretieren ist (die Datenbank ist noch nicht online, entweder wegen Restore oder Recovery). Der Status **RECOVERY_PENDING** weist auf ein Problem hin (Recovery wartet, siehe oben). Im Normalfall sollte der Status *RECOVERING* nach Abschluss der Recovery auf *ONLINE* umspringen; bleibt eine DB hängen, wechselt sie u.U. auf *SUSPECT*.  
 
