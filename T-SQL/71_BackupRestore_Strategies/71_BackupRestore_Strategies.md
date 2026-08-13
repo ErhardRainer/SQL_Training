@@ -182,7 +182,7 @@ Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und 
 | Status | Wie es dazu kommt | Bedeutung | Erforderliches Handeln |
 |---|---|---|---|
 | **ONLINE** | Normalzustand — die Datenbank ist vollständig hochgefahren und für Lese-/Schreibzugriffe verfügbar. | Alles in Ordnung. | Keins. |
-| **RESTORING** | Ein `RESTORE DATABASE`/`RESTORE LOG` läuft gerade, oder eine vorherige Restore-Kette wurde mit `WITH NORECOVERY` abgebrochen und wartet auf den nächsten Schritt (weiteres Backup oder `WITH RECOVERY`). | Die Datenbank befindet sich mitten in einem manuell gesteuerten Wiederherstellungsvorgang. | Restore-Kette fortsetzen (nächstes Backup einspielen) oder mit `WITH RECOVERY` abschließen. Läuft die Kette unerwartet lange oder hängt fest (z. B. wegen Speicherplatzmangels), siehe Abschnitt 3.4. |
+| **RESTORING** | Ein `RESTORE DATABASE`/`RESTORE LOG` läuft gerade, oder eine vorherige Restore-Kette wurde mit `WITH NORECOVERY` abgebrochen und wartet auf den nächsten Schritt (weiteres Backup oder `WITH RECOVERY`). | Die Datenbank befindet sich mitten in einem manuell gesteuerten Wiederherstellungsvorgang. | Restore-Kette fortsetzen (nächstes Backup einspielen) oder mit `WITH RECOVERY` abschließen. Läuft die Kette unerwartet lange oder hängt fest (z. B. wegen Speicherplatzmangels), siehe Abschnitt 3.5. |
 | **RECOVERING** | SQL Server durchläuft nach einem Neustart, einem Failover oder direkt nach einem Restore automatisch die **Crash Recovery** (Analysis → Redo → Undo), um die Datenbank anhand des Transaktionslogs wieder in einen konsistenten Zustand zu bringen. | Übergangszustand, der bei sauberem Log i.d.R. **automatisch** und **temporär** durchlaufen wird. | I.d.R. keins — abwarten. Bei sehr großen Logs oder vielen offenen Transaktionen kann dies dauern; bleibt die Datenbank ungewöhnlich lange in `RECOVERING`, Errorlog auf Fortschritt prüfen. |
 | **RECOVERY_PENDING** | Die Crash Recovery (siehe `RECOVERING`) konnte **gar nicht erst starten** — typischerweise weil eine Datendatei fehlt, gesperrt oder nicht erreichbar ist, der Datenträger voll ist, oder SQL Server aus einem anderen Ressourcengrund nicht mit der Recovery beginnen kann. | SQL Server "weiß", dass etwas fehlt, hat aber noch nicht versucht, das Log tatsächlich anzuwenden — anders als bei `SUSPECT` ist meist noch kein Recovery-Versuch fehlgeschlagen, sondern er konnte nicht beginnen. Die Datenbank ist über `sys.databases`/`sys.master_files` i.d.R. noch lesbar (kein `Msg 926`). | Manueller Eingriff durch einen DBA: Ursache beheben (z. B. fehlende Datei bereitstellen, Speicherplatz freigeben, Berechtigung korrigieren) und die Datenbank danach neu starten lassen (`ALTER DATABASE ... SET ONLINE`) bzw. mit [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) prüfen/reparieren. |
 | **SUSPECT** | Die Crash Recovery **wurde versucht, ist aber fehlgeschlagen** — meist wegen Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) oder eines beschädigten Transaktionslogs, das nicht angewendet werden konnte. | Die Datenbank gilt als potenziell inkonsistent und verweigert **jeden** Zugriff (auch rein lesende Abfragen) mit `Msg 926`, solange sie nicht per `ALTER DATABASE ... SET EMERGENCY` zugänglich gemacht wurde. | Manueller Eingriff zwingend erforderlich: siehe Kapitel 4 (Restores) — je nach Backup-Lage vollständiger Restore, Page Restore, VM-/Disk-Level-Restore oder als letztes Mittel [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)). |
@@ -190,7 +190,56 @@ Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und 
 | **OFFLINE** | Eine Datenbank wurde bewusst per `ALTER DATABASE ... SET OFFLINE` deaktiviert, z. B. um Dateien zu verschieben, auszutauschen oder für einen VM-/Disk-Level-Restore freizugeben. | Kontrollierter, gewollter Zustand. | `ALTER DATABASE ... SET ONLINE`, sobald die zugrunde liegende Wartungsaktion abgeschlossen ist. |
 | **COPYING** | Nur bei Azure SQL Database: Die Datenbank wird gerade als Kopiervorgang (`CREATE DATABASE ... AS COPY OF`) angelegt. | Übergangszustand, temporär. | Abwarten, bis der Kopiervorgang abgeschlossen ist. |
 
-### 3.3 | Typische Root Causes: Wodurch RECOVERY_PENDING/SUSPECT in der Praxis tatsächlich ausgelöst wird
+### 3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY_PENDING? Die genaue Zustandskette
+
+**Kurze Antwort: Nein.** `SUSPECT` ist **kein** Folgezustand von `RECOVERY_PENDING`. Beide Zustände entstehen aus unterschiedlichen Ursachen und an unterschiedlichen Stellen im Startvorgang — sie sind **zwei getrennte, parallele Zweige**, keine lineare Kette. Das ist ein häufiges Missverständnis, deshalb hier die exakte, an der offiziellen Microsoft-Dokumentation verifizierte Zustandslogik.
+
+**Wörtliche Definitionen laut Microsoft Learn** ([Database States](https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-states?view=sql-server-ver17)):
+
+- **RECOVERING:** *"Database is being recovered. The recovering process is a transient state; the database automatically becomes online if the recovery succeeds. **If the recovery fails, the database becomes suspect.**"*
+- **RECOVERY PENDING:** *"SQL Server has encountered a resource-related error during recovery. **The database isn't damaged**, but files might be missing or system resource limitations might be preventing it from starting."*
+- **SUSPECT:** *"At least the primary filegroup is suspect and **might be damaged**. The database can't be recovered during startup of SQL Server."*
+
+Der entscheidende Satz steht bei `RECOVERING`, nicht bei `RECOVERY_PENDING`: **`SUSPECT` entsteht ausschließlich aus einem fehlgeschlagenen `RECOVERING`-Vorgang** (Redo/Undo lief tatsächlich und scheiterte an einer Beschädigung). `RECOVERY_PENDING` wird in der Microsoft-Doku an keiner Stelle als Vorstufe zu `SUSPECT` beschrieben — im Gegenteil, die Datenbank gilt dabei explizit als *"not damaged"*.
+
+**Der eigentliche Unterschied liegt im Zeitpunkt des Scheiterns:**
+
+| | RECOVERY_PENDING | SUSPECT |
+|---|---|---|
+| **Wann tritt es auf?** | *Bevor* der eigentliche Redo/Undo-Vorgang (`RECOVERING`) überhaupt beginnen kann | *Während* der Redo/Undo-Vorgang (`RECOVERING`) bereits läuft |
+| **Was fehlt/schlägt fehl?** | Eine Ressource ist nicht verfügbar (Datei fehlt/gesperrt, Speicherplatz, Systemressource) — SQL Server weiß, dass Recovery nötig ist, kann aber nicht starten | Der Redo- oder Undo-Vorgang selbst scheitert an beschädigten Daten (Seitenkorruption) oder einem beschädigten Log, das nicht angewendet werden kann |
+| **Ist die Datenbank beschädigt?** | Laut Microsoft explizit **nein** — reines Ressourcenproblem | Laut Microsoft **ja, möglicherweise** — mindestens die primäre Filegroup gilt als potenziell beschädigt |
+
+Diese Einordnung deckt sich mit der Praxiserfahrung von Paul Randal (SQLskills, Mitentwickler von `DBCC CHECKDB`) in [Search Engine Q&A #4](https://www.sqlskills.com/blogs/paul/search-engine-qa-4-using-emergency-mode-to-access-a-recovery-pending-or-suspect-database/): *"SQL Server knows that recovery needs to be run on the database but something is preventing recovery from starting"* (RECOVERY_PENDING) — ohne jede Garantie, dass die Recovery bei Behebung des Problems tatsächlich scheitern würde.
+
+**Die korrekte Zustandskette beim Hochfahren einer Datenbank:**
+
+```mermaid
+flowchart TD
+    Start(["Datenbank wird gestartet\n(Neustart, Failover, nach RESTORE)"]) --> Check{"Kann SQL Server\nden Recovery-Vorgang\nüberhaupt STARTEN?"}
+
+    Check -->|"Nein - Ressource fehlt:\nDatei nicht erreichbar,\nSpeicherplatz, Systemressource"| RP["RECOVERY_PENDING\n(Datenbank laut MS 'not damaged')"]
+    Check -->|"Ja - Redo/Undo beginnt"| REC["RECOVERING\n(Analysis -> Redo -> Undo laeuft)"]
+
+    REC -->|"Redo/Undo erfolgreich\nabgeschlossen"| ON["ONLINE"]
+    REC -->|"Redo/Undo scheitert:\nSeitenkorruption oder\nbeschaedigtes Log"| SUS["SUSPECT\n('at least the primary\nfilegroup might be damaged')"]
+
+    RP -.->|"Ursache behoben\n(Datei bereitgestellt,\nPlatz geschaffen) + Neustart"| REC
+
+    style RP fill:#8a6d1f,stroke:#8a6d1f,color:#fff
+    style SUS fill:#8a3b3b,stroke:#8a3b3b,color:#fff
+    style ON fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+```
+
+**Wichtige Lesehinweise zum Diagramm:**
+
+- Der Pfeil von `RECOVERY_PENDING` zurück zu `RECOVERING` (gestrichelt) ist **kein automatischer Übergang**, sondern setzt voraus, dass die blockierende Ursache manuell behoben und die Datenbank neu gestartet/online genommen wird. Erst dann beginnt der eigentliche Redo/Undo-Vorgang — und *dieser* könnte anschließend ebenfalls fehlschlagen und in `SUSPECT` münden. Ein direkter Übergang `RECOVERY_PENDING → SUSPECT` ohne den Zwischenschritt `RECOVERING` ist nach den offiziellen Zustandsdefinitionen nicht vorgesehen.
+- Es gibt **kein offizielles, grafisches Zustandsdiagramm von Microsoft** — die obige Darstellung ist eine Synthese aus den wörtlichen Zustandsdefinitionen der Microsoft-Dokumentation, keine 1:1-Übernahme eines Original-Diagramms.
+- Die numerischen `state`-Werte in `sys.databases` (0=ONLINE, 1=RESTORING, 2=RECOVERING, 3=RECOVERY_PENDING, 4=SUSPECT, 5=EMERGENCY, 6=OFFLINE, 7=COPYING) folgen einer internen Enum-Reihenfolge und sind **keine Aussage über eine zeitliche Abfolge** — Zustand 3 kommt nummerisch vor Zustand 4, aber das bedeutet nicht, dass RECOVERY_PENDING zeitlich vor SUSPECT durchlaufen wird.
+
+**Praktische Konsequenz:** Zeigt `DatabaseStatusOverview.sql` eine Datenbank als `RECOVERY_PENDING`, ist die Wahrscheinlichkeit hoch, dass die Datenbank **noch nicht beschädigt** ist und sich das Problem durch Beheben der Ressourcenursache (siehe [RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) ohne Datenverlust lösen lässt. Erst wenn danach ein erneuter Recovery-Versuch tatsächlich fehlschlägt, wird `SUSPECT` erreicht — und damit auch erst dann der datenverlustbehaftete Reparaturpfad relevant ([SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)).
+
+### 3.4 | Typische Root Causes: Wodurch RECOVERY_PENDING/SUSPECT in der Praxis tatsächlich ausgelöst wird
 
 Die Tabelle in 3.2 beschreibt die **mechanische** Ursache auf SQL-Server-Ebene (Crash Recovery schlägt fehl bzw. kann nicht starten). Dahinter steht aber fast immer ein konkretes Ereignis auf **Infrastrukturebene**, das SQL Server mitten in einem schreibenden Vorgang oder beim Hochfahren gestört hat:
 
@@ -206,7 +255,7 @@ Die Tabelle in 3.2 beschreibt die **mechanische** Ursache auf SQL-Server-Ebene (
 
 **Praktischer Hinweis:** Für die Root-Cause-Analyse eines konkreten Falls automatisiert [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) genau diese Kategorien: Es prüft Dateizugriff, freien Speicherplatz, bekannte Suspect Pages und durchsucht das SQL-Server-Errorlog nach passenden Einträgen (z. B. Hinweisen auf einen unsauberen Shutdown oder I/O-Fehler kurz vor dem Auftreten des Status).
 
-### 3.4 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab
+### 3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab
 
 Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand: Der Datenträger, auf den restored wird, hat **während** des Restore-Vorgangs nicht genug freien Speicherplatz — der Restore bricht ab, die Datenbank bleibt aber im `RESTORING`-Zustand hängen (weder online noch sauber abgebrochen) und blockiert damit den Datenbanknamen für einen erneuten Versuch.
 
@@ -244,7 +293,7 @@ Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand:
 
 ---
 
-### 3.5 | Weiterführende Informationen zu Kapitel 3
+### 3.6 | Weiterführende Informationen zu Kapitel 3
 
 - 📘 Microsoft Learn: [Database States (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/databases/database-states?view=sql-server-ver17) — offizielle Referenz aller `state_desc`-Werte (ONLINE, RESTORING, RECOVERING, RECOVERY_PENDING, SUSPECT, EMERGENCY, OFFLINE, COPYING).
 - 📘 Microsoft Learn: [`sys.databases` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/relational-databases/system-catalog-views/sys-databases-transact-sql?view=sql-server-ver17) — Spaltenreferenz der Katalogsicht inkl. `state_desc`, Basis für die Statusabfragen in 3.1.
@@ -255,6 +304,7 @@ Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand:
 - 📘 Microsoft Learn: [Configure antivirus software to work with SQL Server](https://learn.microsoft.com/en-US/troubleshoot/sql/database-engine/security/antivirus-and-sql-server) — offizielle Ausschlussempfehlungen für `.mdf`/`.ldf`/`.bak`, relevant für den Root Cause "Antivirus-Konflikte".
 - 📘 Microsoft Learn: [`DBCC CHECKDB` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkdb-transact-sql?view=sql-server-ver17) — Referenz inkl. `REPAIR_ALLOW_DATA_LOSS`, zentrales Werkzeug bei `SUSPECT`/Korruption.
 - 📝 Paul Randal (SQLskills, Originalautor von `DBCC CHECKDB`): [Creating, detaching, re-attaching and fixing a suspect database](https://www.sqlskills.com/blogs/paul/creating-detaching-re-attaching-and-fixing-a-suspect-database/) — die in der Community meistzitierte Praxisanleitung zum Reparieren einer `SUSPECT`-Datenbank.
+- 📝 Paul Randal (SQLskills): [Search Engine Q&A #4: Using Emergency mode to access a RECOVERY_PENDING or SUSPECT database](https://www.sqlskills.com/blogs/paul/search-engine-qa-4-using-emergency-mode-to-access-a-recovery-pending-or-suspect-database/) — Primärquelle für die exakte Abgrenzung zwischen `RECOVERY_PENDING` und `SUSPECT` in Abschnitt 3.3.
 - 📝 Brent Ozar: [What to Do When DBCC CHECKDB Reports Corruption](https://www.brentozar.com/archive/2016/05/dbcc-checkdb-reports-corruption/) — operativer DBA-Blickwinkel auf gemeldete Korruption, ergänzt Paul Randals Perspektive.
 - 📝 SQLServerCentral: [Recover a Database from Suspect Mode Step by Step](https://www.sqlservercentral.com/articles/recover-a-database-from-suspect-mode-step-by-step) — Community-Anleitung mit weiterem praktischen Ablauf zur Wiederherstellung aus `SUSPECT`.
 
@@ -263,6 +313,56 @@ Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand:
 ## 4 | Restores
 
 Dieses Kapitel bündelt alle **Arten von Restores** in SQL Server — von der kompletten Datenbankwiederherstellung bis zur gezielten Reparatur einzelner Seiten. Jede Art wird kurz und präzise beschrieben (was sie bedeutet, wann sie zum Einsatz kommt), gefolgt von den zugehörigen Lernressourcen. Eine **Übersichtstabelle** am Ende von Kapitel 4 vergleicht alle Arten auf einen Blick.
+
+### 4.0 | Entscheidungsdiagramm: Welche Restore-Art passt?
+
+Das folgende Diagramm führt Schritt für Schritt zur passenden Restore-Art — abhängig davon, ob überhaupt ein Backup existiert, welches Recovery Model aktiv ist (`SIMPLE` vs. `FULL`/`BULK_LOGGED`), wie die Log-Kette beschaffen ist und welcher Fehler konkret vorliegt (ganze DB betroffen, einzelne Seiten korrupt, versehentliche Datenänderung, Filegroup betroffen). Die Nummern in Klammern verweisen auf die zugehörigen Abschnitte 4.1–4.7.
+
+```mermaid
+flowchart TD
+    Start(["Datenbank fehlerhaft /\nnicht mehr online"]) --> Q1{"Existiert ein\nSQL-natives Backup\n(Full/Diff/Log)?"}
+
+    Q1 -->|"Nein"| Q1a{"Existiert ein\nkomplettes VM-/Disk-/\nStorage-Backup\n(vor dem Ereignis)?"}
+    Q1a -->|"Ja"| R6["VM-/Disk-Level-Restore (4.6)\nunbeschädigte .mdf/.ldf aus\nVM-Backup zurückkopieren"]
+    Q1a -->|"Nein"| R7["Reparatur ohne Backup (4.7)\nDBCC CHECKDB REPAIR_ALLOW_DATA_LOSS\n-> dauerhafter Datenverlust"]
+
+    Q1 -->|"Ja"| Q2{"Ist die Datenbank/das Log\nnoch (teilweise) zugreifbar?"}
+    Q2 -->|"Ja"| T3["Tail-Log-Backup sichern (4.3)\nBACKUP LOG ... WITH NO_TRUNCATE\n(WITH CONTINUE_AFTER_ERROR falls Log beschädigt)"]
+    Q2 -->|"Nein / DB bereits SUSPECT\noder Datei fehlt"| Q3
+
+    T3 --> Q3{"Art des Fehlers /\nWiederherstellungsziel?"}
+
+    Q3 -->|"Gesamte Datenbank betroffen\noder unklar - vollständiger\nRestore gewünscht"| Q4{"Recovery Model?"}
+    Q4 -->|"SIMPLE"| R1a["Vollständiger DB-Restore (4.1)\nnur Full + letztes Diff,\nKEIN Point-in-Time moeglich\n(kein Log-Backup vorhanden)"]
+    Q4 -->|"FULL / BULK_LOGGED"| Q5{"Bis zu einem exakten\nZeitpunkt/vor einem\nbekannten Fehler wiederherstellen?"}
+    Q5 -->|"Nein - bis zum letzten\nverfuegbaren Backup"| R1["Vollständiger DB-Restore (4.1)\nFull -> Diff -> alle Logs\nWITH RECOVERY"]
+    Q5 -->|"Ja"| Q5a{"Log-Kette vom Full-Backup\nbis zum Zielzeitpunkt\nlückenlos?"}
+    Q5a -->|"Ja"| R2["Point-in-Time-Restore (4.2)\nRESTORE LOG ... WITH STOPAT / STOPATMARK"]
+    Q5a -->|"Nein - Lücke\nin der Log-Kette"| R1x["Nur vollständiger Restore (4.1)\nbis zum letzten Backup VOR der Lücke\n-> PITR ab der Lücke nicht möglich"]
+
+    Q3 -->|"Nur einzelne 8-KB-Seiten\nkorrupt (msdb.dbo.suspect_pages,\nFehler 823/824)"| Q6{"Recovery Model FULL\noder BULK_LOGGED,\nund Log-Kette lückenlos?"}
+    Q6 -->|"Ja"| R5["Page Restore (4.5)\nRESTORE DATABASE ... PAGE = 'FileID:PageID'\n+ nachfolgende Log-Backups"]
+    Q6 -->|"Nein - SIMPLE Model\noder Log-Kette unterbrochen"| R1y["Nur vollständiger Restore (4.1)\nPage Restore technisch nicht möglich"]
+
+    Q3 -->|"Nur eine bestimmte\nDatei/Filegroup betroffen"| Q7{"Datenbank ist in\nmehrere Filegroups\nunterteilt?"}
+    Q7 -->|"Ja"| R4["Piecemeal Restore (4.4)\nnur betroffene Filegroup restoren,\nRest ggf. weiter online"]
+    Q7 -->|"Nein - nur eine\nDatendatei insgesamt"| R1z["Vollständiger Restore (4.1)\nFilegroup-Trennung nicht vorhanden"]
+
+    style R1 fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style R2 fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style R4 fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style R5 fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style R6 fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style R7 fill:#8a3b3b,stroke:#8a3b3b,color:#fff
+```
+
+**Wie das Diagramm zu lesen ist:**
+
+- **Erste Weiche (Backup vorhanden?):** Ohne jegliches Backup (weder SQL-nativ noch VM-Ebene) bleibt nur die datenverlustbehaftete Reparatur (4.7) — rot markiert, da hier immer echte Daten verloren gehen. Existiert wenigstens ein VM-/Disk-Backup, ist der VM-/Disk-Level-Restore (4.6) fast immer vorzuziehen.
+- **Tail-Log-Backup (4.3)** ist kein eigenständiges Ziel, sondern eine Pflichtstation, sobald die Datenbank/das Log noch irgendwie lesbar ist — sonst gehen die Transaktionen seit dem letzten Log-Backup unnötig verloren.
+- **Recovery Model entscheidet direkt über die Optionen:** In `SIMPLE` gibt es **keine** Log-Backups, damit sind Point-in-Time-Restore (4.2) und Page Restore (4.5) **grundsätzlich ausgeschlossen** — es bleibt nur der vollständige Restore aus Full/Differential. Nur in `FULL`/`BULK_LOGGED` mit lückenloser Log-Kette sind PITR und Page Restore technisch möglich.
+- **Eine Lücke in der Log-Kette** (z. B. ein fehlendes Log-Backup) begrenzt einen Point-in-Time-Restore auf den letzten Stand **vor** der Lücke — alles danach ist nur noch über ein neueres Backup nach der Lücke erreichbar, falls vorhanden.
+- **Filegroup-Aufteilung ist eine Vorbedingung, keine Nachrüstoption:** Piecemeal Restore (4.4) funktioniert nur, wenn die Datenbank *im Vorfeld* in mehrere Filegroups strukturiert wurde — bei einer einzigen Datendatei bleibt nur der vollständige Restore.
 
 ### 4.1 | Vollständiger Datenbank-Restore (Full/Diff/Log-Kette)
 > **Bedeutung:** Die komplette Datenbank wird aus einem Full-Backup (optional + letztem Differential, optional + allen nachfolgenden Log-Backups) wiederhergestellt. Steuerung der Kette über `WITH NORECOVERY` (weitere Backups folgen), `WITH RECOVERY` (Kette abschließen, DB wird nutzbar) oder `WITH STANDBY` (DB wird read-only mit Undo-Datei nutzbar, weitere Logs können trotzdem noch nachgezogen werden). Dies ist die **sicherste** Restore-Art, da die gesamte Datenbank konsistent aus dem Backup wiederhergestellt wird — kein Restrisiko einzelner, nicht erkannter Folgeschäden. Downtime betrifft die **gesamte** Datenbank für die Dauer des Restores.
