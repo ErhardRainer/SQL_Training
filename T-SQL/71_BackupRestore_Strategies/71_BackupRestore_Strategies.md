@@ -26,7 +26,7 @@
 
 ---
 
-## 2 | Struktur
+## 2 | Struktur (Backup-Themen)
 
 ### 2.1 | Planung: RPO/RTO, Topologien & Grundmuster
 > **Kurzbeschreibung:** Ziele definieren, passende Recovery-Modelle & Backup-Kombinationen auswählen.
@@ -77,72 +77,7 @@
 
 ---
 
-### 2.5 | RESTORE – Ketten, NORECOVERY, STANDBY
-> **Kurzbeschreibung:** Full → Diff → Log(s); `WITH NORECOVERY/RECOVERY/STANDBY`, `FILELISTONLY`.
-
-- 📓 **Notebook:**  
-  [`08_05_restore_chains_norecovery_standby.ipynb`](08_05_restore_chains_norecovery_standby.ipynb)
-- 🎥 **YouTube:**  
-  - [RESTORE Sequence Basics](https://www.youtube.com/results?search_query=sql+server+restore+sequence+norecovery)
-- 📘 **Docs:**  
-  - [`RESTORE` Statements](https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-transact-sql)
-
----
-
-### 2.6 | Point-in-Time & Marked Transactions
-> **Kurzbeschreibung:** `STOPAT` für Zeitpunkte, `STOPATMARK`/`STOPBEFOREMARK` für logisch konsistente Gruppen.
-
-- 📓 **Notebook:**  
-  [`08_06_point_in_time_stopat_mark.ipynb`](08_06_point_in_time_stopat_mark.ipynb)
-- 🎥 **YouTube:**  
-  - [Point-in-Time Restore](https://www.youtube.com/results?search_query=sql+server+point+in+time+restore)
-- 📘 **Docs:**  
-  - [Restore to a Point in Time](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-a-sql-server-database-to-a-point-in-time)  
-  - [Marked Transactions](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/transaction-log-marking-and-recovery)
-
----
-
-### 2.7 | Tail-Log & Notfallwiederherstellung
-> **Kurzbeschreibung:** `BACKUP LOG ... WITH NO_TRUNCATE`/`CONTINUE_AFTER_ERROR`-Szenarien, Vorbereitungen vor RESTORE.
-
-- 📓 **Notebook:**  
-  [`08_07_tail_log_disaster_recovery.ipynb`](08_07_tail_log_disaster_recovery.ipynb)
-- 🎥 **YouTube:**  
-  - [Tail-Log Backup Demo](https://www.youtube.com/results?search_query=sql+server+tail+log+backup)
-- 📘 **Docs:**  
-  - [Tail-Log Backups](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/tail-log-backups-sql-server)
-
----
-
-### 2.8 | File/Filegroup-Backups & Piecemeal Restore
-> **Kurzbeschreibung:** Große DBs gezielt sichern & teilweise wiederherstellen, Read-Only-FGs umgehen.
-
-- 📓 **Notebook:**  
-  [`08_08_file_filegroup_piecemeal.ipynb`](08_08_file_filegroup_piecemeal.ipynb)
-- 🎥 **YouTube:**  
-  - [Filegroup Backup and Restore](https://www.youtube.com/results?search_query=sql+server+filegroup+backup+restore)
-- 📘 **Docs:**  
-  - [Full/Partial/Piecemeal Restore](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-and-recovery-overview-sql-server#piecemeal-restore)
-
----
-
-### 2.9 | Page Restore – gezielte Seitenwiederherstellung
-> **Kurzbeschreibung:** Einzelne Seiten aus Backups einspielen statt kompletter DB-Restores.
-
-- 📓 **Notebook:**  
-  [`08_09_page_restore_targeted.ipynb`](08_09_page_restore_targeted.ipynb)
-- 📄 **Praxis-Anleitung (SUSPECT-Datenbank reparieren):**  
-  [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich der Optionen bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824): vollständiger DB-Restore, gezielter Page Restore, sowie `DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS` als letzte Notlösung ohne Backup. Mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) zur automatisierten Ursachenanalyse.
-- 📄 **Praxis-Anleitung (Wiederherstellung über ein VM-/Disk-Backup):**  
-  [`SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md`](SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md) — zusätzliche Option, wenn kein SQL-natives Backup existiert, aber ein komplettes Backup der virtuellen Maschine/Disk vorhanden ist: unbeschädigte Datenbankdateien direkt aus dem gemounteten VM-Backup zurückkopieren, statt Daten per `REPAIR_ALLOW_DATA_LOSS` zu verlieren.
-- 🎥 **YouTube:**  
-  - [Page Restore in SQL Server](https://www.youtube.com/results?search_query=sql+server+page+restore)
-- 📘 **Docs:**  
-  - [Restore Pages](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-pages-sql-server)
-
----
-
-### 2.10 | Performance: Striping, Compression, BUFFERCOUNT
+### 2.5 | Performance: Striping, Compression, BUFFERCOUNT
 > **Kurzbeschreibung:** Mehrere Ziele (Striping), Transfergrößen, `MAXTRANSFERSIZE`, `BLOCKSIZE`, IO/CPU abwägen.
 
 - 📓 **Notebook:**  
@@ -154,7 +89,7 @@
 
 ---
 
-### 2.11 | Sicherheit: Verschlüsselung, TDE & Schutz der Dateien
+### 2.6 | Sicherheit: Verschlüsselung, TDE & Schutz der Dateien
 > **Kurzbeschreibung:** Backup Encryption (Cert/Asym), TDE-Key-Export, Offsite/Immutability (3-2-1-Regel).
 
 - 📓 **Notebook:**  
@@ -167,7 +102,7 @@
 
 ---
 
-### 2.12 | Backups in die Cloud: `TO URL` (Azure Blob)
+### 2.7 | Backups in die Cloud: `TO URL` (Azure Blob)
 > **Kurzbeschreibung:** Sicherungen direkt nach Azure Blob (SAS/Credential/MI), Throttling & Kosten.
 
 - 📓 **Notebook:**  
@@ -179,7 +114,7 @@
 
 ---
 
-### 2.13 | Verifikation & Integrität: VERIFYONLY, CHECKSUM, Test-Restores
+### 2.8 | Verifikation & Integrität: VERIFYONLY, CHECKSUM, Test-Restores
 > **Kurzbeschreibung:** Prüfen, ob das Backup **lesbar** ist; Restore-Probe, `DBCC CHECKDB` nach Restore.
 
 - 📓 **Notebook:**  
@@ -192,7 +127,7 @@
 
 ---
 
-### 2.14 | Automatisierung & Aufräumen: Wartung, msdb, Retention
+### 2.9 | Automatisierung & Aufräumen: Wartung, msdb, Retention
 > **Kurzbeschreibung:** Jobs/Plans/Skripte, `msdb`-Historie, Lösch-/Kopier-Policies, Reporting.
 
 - 📓 **Notebook:**  
@@ -204,7 +139,7 @@
 
 ---
 
-### 2.15 | HA/DR-Integration: AG, Log Shipping & Copy-Only
+### 2.10 | HA/DR-Integration: AG, Log Shipping & Copy-Only
 > **Kurzbeschreibung:** Backup-Präferenzen in **Always On AG**, Sekundärknoten-Backups, Log Shipping-Ketten, Copy-Only bei Ad-hoc.
 
 - 📓 **Notebook:**  
@@ -217,7 +152,7 @@
 
 ---
 
-### 2.16 | Anti-Patterns & Checkliste
+### 2.11 | Anti-Patterns & Checkliste
 > **Kurzbeschreibung:** Nur Full-Backups im FULL-Model (ohne Log), keine Restore-Tests, Copy-Only falsch eingesetzt, Differential-Basen zerstört, LSN-Lücken, ungeprüfte Verschlüsselungs-Keys, fehlende Offsite/Immutability, `msdb`-Cleanup vergessen.
 
 - 📓 **Notebook:**  
@@ -229,7 +164,102 @@
 
 ---
 
-## 3 | Weiterführende Informationen
+## 3 | Restores
+
+Dieses Kapitel bündelt alle **Arten von Restores** in SQL Server — von der kompletten Datenbankwiederherstellung bis zur gezielten Reparatur einzelner Seiten. Jede Art wird kurz und präzise beschrieben (was sie bedeutet, wann sie zum Einsatz kommt), gefolgt von den zugehörigen Lernressourcen. Eine **Übersichtstabelle** am Ende von Kapitel 3 vergleicht alle Arten auf einen Blick.
+
+### 3.1 | Vollständiger Datenbank-Restore (Full/Diff/Log-Kette)
+> **Bedeutung:** Die komplette Datenbank wird aus einem Full-Backup (optional + letztem Differential, optional + allen nachfolgenden Log-Backups) wiederhergestellt. Steuerung der Kette über `WITH NORECOVERY` (weitere Backups folgen), `WITH RECOVERY` (Kette abschließen, DB wird nutzbar) oder `WITH STANDBY` (DB wird read-only mit Undo-Datei nutzbar, weitere Logs können trotzdem noch nachgezogen werden). Dies ist die **sicherste** Restore-Art, da die gesamte Datenbank konsistent aus dem Backup wiederhergestellt wird — kein Restrisiko einzelner, nicht erkannter Folgeschäden. Downtime betrifft die **gesamte** Datenbank für die Dauer des Restores.
+
+- 📓 **Notebook:**  
+  [`08_05_restore_chains_norecovery_standby.ipynb`](08_05_restore_chains_norecovery_standby.ipynb)
+- 🎥 **YouTube:**  
+  - [RESTORE Sequence Basics](https://www.youtube.com/results?search_query=sql+server+restore+sequence+norecovery)
+- 📘 **Docs:**  
+  - [`RESTORE` Statements](https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-transact-sql)
+
+---
+
+### 3.2 | Point-in-Time-Restore (PITR) & Marked Transactions
+> **Bedeutung:** Eine Sonderform des vollständigen Restores, die die Wiederherstellung nicht am Ende des letzten Log-Backups stoppt, sondern gezielt bei `STOPAT` (einem konkreten Zeitpunkt) oder `STOPATMARK`/`STOPBEFOREMARK` (einer markierten, logisch konsistenten Transaktion). Damit lässt sich z. B. exakt bis kurz **vor** einem fehlerhaften `DELETE` oder einer Korruption zurückgehen, ohne spätere, noch unbeschädigte Transaktionen zu verlieren. Voraussetzung ist eine lückenlose Log-Kette bis zum gewünschten Zeitpunkt (Recovery Model `FULL`/`BULK_LOGGED`).
+
+- 📓 **Notebook:**  
+  [`08_06_point_in_time_stopat_mark.ipynb`](08_06_point_in_time_stopat_mark.ipynb)
+- 🎥 **YouTube:**  
+  - [Point-in-Time Restore](https://www.youtube.com/results?search_query=sql+server+point+in+time+restore)
+- 📘 **Docs:**  
+  - [Restore to a Point in Time](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-a-sql-server-database-to-a-point-in-time)  
+  - [Marked Transactions](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/transaction-log-marking-and-recovery)
+
+---
+
+### 3.3 | Tail-Log-Restore (Notfallwiederherstellung)
+> **Bedeutung:** Kein eigener Restore-Typ im engeren Sinn, sondern der **vorbereitende Schritt** vor jedem Restore einer noch (teilweise) zugreifbaren, aber beschädigten Datenbank: `BACKUP LOG ... WITH NO_TRUNCATE` sichert den allerletzten, noch nicht gesicherten Log-Abschnitt, bevor die Restore-Kette beginnt — nur so gehen die Transaktionen zwischen dem letzten regulären Log-Backup und dem Ausfallzeitpunkt nicht verloren. `WITH CONTINUE_AFTER_ERROR` erlaubt das Sichern sogar bei bereits beschädigten Bereichen, auf Kosten einzelner fehlender Log-Einträge.
+
+- 📓 **Notebook:**  
+  [`08_07_tail_log_disaster_recovery.ipynb`](08_07_tail_log_disaster_recovery.ipynb)
+- 🎥 **YouTube:**  
+  - [Tail-Log Backup Demo](https://www.youtube.com/results?search_query=sql+server+tail+log+backup)
+- 📘 **Docs:**  
+  - [Tail-Log Backups](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/tail-log-backups-sql-server)
+
+---
+
+### 3.4 | Piecemeal Restore (File-/Filegroup-Restore)
+> **Bedeutung:** Statt der gesamten Datenbank wird nur eine einzelne Datei oder Filegroup aus einem File-/Filegroup-Backup wiederhergestellt. Sinnvoll bei sehr großen Datenbanken, die aus mehreren Filegroups bestehen (z. B. eine historische, read-only Filegroup getrennt von einer aktiven) — nur die tatsächlich betroffene Filegroup muss zurückgespielt werden, der Rest der Datenbank bleibt (je nach Edition und Konfiguration) online nutzbar. Erfordert eine durchdachte Filegroup-Architektur im Vorfeld.
+
+- 📓 **Notebook:**  
+  [`08_08_file_filegroup_piecemeal.ipynb`](08_08_file_filegroup_piecemeal.ipynb)
+- 🎥 **YouTube:**  
+  - [Filegroup Backup and Restore](https://www.youtube.com/results?search_query=sql+server+filegroup+backup+restore)
+- 📘 **Docs:**  
+  - [Full/Partial/Piecemeal Restore](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-and-recovery-overview-sql-server#piecemeal-restore)
+
+---
+
+### 3.5 | Page Restore (gezielte Seitenwiederherstellung)
+> **Bedeutung:** Die granularste Restore-Art — statt einer ganzen Datei/Filegroup werden nur einzelne, konkret als beschädigt identifizierte 8-KB-Datenseiten (`msdb.dbo.suspect_pages`, Fehler 823/824) aus dem Backup eingespielt (`RESTORE DATABASE ... PAGE = 'FileID:PageID'`). Voraussetzung: Recovery Model `FULL`/`BULK_LOGGED`, ein Backup, das die betroffene Seite unbeschädigt enthält, und eine lückenlose Log-Kette bis zur aktuellen Zeit. Kürzeste Downtime aller Restore-Arten bei wenigen betroffenen Seiten; in Enterprise Edition sogar online möglich, während der Rest der Datenbank weiterläuft.
+
+- 📓 **Notebook:**  
+  [`08_09_page_restore_targeted.ipynb`](08_09_page_restore_targeted.ipynb)
+- 🎥 **YouTube:**  
+  - [Page Restore in SQL Server](https://www.youtube.com/results?search_query=sql+server+page+restore)
+- 📘 **Docs:**  
+  - [Restore Pages](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-pages-sql-server)
+
+---
+
+### 3.6 | VM-/Disk-Level-Restore (Wiederherstellung ohne SQL-natives Backup)
+> **Bedeutung:** Kein SQL-Server-`RESTORE`-Befehl im eigentlichen Sinn, sondern das Zurückkopieren unbeschädigter `.mdf`/`.ldf`-Dateien aus einem **kompletten VM-/Disk-/Storage-Backup** (Hyper-V-Checkpoint, VMware-Snapshot, Cloud-Snapshot, SAN-Snapshot) auf Dateisystemebene. Kommt zum Einsatz, wenn kein SQL-natives Backup existiert, aber ein VM-Backup von vor dem Korruptions-/Ausfallereignis vorhanden ist. Bedeutet in der Regel Datenverlust für alle Transaktionen seit dem VM-Backup-Zeitpunkt (kein Tail-Log-Backup möglich, da die DB bereits nicht mehr zugreifbar ist), ist aber der SQL-nativen `REPAIR_ALLOW_DATA_LOSS`-Notlösung meist vorzuziehen, da keine Daten durch Entfernen beschädigter Seiten verloren gehen, sondern nur der Zeitstand zurückgesetzt wird.
+
+- 📄 **Praxis-Anleitung (Wiederherstellung über ein VM-/Disk-Backup):**  
+  [`SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md`](SuspectOrRecoveryPendingDatabase_VMDiskLevelRestore.md) — Voraussetzungen, Schritt-für-Schritt-Ablauf, Datenverlust-Analyse und Risiken.
+
+---
+
+### 3.7 | Reparatur ohne Backup (`DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS`)
+> **Bedeutung:** **Kein echter Restore**, sondern die letzte Notlösung, wenn weder ein vollständiger Restore noch ein Page Restore noch ein VM-/Disk-Level-Restore möglich ist: `DBCC CHECKDB` entfernt beschädigte Seiten/Zeilen/Strukturen dauerhaft, um die Datenbank wieder konsistent (aber unvollständig) zu machen. Wird hier dennoch mitgeführt, da sie in der Praxis regelmäßig als letzte Eskalationsstufe neben den echten Restore-Arten steht.
+
+- 📄 **Praxis-Anleitung (SUSPECT-/RECOVERY_PENDING-Datenbank reparieren):**  
+  [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich aller Restore-Arten bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) und der `REPAIR_ALLOW_DATA_LOSS`-Notlösung, mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) zur automatisierten Ursachenanalyse.
+
+---
+
+### 3.8 | Übersichtstabelle: Restore-Arten im Vergleich
+
+| Restore-Art | Umfang | Voraussetzung | Datenverlust | Downtime | Wann einsetzen |
+|---|---|---|---|---|---|
+| **Vollständiger DB-Restore** (3.1) | Gesamte Datenbank | Full-Backup, optional Diff, optional Logs | Nein (bis zum Backup-/Log-Zeitpunkt) | Gesamte DB für Restore-Dauer | Standardfall bei vorhandenem Backup; sicherste Option |
+| **Point-in-Time-Restore** (3.2) | Gesamte Datenbank, bis zu einem exakten Zeitpunkt/Marker | Full/Diff + lückenlose Log-Kette, Recovery Model FULL/BULK_LOGGED | Nein bis zum gewählten Zeitpunkt | Gesamte DB für Restore-Dauer | Gezielt vor einem bekannten Fehlerereignis zurückgehen |
+| **Tail-Log-Restore** (3.3) | Vorbereitender Schritt, kein eigenständiger Restore | Log noch zugreifbar | Minimiert Verlust der letzten Transaktionen | – (Vorbereitung) | Immer vor einem Restore, wenn das Log noch lesbar ist |
+| **Piecemeal Restore** (3.4) | Einzelne Datei/Filegroup | File-/Filegroup-Backup-Strategie, durchdachte Filegroup-Architektur | Nein (bis zum Backup-/Log-Zeitpunkt) | Nur betroffene Filegroup; Rest ggf. weiter nutzbar | Sehr große Datenbanken mit klar getrennten Filegroups |
+| **Page Restore** (3.5) | Einzelne 8-KB-Seite(n) | Full-Backup + lückenlose Log-Kette, Recovery Model FULL/BULK_LOGGED | Nein (bis zum Log-Zeitpunkt) | Kürzeste Downtime; Enterprise Edition ggf. online | Wenige, klar identifizierte beschädigte Seiten bei großer DB |
+| **VM-/Disk-Level-Restore** (3.6) | Gesamte Datenbankdatei(en) auf Dateisystemebene | Vollständiges VM-/Disk-/Storage-Backup vor dem Ereignis | Transaktionen seit VM-Backup-Zeitpunkt | Abhängig vom Disk-Mount-/Kopiervorgang | Kein SQL-natives Backup vorhanden, aber VM-/Snapshot-Backup existiert |
+| **Repair ohne Backup** (3.7) | Beschädigte Seiten/Zeilen (werden entfernt, nicht wiederhergestellt) | Keine (funktioniert immer, aber mit Verlust) | Ja, dauerhaft | Kurz, aber Datenintegrität unvollständig | Letztes Mittel, wenn keine der obigen Optionen möglich ist |
+
+---
+
+## 4 | Weiterführende Informationen
 
 - 📘 Microsoft Learn: [Backup & Restore – Überblick](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/back-up-and-restore-of-sql-server-databases)  
 - 📘 Microsoft Learn: [Recovery-Modelle (FULL/SIMPLE/BULK_LOGGED)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/recovery-models-sql-server)  
