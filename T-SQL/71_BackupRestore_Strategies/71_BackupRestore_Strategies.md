@@ -1,6 +1,43 @@
 # T-SQL Backup & Restore – Strategien  
 *Backup-Typen, Recovery-Modelle, Point-in-Time-Restores, Log-Ketten & Copy-Only*
 
+## Inhaltsverzeichnis
+
+- [1 | Begriffsdefinition](#1--begriffsdefinition)
+- [2 | Struktur (Backup-Themen)](#2--struktur-backup-themen)
+  - [2.1 | Planung: RPO/RTO, Topologien & Grundmuster](#21--planung-rporto-topologien--grundmuster)
+  - [2.2 | Recovery-Modelle: FULL, SIMPLE, BULK_LOGGED](#22--recovery-modelle-full-simple-bulk_logged)
+  - [2.3 | Backup-Typen: Full, Differential, Log, Copy-Only](#23--backup-typen-full-differential-log-copy-only)
+  - [2.4 | BACKUP DATABASE/LOG – Syntax & Optionen](#24--backup-databaselog--syntax--optionen)
+  - [2.5 | Performance: Striping, Compression, BUFFERCOUNT](#25--performance-striping-compression-buffercount)
+  - [2.6 | Sicherheit: Verschlüsselung, TDE & Schutz der Dateien](#26--sicherheit-verschlüsselung-tde--schutz-der-dateien)
+  - [2.7 | Backups in die Cloud: `TO URL` (Azure Blob)](#27--backups-in-die-cloud-to-url-azure-blob)
+  - [2.8 | Verifikation & Integrität: VERIFYONLY, CHECKSUM, Test-Restores](#28--verifikation--integrität-verifyonly-checksum-test-restores)
+  - [2.9 | Automatisierung & Aufräumen: Wartung, msdb, Retention](#29--automatisierung--aufräumen-wartung-msdb-retention)
+  - [2.10 | HA/DR-Integration: AG, Log Shipping & Copy-Only](#210--hadr-integration-ag-log-shipping--copy-only)
+  - [2.11 | Anti-Patterns & Checkliste](#211--anti-patterns--checkliste)
+- [3 | Datenbank-Status: Wie es dazu kommt und was er bedeutet](#3--datenbank-status-wie-es-dazu-kommt-und-was-er-bedeutet)
+  - [3.0 | DBCC CHECKDB: Konsistenzprüfung vor jeder Statusbewertung](#30--dbcc-checkdb-konsistenzprüfung-vor-jeder-statusbewertung)
+  - [3.1 | Status auslesen](#31--status-auslesen)
+  - [3.2 | Die Zustände im Detail: Wie sie entstehen und was sie bedeuten](#32--die-zustände-im-detail-wie-sie-entstehen-und-was-sie-bedeuten)
+  - [3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY_PENDING? Die genaue Zustandskette](#33--ist-suspect-ein-fehlgeschlagenes-recovery_pending-die-genaue-zustandskette)
+  - [3.4 | Typische Root Causes: Wodurch RECOVERY_PENDING/SUSPECT in der Praxis tatsächlich ausgelöst wird](#34--typische-root-causes-wodurch-recovery_pendingsuspect-in-der-praxis-tatsächlich-ausgelöst-wird)
+  - [3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab](#35--sonderfall-restore-bricht-wegen-speicherplatzmangel-ab)
+  - [3.6 | Weiterführende Informationen zu Kapitel 3](#36--weiterführende-informationen-zu-kapitel-3)
+- [4 | Restores](#4--restores)
+  - [4.0 | Entscheidungsdiagramm: Welche Restore-Art passt?](#40--entscheidungsdiagramm-welche-restore-art-passt)
+  - [4.1 | Vollständiger Datenbank-Restore (Full/Diff/Log-Kette)](#41--vollständiger-datenbank-restore-fulldifflog-kette)
+  - [4.2 | Point-in-Time-Restore (PITR) & Marked Transactions](#42--point-in-time-restore-pitr--marked-transactions)
+  - [4.3 | Tail-Log-Restore (Notfallwiederherstellung)](#43--tail-log-restore-notfallwiederherstellung)
+  - [4.4 | Piecemeal Restore (File-/Filegroup-Restore)](#44--piecemeal-restore-file-filegroup-restore)
+  - [4.5 | Page Restore (gezielte Seitenwiederherstellung)](#45--page-restore-gezielte-seitenwiederherstellung)
+  - [4.6 | VM-/Disk-Level-Restore (Wiederherstellung ohne SQL-natives Backup)](#46--vm-disk-level-restore-wiederherstellung-ohne-sql-natives-backup)
+  - [4.7 | Reparatur ohne Backup (`DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS`)](#47--reparatur-ohne-backup-dbcc-checkdb--repair_allow_data_loss)
+  - [4.8 | Übersichtstabelle: Restore-Arten im Vergleich](#48--übersichtstabelle-restore-arten-im-vergleich)
+- [5 | Weiterführende Informationen](#5--weiterführende-informationen)
+
+---
+
 ## 1 | Begriffsdefinition
 
 | SQL-Term | Beschreibung |
@@ -167,6 +204,78 @@
 ## 3 | Datenbank-Status: Wie es dazu kommt und was er bedeutet
 
 Bevor über die passende Restore-Art entschieden werden kann, muss zuerst klar sein, **in welchem Zustand sich die Datenbank gerade befindet** — SQL Server zeigt das über `sys.databases.state_desc`. Dieses Kapitel erklärt, wie es zu den einzelnen Zuständen kommt und was jeweils zu tun ist.
+
+### 3.0 | DBCC CHECKDB: Konsistenzprüfung vor jeder Statusbewertung
+
+Der Status `ONLINE` allein sagt nichts darüber aus, ob eine Datenbank tatsächlich **konsistent** ist — dafür ist `DBCC CHECKDB` zuständig. Dieser Abschnitt erklärt genau, was der Befehl prüft, wie sein Ergebnis zu lesen ist, und warum eine Datenbank mit tausenden gemeldeten Fehlern trotzdem als `ONLINE` angezeigt werden kann.
+
+#### 3.0.1 | Was DBCC CHECKDB tatsächlich prüft
+
+`DBCC CHECKDB` führt intern drei Prüfungen nacheinander aus ([Microsoft Learn](https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkdb-transact-sql)):
+
+- **`DBCC CHECKALLOC` — Allocation-Check:** Prüft die *physische Buchhaltung* der Seiten-/Extent-Zuordnung anhand der `GAM`-, `SGAM`-, `PFS`- und `IAM`-Seiten. Jeder Extent muss eindeutig entweder als frei oder genau einer Tabelle/einem Index zugeordnet sein — nur bestimmte Bit-Kombinationen dieser vier Strukturen sind gültig. Ein Allocation-Fehler bedeutet z. B., dass eine Seite zwei Objekten gleichzeitig "gehört" oder als frei markiert ist, obwohl sie Daten enthält ([Paul Randal: Inside The Storage Engine](https://www.sqlskills.com/blogs/paul/inside-the-storage-engine-gam-sgam-pfs-and-other-allocation-maps/)).
+- **`DBCC CHECKTABLE`** (für jede Tabelle/View): Prüft die *logische* Struktur — Seiten-Header-Integrität, korrekte Verkettung der Seiten im B-Tree/Heap, Übereinstimmung jedes Nonclustered-Index-Eintrags mit der Basistabelle, Duplikate/Überlappungen in Indizes, sowie neu berechnete berechnete Spalten ([Paul Randal: CHECKDB From Every Angle](https://www.sqlskills.com/blogs/paul/checkdb-from-every-angle-complete-description-of-all-checkdb-stages/)).
+- **`DBCC CHECKCATALOG`:** Prüft die referenzielle Konsistenz zwischen den Systemkatalog-Tabellen selbst (`sys.objects`, `sys.columns`, `sys.indexes` usw.).
+
+**`PHYSICAL_ONLY`** beschränkt die Prüfung auf Seiten-Header-Integrität und Checksummen (erkennt Torn Pages und Hardware-/I/O-Fehler), überspringt aber die vollen logischen Checks — deutlich schneller, aber weniger gründlich; empfohlen für häufige Läufe, ein vollständiger `CHECKDB` sollte dennoch regelmäßig laufen ([Microsoft Learn](https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkdb-transact-sql)).
+
+#### 3.0.2 | Das Skript in diesem Kapitel
+
+[SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) (Doku: [SQLScripts/CheckDbAllDatabases.md](SQLScripts/CheckDbAllDatabases.md)) führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, zeigt vor jeder Prüfung eine Fortschrittsmeldung mit Zähler, misst die Dauer millisekundengenau und protokolliert am Ende jede Datenbank mit Status (`OK`/`FAILED`/`SKIPPED`) in einer zusammenfassenden Tabelle. Es ist rein diagnostisch — für eine anschließende Reparatur siehe [SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) bzw. [RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql).
+
+#### 3.0.3 | Ein Beispiel aus der Praxis, Zeile für Zeile erklärt
+
+```text
+Pruefe jetzt: [BI_Logging] (1 von 1)
+Gestartet um 2026-08-14 08:20:30.284.
+CHECKDB found 0 allocation errors and 13034 consistency errors not associated with any single object.
+CHECKDB found 0 allocation errors and 34 consistency errors in table 'LW_RowComparison' (object ID 18099105).
+CHECKDB found 0 allocation errors and 206 consistency errors in table 'log.History' (object ID 581577110).
+CHECKDB found 0 allocation errors and 19664 consistency errors in table 'log.LogDetails' (object ID 773577794).
+CHECKDB found 0 allocation errors and 8 consistency errors in table 'LW_Counts' (object ID 1557580587).
+CHECKDB found 0 allocation errors and 40 consistency errors in table 'SAP_Counts' (object ID 1701581100).
+CHECKDB found 0 allocation errors and 9 consistency errors in table 'log.JobLog' (object ID 1845581613).
+CHECKDB found 0 allocation errors and 32995 consistency errors in database 'BI_Logging'.
+repair_allow_data_loss is the minimum repair level for the errors found by DBCC CHECKDB (BI_Logging).
+Abgeschlossen um 2026-08-14 08:28:23.414 (Dauer: 473.130 Sekunden).
+```
+
+**`0 allocation errors`** — die physische Seiten-/Extent-Buchhaltung (GAM/SGAM/PFS/IAM) ist über die gesamte Datenbank hinweg intakt. Das eigentliche Problem liegt ausschließlich auf der logischen Ebene.
+
+**`consistency errors` je Tabelle** — jede Zeile mit `in table '...'` listet die Anzahl logischer Fehler, die `CHECKTABLE` für genau dieses Objekt gefunden hat (z. B. defekte Seiten-Verkettung, Index-Diskrepanzen). Auffällig: Die Fehler konzentrieren sich stark auf `log.LogDetails` (19.664 von 32.995 Fehlern) — plausibel, aber nicht durch eine offizielle Quelle belegbar, ist die Erklärung über das schiere Datenvolumen: Log-/Historientabellen sind typischerweise die mit Abstand am stärksten beschriebenen und größten Tabellen einer Datenbank, wodurch bei einem systemweiten I/O-Problem statistisch die meisten betroffenen Seiten dort landen — nicht, weil Log-Tabellen strukturell anfälliger wären.
+
+**`13034 consistency errors not associated with any single object`** — Fehler, die *keinem* Objekt eindeutig zugeordnet werden konnten. Das betrifft typischerweise Datenseiten (meist in einem Heap), die keine erkennbare B-Tree-Verkettung zu einem Objekt mehr haben, oder Fehler in `CHECKCATALOG`-übergreifenden Systemkatalog-Referenzen. SQL Server kann in diesem Fall nicht mehr sicher bestimmen, zu welcher Tabelle die Seite gehört — die Reparatur bedeutet dann das vollständige Entfernen der Seite (siehe Paul Randal, [Foren-Erklärung genau dieser Formulierung](https://microsoft.public.sqlserver.server.narkive.com/TbKqDYAE/consistency-errors-not-associated-with-any-single-object)).
+
+**Die Rechnung geht exakt auf:** 34 + 206 + 19.664 + 8 + 40 + 9 = **19.961** objektgebundene Fehler. 32.995 (Gesamtsumme laut `in database 'BI_Logging'`) − 19.961 = **13.034** — exakt die Zahl der nicht zuordenbaren Fehler aus der ersten Zeile. Das ist kein Zufall: Die datenbankweite Summe ist immer *objektgebundene Fehler + nicht zuordenbare Fehler*, auch wenn die nicht zuordenbaren Fehler in der objektweisen Auflistung selbst nicht auftauchen.
+
+**`repair_allow_data_loss is the minimum repair level`** — mindestens einer der gefundenen Fehlertypen lässt sich **nicht** mit dem verlustfreien `REPAIR_REBUILD` beheben (das nur z. B. fehlende Nonclustered-Index-Einträge neu aufbaut). Es bleibt nur `REPAIR_ALLOW_DATA_LOSS`, das ganze Zeilen, Seiten oder Seitenfolgen dauerhaft entfernen kann. Die Meldung ist eine *Mindestangabe* — sie garantiert nicht, dass danach alles behoben ist, nur dass dies die niedrigste Stufe ist, die überhaupt einen Reparaturversuch erlaubt (siehe [Troubleshoot database consistency errors – Microsoft Learn](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/database-file-operations/troubleshoot-dbcc-checkdb-errors)).
+
+**Praktische Konsequenz:** Bei diesem Befund zuerst prüfen, ob ein brauchbares Backup existiert (siehe Kapitel 4) — `REPAIR_ALLOW_DATA_LOSS` ist erst das letzte Mittel, wenn kein Restore möglich ist.
+
+#### 3.0.4 | Warum zeigt `sys.databases` trotzdem `ONLINE` an?
+
+Das ist der Punkt, der am häufigsten zu Verwirrung führt: Eine Datenbank mit 32.995 gemeldeten Konsistenzfehlern kann weiterhin problemlos als `ONLINE` in `sys.databases.state_desc` erscheinen — das ist **kein Widerspruch**, sondern eine Folge davon, dass `state_desc` und `DBCC CHECKDB` zwei völlig unabhängige Prüfmechanismen sind:
+
+- **`state_desc` spiegelt nur, ob die Crash-Recovery-Maschinerie erfolgreich war** (siehe Abschnitt 3.3): Konnte die Datenbank beim letzten Start ihr Transaktionslog erfolgreich anwenden (Redo/Undo) und ist sie seitdem für Verbindungen geöffnet, steht sie auf `ONLINE` — unabhängig davon, ob einzelne Datenseiten inhaltlich beschädigt sind. SQL Server prüft beim normalen Hochfahren **nicht** automatisch jede einzelne Datenseite auf logische Konsistenz; das wäre bei jedem Neustart extrem teuer.
+- **`DBCC CHECKDB` ist eine bewusst separate, aktiv anzustoßende Prüfung**, die tief in die Seitenstruktur, Index-Verkettungen und Systemkatalog-Referenzen hineinschaut — Dinge, die für den reinen Start-/Zugriffs-Mechanismus von SQL Server gar nicht relevant sind. Ein Client kann sich verbinden, `SELECT`s gegen unbeschädigte Tabellen/Seiten ausführen und normal arbeiten, während zeitgleich andere Seiten oder Tabellen (wie hier `log.LogDetails`) bereits inkonsistent sind — SQL Server merkt das erst, wenn genau diese beschädigte Seite tatsächlich gelesen/geschrieben wird (dann typischerweise mit Fehler 823/824), oder eben wenn `DBCC CHECKDB` aktiv danach sucht.
+- **`SUSPECT` entsteht nur, wenn die Crash Recovery selbst (Redo/Undo) an einer Beschädigung scheitert** (siehe Abschnitt 3.3) — nicht bereits dann, wenn irgendwo in der Datenbank beschädigte Seiten liegen, die die Recovery gar nicht betreten musste. Corruption in einer selten gelesenen Tabelle oder in Bereichen außerhalb des aktiven Log-Redo-Pfads bleibt für den Startvorgang unsichtbar.
+- **Praktische Konsequenz:** `ONLINE` bedeutet nur *"die Datenbank ist zugreifbar"*, nicht *"die Datenbank ist konsistent"*. Deshalb ist eine regelmäßige, proaktive `DBCC CHECKDB`-Prüfung (siehe [CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql)) unverzichtbar — ohne sie können Datenbanken monatelang unbemerkt mit fortschreitender Korruption weiterlaufen, bis zufällig eine betroffene Seite gelesen wird oder ein Neustart die Recovery über genau diesen beschädigten Bereich zwingt und die Datenbank dann erst `SUSPECT` wird.
+
+#### 3.0.5 | Weiterführende Informationen zu DBCC CHECKDB
+
+- 📘 Microsoft Learn: [DBCC CHECKDB (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/database-console-commands/dbcc-checkdb-transact-sql) — offizielle Referenz: Syntax, alle Optionen (`PHYSICAL_ONLY`, `DATA_PURITY`, `TABLOCK`, Repair-Level), Beispiel-Ausgaben.
+- 📘 Microsoft Learn: [Troubleshoot database consistency errors reported by DBCC CHECKDB](https://learn.microsoft.com/en-us/troubleshoot/sql/database-engine/database-file-operations/troubleshoot-dbcc-checkdb-errors) — offizieller Troubleshooting-Guide inkl. der Meldung "repair_allow_data_loss is the minimum repair level".
+- 📝 Paul Randal (SQLskills, Originalautor von `DBCC CHECKDB`): [CHECKDB From Every Angle: Complete description of all CHECKDB stages](https://www.sqlskills.com/blogs/paul/checkdb-from-every-angle-complete-description-of-all-checkdb-stages/) — detaillierte interne Phasenbeschreibung.
+- 📝 Paul Randal: [Inside The Storage Engine: GAM, SGAM, PFS and other allocation maps](https://www.sqlskills.com/blogs/paul/inside-the-storage-engine-gam-sgam-pfs-and-other-allocation-maps/) — Grundlagenartikel zu den Strukturen, die der Allocation-Check prüft.
+- 📝 Paul Randal: [CHECKDB From Every Angle: Can CHECKDB repair everything?](https://www.sqlskills.com/blogs/paul/checkdb-from-every-angle-can-checkdb-repair-everything/) — Grenzen der Reparatur, warum `REPAIR_ALLOW_DATA_LOSS` manchmal unausweichlich ist.
+- 📝 Paul Randal: [Misconceptions around database repair](https://www.sqlskills.com/blogs/paul/misconceptions-around-database-repair/) — räumt mit gängigen Irrtümern zu DBCC-Repair auf, betont die Backup-Priorität.
+- 📝 Paul Randal: [CHECKDB From Every Angle: Consistency Checking Options for a VLDB](https://www.sqlskills.com/blogs/paul/checkdb-from-every-angle-consistency-checking-options-for-a-vldb/) — Performance-Strategien für sehr große Datenbanken (Filegroup-Rotation, Wochenpläne).
+- 📝 Paul Randal: ["consistency errors not associated with any single object" — Erklärung der genauen Formulierung](https://microsoft.public.sqlserver.server.narkive.com/TbKqDYAE/consistency-errors-not-associated-with-any-single-object).
+- 📝 Erin Stellato (SQLskills): [DBCC CHECKDB Parallel Checks and SQL Server Edition](https://www.sqlskills.com/blogs/erin/dbcc-checkdb-parallel-checks-and-sql-server-edition/) — Parallelität von `CHECKDB` je nach Edition, relevant für Performance-Planung.
+- 📝 Erin Stellato (SQLskills): [Capturing DBCC CHECKDB Output](https://www.sqlskills.com/blogs/erin/capturing-dbcc-checkdb-output/) — Praxisleitfaden zum Erfassen und Auswerten von `CHECKDB`-Ausgaben in Agent-Jobs.
+- 📝 Brent Ozar: [3 Ways to Run DBCC CHECKDB Faster](https://www.brentozar.com/archive/2020/08/3-ways-to-run-dbcc-checkdb-faster/) — praxisnahe Performance-Tipps (`PHYSICAL_ONLY`, `MAXDOP`, Backup-Restore-Strategie).
+
+---
 
 ### 3.1 | Status auslesen
 
