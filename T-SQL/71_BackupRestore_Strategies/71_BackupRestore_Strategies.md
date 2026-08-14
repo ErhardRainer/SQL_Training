@@ -3,38 +3,52 @@
 
 ## Inhaltsverzeichnis
 
-- [1 | Begriffsdefinition](#1--begriffsdefinition)
-- [2 | Struktur (Backup-Themen)](#2--struktur-backup-themen)
-  - [2.1 | Grundlagen: Recovery Models, Planung & RPO/RTO](#21--grundlagen-recovery-models-planung--rporto)
-  - [2.2 | Backup-Konzepte im Detail: Full, Differential, Log, Copy-Only](#22--backup-konzepte-im-detail-full-differential-log-copy-only)
-  - [2.3 | Entscheidungshilfe: Welches Backup-Konzept für welches Recovery Model?](#23--entscheidungshilfe-welches-backup-konzept-für-welches-recovery-model)
-  - [2.4 | BACKUP DATABASE/LOG – Syntax & Optionen](#24--backup-databaselog--syntax--optionen)
-  - [2.5 | Performance: Striping, Compression, BUFFERCOUNT](#25--performance-striping-compression-buffercount)
-  - [2.6 | Sicherheit: Verschlüsselung, TDE & Schutz der Dateien](#26--sicherheit-verschlüsselung-tde--schutz-der-dateien)
-  - [2.7 | Backups in die Cloud: `TO URL` (Azure Blob)](#27--backups-in-die-cloud-to-url-azure-blob)
-  - [2.8 | Verifikation & Integrität: VERIFYONLY, CHECKSUM, Test-Restores](#28--verifikation--integrität-verifyonly-checksum-test-restores)
-  - [2.9 | Automatisierung & Aufräumen: Wartung, msdb, Retention](#29--automatisierung--aufräumen-wartung-msdb-retention)
-  - [2.10 | HA/DR-Integration: AG, Log Shipping & Copy-Only](#210--hadr-integration-ag-log-shipping--copy-only)
-  - [2.11 | Anti-Patterns & Checkliste](#211--anti-patterns--checkliste)
-- [3 | Datenbank-Status: Wie es dazu kommt und was er bedeutet](#3--datenbank-status-wie-es-dazu-kommt-und-was-er-bedeutet)
-  - [3.0 | DBCC CHECKDB: Konsistenzprüfung vor jeder Statusbewertung](#30--dbcc-checkdb-konsistenzprüfung-vor-jeder-statusbewertung)
-  - [3.1 | Status auslesen](#31--status-auslesen)
-  - [3.2 | Die Zustände im Detail: Wie sie entstehen und was sie bedeuten](#32--die-zustände-im-detail-wie-sie-entstehen-und-was-sie-bedeuten)
-  - [3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY_PENDING? Die genaue Zustandskette](#33--ist-suspect-ein-fehlgeschlagenes-recovery_pending-die-genaue-zustandskette)
-  - [3.4 | Typische Root Causes: Wodurch RECOVERY_PENDING/SUSPECT in der Praxis tatsächlich ausgelöst wird](#34--typische-root-causes-wodurch-recovery_pendingsuspect-in-der-praxis-tatsächlich-ausgelöst-wird)
-  - [3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab](#35--sonderfall-restore-bricht-wegen-speicherplatzmangel-ab)
-  - [3.6 | Weiterführende Informationen zu Kapitel 3](#36--weiterführende-informationen-zu-kapitel-3)
-- [4 | Restores](#4--restores)
-  - [4.0 | Entscheidungsdiagramm: Welche Restore-Art passt?](#40--entscheidungsdiagramm-welche-restore-art-passt)
-  - [4.1 | Vollständiger Datenbank-Restore (Full/Diff/Log-Kette)](#41--vollständiger-datenbank-restore-fulldifflog-kette)
-  - [4.2 | Point-in-Time-Restore (PITR) & Marked Transactions](#42--point-in-time-restore-pitr--marked-transactions)
-  - [4.3 | Tail-Log-Restore (Notfallwiederherstellung)](#43--tail-log-restore-notfallwiederherstellung)
-  - [4.4 | Piecemeal Restore (File-/Filegroup-Restore)](#44--piecemeal-restore-file-filegroup-restore)
-  - [4.5 | Page Restore (gezielte Seitenwiederherstellung)](#45--page-restore-gezielte-seitenwiederherstellung)
-  - [4.6 | VM-/Disk-Level-Restore (Wiederherstellung ohne SQL-natives Backup)](#46--vm-disk-level-restore-wiederherstellung-ohne-sql-natives-backup)
-  - [4.7 | Reparatur ohne Backup (`DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS`)](#47--reparatur-ohne-backup-dbcc-checkdb--repair_allow_data_loss)
-  - [4.8 | Übersichtstabelle: Restore-Arten im Vergleich](#48--übersichtstabelle-restore-arten-im-vergleich)
-- [5 | Weiterführende Informationen](#5--weiterführende-informationen)
+- [T-SQL Backup \& Restore – Strategien](#t-sql-backup--restore--strategien)
+  - [Inhaltsverzeichnis](#inhaltsverzeichnis)
+  - [1 | Begriffsdefinition](#1--begriffsdefinition)
+  - [2 | Struktur (Backup-Themen)](#2--struktur-backup-themen)
+    - [2.1 | Grundlagen: Recovery Models, Planung \& RPO/RTO](#21--grundlagen-recovery-models-planung--rporto)
+    - [2.2 | Backup-Konzepte im Detail: Full, Differential, Log, Copy-Only](#22--backup-konzepte-im-detail-full-differential-log-copy-only)
+    - [2.3 | Entscheidungshilfe: Welches Backup-Konzept für welches Recovery Model?](#23--entscheidungshilfe-welches-backup-konzept-für-welches-recovery-model)
+    - [2.4 | BACKUP DATABASE/LOG – Syntax \& Optionen](#24--backup-databaselog--syntax--optionen)
+      - [Grundsyntax](#grundsyntax)
+      - [Die wichtigsten `WITH`-Optionen im Detail](#die-wichtigsten-with-optionen-im-detail)
+      - [Beispiele](#beispiele)
+    - [2.5 | Performance: Striping, Compression, BUFFERCOUNT](#25--performance-striping-compression-buffercount)
+      - [Striping: parallele I/O über mehrere Ziele](#striping-parallele-io-über-mehrere-ziele)
+      - [BUFFERCOUNT: Anzahl der I/O-Puffer](#buffercount-anzahl-der-io-puffer)
+      - [MAXTRANSFERSIZE und BLOCKSIZE: Größe der I/O-Anfragen](#maxtransfersize-und-blocksize-größe-der-io-anfragen)
+      - [Kompression: CPU-für-I/O-Tausch](#kompression-cpu-für-io-tausch)
+    - [2.6 | Sicherheit: Verschlüsselung, TDE \& Schutz der Dateien](#26--sicherheit-verschlüsselung-tde--schutz-der-dateien)
+    - [2.7 | Backups in die Cloud: `TO URL` (Azure Blob)](#27--backups-in-die-cloud-to-url-azure-blob)
+    - [2.8 | Verifikation \& Integrität: VERIFYONLY, CHECKSUM, Test-Restores](#28--verifikation--integrität-verifyonly-checksum-test-restores)
+    - [2.9 | Automatisierung \& Aufräumen: Wartung, msdb, Retention](#29--automatisierung--aufräumen-wartung-msdb-retention)
+    - [2.10 | HA/DR-Integration: AG, Log Shipping \& Copy-Only](#210--hadr-integration-ag-log-shipping--copy-only)
+    - [2.11 | Anti-Patterns \& Checkliste](#211--anti-patterns--checkliste)
+  - [3 | Datenbank-Status: Wie es dazu kommt und was er bedeutet](#3--datenbank-status-wie-es-dazu-kommt-und-was-er-bedeutet)
+    - [3.0 | DBCC CHECKDB: Konsistenzprüfung vor jeder Statusbewertung](#30--dbcc-checkdb-konsistenzprüfung-vor-jeder-statusbewertung)
+      - [3.0.1 | Was DBCC CHECKDB tatsächlich prüft](#301--was-dbcc-checkdb-tatsächlich-prüft)
+      - [3.0.2 | Das Skript in diesem Kapitel](#302--das-skript-in-diesem-kapitel)
+      - [3.0.3 | Ein Beispiel aus der Praxis, Zeile für Zeile erklärt](#303--ein-beispiel-aus-der-praxis-zeile-für-zeile-erklärt)
+      - [3.0.4 | Warum zeigt `sys.databases` trotzdem `ONLINE` an?](#304--warum-zeigt-sysdatabases-trotzdem-online-an)
+      - [3.0.5 | Weiterführende Informationen zu DBCC CHECKDB](#305--weiterführende-informationen-zu-dbcc-checkdb)
+    - [3.1 | Status auslesen](#31--status-auslesen)
+    - [3.2 | Die Zustände im Detail: Wie sie entstehen und was sie bedeuten](#32--die-zustände-im-detail-wie-sie-entstehen-und-was-sie-bedeuten)
+    - [3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY\_PENDING? Die genaue Zustandskette](#33--ist-suspect-ein-fehlgeschlagenes-recovery_pending-die-genaue-zustandskette)
+    - [3.4 | Typische Root Causes: Wodurch RECOVERY\_PENDING/SUSPECT in der Praxis tatsächlich ausgelöst wird](#34--typische-root-causes-wodurch-recovery_pendingsuspect-in-der-praxis-tatsächlich-ausgelöst-wird)
+    - [3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab](#35--sonderfall-restore-bricht-wegen-speicherplatzmangel-ab)
+    - [3.6 | Weiterführende Informationen zu Kapitel 3](#36--weiterführende-informationen-zu-kapitel-3)
+  - [4 | Restores](#4--restores)
+    - [4.0 | Entscheidungsdiagramm: Welche Restore-Art passt?](#40--entscheidungsdiagramm-welche-restore-art-passt)
+    - [4.1 | Vollständiger Datenbank-Restore (Full/Diff/Log-Kette)](#41--vollständiger-datenbank-restore-fulldifflog-kette)
+    - [4.2 | Point-in-Time-Restore (PITR) \& Marked Transactions](#42--point-in-time-restore-pitr--marked-transactions)
+    - [4.3 | Tail-Log-Restore (Notfallwiederherstellung)](#43--tail-log-restore-notfallwiederherstellung)
+    - [4.4 | Piecemeal Restore (File-/Filegroup-Restore)](#44--piecemeal-restore-file-filegroup-restore)
+    - [4.5 | Page Restore (gezielte Seitenwiederherstellung)](#45--page-restore-gezielte-seitenwiederherstellung)
+    - [4.6 | VM-/Disk-Level-Restore (Wiederherstellung ohne SQL-natives Backup)](#46--vm-disk-level-restore-wiederherstellung-ohne-sql-natives-backup)
+    - [4.7 | Reparatur ohne Backup (`DBCC CHECKDB ... REPAIR_ALLOW_DATA_LOSS`)](#47--reparatur-ohne-backup-dbcc-checkdb--repair_allow_data_loss)
+    - [4.8 | Übersichtstabelle: Restore-Arten im Vergleich](#48--übersichtstabelle-restore-arten-im-vergleich)
+  - [5 | Weiterführende Informationen](#5--weiterführende-informationen)
 
 ---
 
@@ -122,6 +136,8 @@ Die folgende Tabelle fasst zusammen, welche Backup-Typen unter welchem Recovery 
 - Wird **kein** Point-in-Time-Restore benötigt und ist ein Datenverlust bis zum letzten Full-/Differential-Backup akzeptabel (z. B. bei reinen Reporting-/Staging-Datenbanken, die aus einer Quelle neu befüllbar sind), ist **SIMPLE** die einfachste, wartungsärmste Wahl — kein Log-Backup-Management nötig.
 - Wird **minimaler Datenverlust und PITR** benötigt (der Regelfall für produktive Datenbanken), ist **FULL** die richtige Wahl — vorausgesetzt, Log-Backups laufen tatsächlich regelmäßig (siehe Anti-Pattern in [2.11](#211--anti-patterns--checkliste)).
 - **BULK_LOGGED** ist kein dauerhafter Ersatz für FULL, sondern ein **temporäres Fenster**: vor einem großen Bulk-Load aktivieren, danach zurück zu FULL wechseln, um die volle PITR-Fähigkeit wiederherzustellen.
+
+> 🧩 **Diese Entscheidungslogik gibt es auch als fertiges, ausführbares Skript:** [SQLScripts/SmartDatabaseBackup.sql](SQLScripts/SmartDatabaseBackup.sql) ([Dokumentation](SQLScripts/SmartDatabaseBackup.md)) ermittelt für eine angegebene Datenbank automatisch anhand des Recovery Models, der Backup-Historie und des tatsächlichen Änderungsvolumens, ob gerade ein Full-, Differential- oder Log-Backup fällig ist, führt es an einem frei konfigurierbaren Zielpfad (z. B. Netzlaufwerk) aus, verifiziert das Ergebnis, schützt sich gegen parallele Läufe und protokolliert jeden Schritt mit Zeitstempel. Die `.md`-Doku enthält zusätzlich einen Vergleich mit Ola Hallengren's Maintenance Solution und weiteren vergleichbaren Lösungen.
 
 ```mermaid
 flowchart TD
@@ -357,7 +373,7 @@ Für alle, die zusätzlich die Original-Quellen nachvollziehen wollen, wie ein B
 - 📝 [MS SQL Backup with Python and pyodbc](https://mindless.gr/2012/09/ms-sql-backup-with-python-and-pyodbc/) — kompaktes Codebeispiel für `BACKUP DATABASE` via `pyodbc`.
 
 - 📓 **Notebook:**  
-  [`08_14_automation_msdb_retention.ipynb`](08_14_automation_msdb_retention.ipynb)
+  - [`08_14_automation_msdb_retention.ipynb`](08_14_automation_msdb_retention.ipynb)
 - 🎥 **YouTube:**  
   - [Automate SQL Backups](https://www.youtube.com/results?search_query=sql+server+automate+backups+ola+hallengren)
 - 📘 **Docs:**  
@@ -368,7 +384,8 @@ Für alle, die zusätzlich die Original-Quellen nachvollziehen wollen, wie ein B
   - [Backup-DbaDatabase (dbatools)](https://dbatools.io/Backup-DbaDatabase/)
   - [Ola Hallengren's SQL Server Maintenance Solution](https://ola.hallengren.com/)
 - 🧩 **Scripts:**  
-  - [SQLScripts/LastBackupOverview.sql](SQLScripts/LastBackupOverview.sql) (Doku: [SQLScripts/LastBackupOverview.md](SQLScripts/LastBackupOverview.md)) — zeigt je Datenbank Recovery Model, letztes Full-Backup und letztes Backup jeglichen Typs aus `msdb.dbo.backupset`, mit Klartext-Einordnung von Backup-Lücken.
+  - [SQLScripts/SmartDatabaseBackup.sql](SQLScripts/SmartDatabaseBackup.sql) ([Dokumentation](SQLScripts/SmartDatabaseBackup.md)) — führt für eine Datenbank automatisch das je nach Recovery Model und Backup-Historie passende Backup (Full/Differential/Log) aus, mit konfigurierbarem Zielpfad und Zeitstempel-Protokollierung.
+  - [LastBackupOverview.sql](SQLScripts/LastBackupOverview.sql) ([Dokumentation](SQLScripts/LastBackupOverview.md)) — zeigt je Datenbank Recovery Model, letztes Full-Backup und letztes Backup jeglichen Typs aus `msdb.dbo.backupset`, mit Klartext-Einordnung von Backup-Lücken.
 
 ---
 
@@ -420,7 +437,7 @@ Der Status `ONLINE` allein sagt nichts darüber aus, ob eine Datenbank tatsächl
 
 #### 3.0.2 | Das Skript in diesem Kapitel
 
-[SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) (Doku: [SQLScripts/CheckDbAllDatabases.md](SQLScripts/CheckDbAllDatabases.md)) führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, zeigt vor jeder Prüfung eine Fortschrittsmeldung mit Zähler, misst die Dauer millisekundengenau und protokolliert am Ende jede Datenbank mit Status (`OK`/`FAILED`/`SKIPPED`) in einer zusammenfassenden Tabelle. Es ist rein diagnostisch — für eine anschließende Reparatur siehe [SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) bzw. [RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql).
+[SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) ([Dokumentation](SQLScripts/CheckDbAllDatabases.md)) führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, zeigt vor jeder Prüfung eine Fortschrittsmeldung mit Zähler, misst die Dauer millisekundengenau und protokolliert am Ende jede Datenbank mit Status (`OK`/`FAILED`/`SKIPPED`) in einer zusammenfassenden Tabelle. Es ist rein diagnostisch — für eine anschließende Reparatur siehe [SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) bzw. [RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql).
 
 #### 3.0.3 | Ein Beispiel aus der Praxis, Zeile für Zeile erklärt
 
@@ -475,7 +492,7 @@ Das ist der Punkt, der am häufigsten zu Verwirrung führt: Eine Datenbank mit 3
 - 📝 Brent Ozar: [3 Ways to Run DBCC CHECKDB Faster](https://www.brentozar.com/archive/2020/08/3-ways-to-run-dbcc-checkdb-faster/) — praxisnahe Performance-Tipps (`PHYSICAL_ONLY`, `MAXDOP`, Backup-Restore-Strategie).
 
 **🧩 Scripts:**  
-- [SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) (Doku: [SQLScripts/CheckDbAllDatabases.md](SQLScripts/CheckDbAllDatabases.md)) — führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, mit Fortschrittsanzeige und zusammenfassendem Laufprotokoll.
+- [SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) ([Dokumentation](SQLScripts/CheckDbAllDatabases.md)) — führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, mit Fortschrittsanzeige und zusammenfassendem Laufprotokoll.
 
 ---
 
@@ -486,11 +503,11 @@ SELECT name, state_desc, recovery_model_desc, user_access_desc
 FROM sys.databases;
 ```
 
-Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und Kritikalitäts-Sortierung siehe [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) (Doku: [SQLScripts/DatabaseStatusOverview.md](SQLScripts/DatabaseStatusOverview.md)) — das Skript ordnet jeden Status direkt in Klartext ein und sortiert kritische Zustände (`SUSPECT`, `RECOVERY_PENDING`, `EMERGENCY`) an den Anfang der Ausgabe. Zeigt es eine betroffene Datenbank an, hilft als nächster Schritt [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)), die konkrete Ursache automatisiert einzugrenzen (Dateizugriff, Speicherplatz, Seitenkorruption, Errorlog).
+Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und Kritikalitäts-Sortierung siehe [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) ([Dokumentation](SQLScripts/DatabaseStatusOverview.md)) — das Skript ordnet jeden Status direkt in Klartext ein und sortiert kritische Zustände (`SUSPECT`, `RECOVERY_PENDING`, `EMERGENCY`) an den Anfang der Ausgabe. Zeigt es eine betroffene Datenbank an, hilft als nächster Schritt [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)), die konkrete Ursache automatisiert einzugrenzen (Dateizugriff, Speicherplatz, Seitenkorruption, Errorlog).
 
 **🧩 Scripts:**  
-- [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) (Doku: [SQLScripts/DatabaseStatusOverview.md](SQLScripts/DatabaseStatusOverview.md)) — Status, Recovery Model und Zugriffsmodus aller Datenbanken mit Klartext-Einordnung.
-- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse für betroffene Datenbanken.
+- [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) ([Dokumentation](SQLScripts/DatabaseStatusOverview.md)) — Status, Recovery Model und Zugriffsmodus aller Datenbanken mit Klartext-Einordnung.
+- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse für betroffene Datenbanken.
 
 ### 3.2 | Die Zustände im Detail: Wie sie entstehen und was sie bedeuten
 
@@ -499,16 +516,16 @@ Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und 
 | **ONLINE** | Normalzustand — die Datenbank ist vollständig hochgefahren und für Lese-/Schreibzugriffe verfügbar. | Alles in Ordnung. | Keins. |
 | **RESTORING** | Ein `RESTORE DATABASE`/`RESTORE LOG` läuft gerade, oder eine vorherige Restore-Kette wurde mit `WITH NORECOVERY` abgebrochen und wartet auf den nächsten Schritt (weiteres Backup oder `WITH RECOVERY`). | Die Datenbank befindet sich mitten in einem manuell gesteuerten Wiederherstellungsvorgang. | Restore-Kette fortsetzen (nächstes Backup einspielen) oder mit `WITH RECOVERY` abschließen. Läuft die Kette unerwartet lange oder hängt fest (z. B. wegen Speicherplatzmangels), siehe Abschnitt 3.5. |
 | **RECOVERING** | SQL Server durchläuft nach einem Neustart, einem Failover oder direkt nach einem Restore automatisch die **Crash Recovery** (Analysis → Redo → Undo), um die Datenbank anhand des Transaktionslogs wieder in einen konsistenten Zustand zu bringen. | Übergangszustand, der bei sauberem Log i.d.R. **automatisch** und **temporär** durchlaufen wird. | I.d.R. keins — abwarten. Bei sehr großen Logs oder vielen offenen Transaktionen kann dies dauern; bleibt die Datenbank ungewöhnlich lange in `RECOVERING`, Errorlog auf Fortschritt prüfen. |
-| **RECOVERY_PENDING** | Die Crash Recovery (siehe `RECOVERING`) konnte **gar nicht erst starten** — typischerweise weil eine Datendatei fehlt, gesperrt oder nicht erreichbar ist, der Datenträger voll ist, oder SQL Server aus einem anderen Ressourcengrund nicht mit der Recovery beginnen kann. | SQL Server "weiß", dass etwas fehlt, hat aber noch nicht versucht, das Log tatsächlich anzuwenden — anders als bei `SUSPECT` ist meist noch kein Recovery-Versuch fehlgeschlagen, sondern er konnte nicht beginnen. Die Datenbank ist über `sys.databases`/`sys.master_files` i.d.R. noch lesbar (kein `Msg 926`). | Manueller Eingriff durch einen DBA: Ursache beheben (z. B. fehlende Datei bereitstellen, Speicherplatz freigeben, Berechtigung korrigieren) und die Datenbank danach neu starten lassen (`ALTER DATABASE ... SET ONLINE`) bzw. mit [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) prüfen/reparieren. |
-| **SUSPECT** | Die Crash Recovery **wurde versucht, ist aber fehlgeschlagen** — meist wegen Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) oder eines beschädigten Transaktionslogs, das nicht angewendet werden konnte. | Die Datenbank gilt als potenziell inkonsistent und verweigert **jeden** Zugriff (auch rein lesende Abfragen) mit `Msg 926`, solange sie nicht per `ALTER DATABASE ... SET EMERGENCY` zugänglich gemacht wurde. | Manueller Eingriff zwingend erforderlich: siehe Kapitel 4 (Restores) — je nach Backup-Lage vollständiger Restore, Page Restore, VM-/Disk-Level-Restore oder als letztes Mittel [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)). |
+| **RECOVERY_PENDING** | Die Crash Recovery (siehe `RECOVERING`) konnte **gar nicht erst starten** — typischerweise weil eine Datendatei fehlt, gesperrt oder nicht erreichbar ist, der Datenträger voll ist, oder SQL Server aus einem anderen Ressourcengrund nicht mit der Recovery beginnen kann. | SQL Server "weiß", dass etwas fehlt, hat aber noch nicht versucht, das Log tatsächlich anzuwenden — anders als bei `SUSPECT` ist meist noch kein Recovery-Versuch fehlgeschlagen, sondern er konnte nicht beginnen. Die Datenbank ist über `sys.databases`/`sys.master_files` i.d.R. noch lesbar (kein `Msg 926`). | Manueller Eingriff durch einen DBA: Ursache beheben (z. B. fehlende Datei bereitstellen, Speicherplatz freigeben, Berechtigung korrigieren) und die Datenbank danach neu starten lassen (`ALTER DATABASE ... SET ONLINE`) bzw. mit [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) prüfen/reparieren. |
+| **SUSPECT** | Die Crash Recovery **wurde versucht, ist aber fehlgeschlagen** — meist wegen Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) oder eines beschädigten Transaktionslogs, das nicht angewendet werden konnte. | Die Datenbank gilt als potenziell inkonsistent und verweigert **jeden** Zugriff (auch rein lesende Abfragen) mit `Msg 926`, solange sie nicht per `ALTER DATABASE ... SET EMERGENCY` zugänglich gemacht wurde. | Manueller Eingriff zwingend erforderlich: siehe Kapitel 4 (Restores) — je nach Backup-Lage vollständiger Restore, Page Restore, VM-/Disk-Level-Restore oder als letztes Mittel [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)). |
 | **EMERGENCY** | Wird **nicht** von SQL Server automatisch gesetzt, sondern bewusst manuell per `ALTER DATABASE ... SET EMERGENCY` aktiviert — meist als Zwischenschritt, um eine `SUSPECT`-Datenbank überhaupt wieder lesbar zu machen. | Die Datenbank ist nur eingeschränkt (meist `READ_ONLY`, `SINGLE_USER`) zugänglich, i.d.R. zu reinen Diagnose- oder Reparaturzwecken. | Sollte nie ein Dauerzustand sein — nach Abschluss der Reparatur/Extraktion entweder `SET ONLINE`/`SET MULTI_USER` oder die Datenbank gezielt verwerfen (siehe [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql), Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)). |
 | **OFFLINE** | Eine Datenbank wurde bewusst per `ALTER DATABASE ... SET OFFLINE` deaktiviert, z. B. um Dateien zu verschieben, auszutauschen oder für einen VM-/Disk-Level-Restore freizugeben. | Kontrollierter, gewollter Zustand. | `ALTER DATABASE ... SET ONLINE`, sobald die zugrunde liegende Wartungsaktion abgeschlossen ist. |
 | **COPYING** | Nur bei Azure SQL Database: Die Datenbank wird gerade als Kopiervorgang (`CREATE DATABASE ... AS COPY OF`) angelegt. | Übergangszustand, temporär. | Abwarten, bis der Kopiervorgang abgeschlossen ist. |
 
 **🧩 Scripts:**  
-- [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Dateizugriffscheck und Reparaturpfad für `RECOVERY_PENDING`.
-- [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparaturpfad für `SUSPECT` ohne Backup.
-- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)) — Datenbank nach abgeschlossener Reparatur/Extraktion vollständig entfernen.
+- [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Dateizugriffscheck und Reparaturpfad für `RECOVERY_PENDING`.
+- [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparaturpfad für `SUSPECT` ohne Backup.
+- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) ([Dokumentation](SQLScripts/DropDatabaseCompletely.md)) — Datenbank nach abgeschlossener Reparatur/Extraktion vollständig entfernen.
 
 ### 3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY_PENDING? Die genaue Zustandskette
 
@@ -573,10 +590,10 @@ Die Tabelle in 3.2 beschreibt die **mechanische** Ursache auf SQL-Server-Ebene (
 | **Plötzlicher Stromausfall / harter Server-Reset** | `RECOVERY_PENDING`, `SUSPECT` | Wie beim erzwungenen Windows-Update: SQL Server wird ohne sauberen Shutdown beendet, während Daten- oder Logdateien offene, nicht committete Änderungen enthalten. |
 | **Speicherengpass / Ressourcenmangel beim Hochfahren** | `RECOVERY_PENDING` | Reicht der verfügbare Arbeitsspeicher oder tempdb-Speicherplatz beim Start nicht aus, um die Crash Recovery durchzuführen, bleibt die Datenbank ebenfalls in `RECOVERY_PENDING` hängen, bis die Ressource verfügbar ist. |
 
-**Praktischer Hinweis:** Für die Root-Cause-Analyse eines konkreten Falls automatisiert [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) genau diese Kategorien: Es prüft Dateizugriff, freien Speicherplatz, bekannte Suspect Pages und durchsucht das SQL-Server-Errorlog nach passenden Einträgen (z. B. Hinweisen auf einen unsauberen Shutdown oder I/O-Fehler kurz vor dem Auftreten des Status).
+**Praktischer Hinweis:** Für die Root-Cause-Analyse eines konkreten Falls automatisiert [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) genau diese Kategorien: Es prüft Dateizugriff, freien Speicherplatz, bekannte Suspect Pages und durchsucht das SQL-Server-Errorlog nach passenden Einträgen (z. B. Hinweisen auf einen unsauberen Shutdown oder I/O-Fehler kurz vor dem Auftreten des Status).
 
 **🧩 Scripts:**  
-- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Root-Cause-Analyse (Dateizugriff, Speicherplatz, Suspect Pages, Errorlog).
+- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Root-Cause-Analyse (Dateizugriff, Speicherplatz, Suspect Pages, Errorlog).
 
 ### 3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab
 
@@ -610,12 +627,12 @@ Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand:
    DROP DATABASE [DeineDatenbank];
    ```
 
-   Für ein robusteres, automatisiertes Vorgehen (killt aktive Verbindungen, entfernt auch am Dateisystem verbliebene Dateien via `xp_cmdshell`-Fallback) siehe [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)).
+   Für ein robusteres, automatisiertes Vorgehen (killt aktive Verbindungen, entfernt auch am Dateisystem verbliebene Dateien via `xp_cmdshell`-Fallback) siehe [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) ([Dokumentation](SQLScripts/DropDatabaseCompletely.md)).
 
 4. **Vor dem erneuten Restore-Versuch**: Speicherplatz auf dem Zieldatenträger sicherstellen (freien Platz prüfen, ggf. alte Backups/Logs verschieben oder ein Laufwerk mit mehr Kapazität wählen) — sonst wiederholt sich derselbe Abbruch.
 
 **🧩 Scripts:**  
-- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)) — killt aktive Verbindungen, führt `DROP DATABASE` aus und entfernt auch am Dateisystem verbliebene Dateien.
+- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) ([Dokumentation](SQLScripts/DropDatabaseCompletely.md)) — killt aktive Verbindungen, führt `DROP DATABASE` aus und entfernt auch am Dateisystem verbliebene Dateien.
 
 ---
 
@@ -763,11 +780,11 @@ flowchart TD
 > **Bedeutung:** **Kein echter Restore**, sondern die letzte Notlösung, wenn weder ein vollständiger Restore noch ein Page Restore noch ein VM-/Disk-Level-Restore möglich ist: `DBCC CHECKDB` entfernt beschädigte Seiten/Zeilen/Strukturen dauerhaft, um die Datenbank wieder konsistent (aber unvollständig) zu machen. Wird hier dennoch mitgeführt, da sie in der Praxis regelmäßig als letzte Eskalationsstufe neben den echten Restore-Arten steht.
 
 - 📄 **Praxis-Anleitung (SUSPECT-/RECOVERY_PENDING-Datenbank reparieren):**  
-  [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich aller Restore-Arten bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) und der `REPAIR_ALLOW_DATA_LOSS`-Notlösung, mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) zur automatisierten Ursachenanalyse.
+  [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich aller Restore-Arten bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) und der `REPAIR_ALLOW_DATA_LOSS`-Notlösung, mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) zur automatisierten Ursachenanalyse.
 - 🧩 **Scripts:**  
-  - [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse vor der Entscheidung für diesen Reparaturweg.
-  - [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparatur für `SUSPECT`.
-  - [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Reparatur für `RECOVERY_PENDING`.
+  - [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) ([Dokumentation](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse vor der Entscheidung für diesen Reparaturweg.
+  - [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparatur für `SUSPECT`.
+  - [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) ([Dokumentation](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Reparatur für `RECOVERY_PENDING`.
 
 ---
 
