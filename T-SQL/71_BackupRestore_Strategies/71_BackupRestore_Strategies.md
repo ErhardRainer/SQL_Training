@@ -5,9 +5,9 @@
 
 - [1 | Begriffsdefinition](#1--begriffsdefinition)
 - [2 | Struktur (Backup-Themen)](#2--struktur-backup-themen)
-  - [2.1 | Planung: RPO/RTO, Topologien & Grundmuster](#21--planung-rporto-topologien--grundmuster)
-  - [2.2 | Recovery-Modelle: FULL, SIMPLE, BULK_LOGGED](#22--recovery-modelle-full-simple-bulk_logged)
-  - [2.3 | Backup-Typen: Full, Differential, Log, Copy-Only](#23--backup-typen-full-differential-log-copy-only)
+  - [2.1 | Grundlagen: Recovery Models, Planung & RPO/RTO](#21--grundlagen-recovery-models-planung--rporto)
+  - [2.2 | Backup-Konzepte im Detail: Full, Differential, Log, Copy-Only](#22--backup-konzepte-im-detail-full-differential-log-copy-only)
+  - [2.3 | Entscheidungshilfe: Welches Backup-Konzept für welches Recovery Model?](#23--entscheidungshilfe-welches-backup-konzept-für-welches-recovery-model)
   - [2.4 | BACKUP DATABASE/LOG – Syntax & Optionen](#24--backup-databaselog--syntax--optionen)
   - [2.5 | Performance: Striping, Compression, BUFFERCOUNT](#25--performance-striping-compression-buffercount)
   - [2.6 | Sicherheit: Verschlüsselung, TDE & Schutz der Dateien](#26--sicherheit-verschlüsselung-tde--schutz-der-dateien)
@@ -65,32 +65,37 @@
 
 ## 2 | Struktur (Backup-Themen)
 
-### 2.1 | Planung: RPO/RTO, Topologien & Grundmuster
-> **Kurzbeschreibung:** Ziele definieren, passende Recovery-Modelle & Backup-Kombinationen auswählen.
+### 2.1 | Grundlagen: Recovery Models, Planung & RPO/RTO
+> **Kurzbeschreibung:** Log-Verhalten der drei Recovery Models (FULL/SIMPLE/BULK_LOGGED), Bulk-Operationen, Ziele definieren und passende Backup-Kombinationen auswählen.
+
+Das **Recovery Model** ist die grundlegendste Entscheidung jeder Backup-Strategie — es legt fest, wie SQL Server das Transaktionslog behandelt, und bestimmt damit direkt, welche Backup-Typen überhaupt sinnvoll sind (siehe [Abschnitt 2.3](#23--entscheidungshilfe-welches-backup-konzept-für-welches-recovery-model)):
+
+- **SIMPLE:** Das Log wird nach jedem Checkpoint automatisch abgeschnitten (truncated) — es gibt keine fortlaufende Log-Kette, daher sind **keine** Log-Backups möglich.
+- **FULL:** Das Log wächst so lange, bis ein Log-Backup durchgeführt wird — das ermöglicht eine lückenlose Log-Kette und damit Point-in-Time-Restores, verlangt aber regelmäßige Log-Backups (siehe [Anti-Pattern in 2.11](#211--anti-patterns--checkliste)).
+- **BULK_LOGGED:** Eine Variante von FULL, die bestimmte Massenoperationen (`BULK INSERT`, `SELECT INTO`, Index-Neuaufbau) minimal loggt statt vollständig — reduziert die Logdatei-Last bei großen Bulk-Loads, schränkt aber Point-in-Time-Restore für Log-Backups ein, die eine solche Operation enthalten.
+
+Aus dem Recovery Model ergibt sich unmittelbar das erreichbare **RPO** (Recovery Point Objective — wie viel Datenverlust im Ernstfall akzeptiert wird) und **RTO** (Recovery Time Objective — wie schnell wiederhergestellt werden muss). Beide Ziele sollten **vor** der technischen Umsetzung festgelegt werden, da sie die Wahl von Recovery Model und Backup-Kombination bestimmen, nicht umgekehrt.
 
 - 📓 **Notebook:**  
-  [`08_01_backup_planning_rpo_rto.ipynb`](08_01_backup_planning_rpo_rto.ipynb)
+  [`08_01_backup_planning_rpo_rto.ipynb`](08_01_backup_planning_rpo_rto.ipynb) · [`08_02_recovery_models_basics.ipynb`](08_02_recovery_models_basics.ipynb)
 - 🎥 **YouTube:**  
   - [SQL Server Backup Strategy Overview](https://www.youtube.com/results?search_query=sql+server+backup+strategy+overview)
-- 📘 **Docs:**  
-  - [Backup Overview (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/back-up-and-restore-of-sql-server-databases)
-
----
-
-### 2.2 | Recovery-Modelle: FULL, SIMPLE, BULK_LOGGED
-> **Kurzbeschreibung:** Log-Verhalten, Bulk-Operationen, Wechselwirkungen mit Log-Backups.
-
-- 📓 **Notebook:**  
-  [`08_02_recovery_models_basics.ipynb`](08_02_recovery_models_basics.ipynb)
-- 🎥 **YouTube:**  
   - [Recovery Models Explained](https://www.youtube.com/results?search_query=sql+server+recovery+models)
 - 📘 **Docs:**  
+  - [Backup Overview (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/back-up-and-restore-of-sql-server-databases)
   - [Recovery Models](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/recovery-models-sql-server)
 
 ---
 
-### 2.3 | Backup-Typen: Full, Differential, Log, Copy-Only
+### 2.2 | Backup-Konzepte im Detail: Full, Differential, Log, Copy-Only
 > **Kurzbeschreibung:** Differential-Base, Log-Kette, Einsatz von Copy-Only ohne Basis zu stören.
+
+Jedes Backup-Konzept hat eine klare Beziehung zum Recovery Model, unter dem es sinnvoll ist:
+
+- **Full Backup:** Vollständige Kopie der Datenbank inklusive der zur Konsistenz nötigen Log-Teile. Funktioniert unter **allen drei** Recovery Models und ist immer die Basis, auf der Differential- und Log-Backups aufbauen.
+- **Differential Backup:** Sichert nur die Änderungen seit dem letzten Full-Backup (der "Differential Base"). Ebenfalls unter **allen drei** Recovery Models nutzbar — reduziert Backup-Größe/-Dauer gegenüber wiederholten Full-Backups, ersetzt aber kein Log-Backup und ermöglicht selbst kein PITR.
+- **Transaction Log Backup:** Sichert die fortlaufende Log-Sequenz (LSN-Kette). Nur unter **FULL** und **BULK_LOGGED** möglich — unter SIMPLE gibt es keine fortlaufende Kette, die gesichert werden könnte. Ist die Voraussetzung für Point-in-Time-Restore und für die Begrenzung des Log-Wachstums.
+- **Copy-Only Backup:** Ein Full- oder Log-Backup, das bewusst **nicht** in die reguläre Backup-Kette eingreift — die Differential-Base bleibt unverändert (bei Full) bzw. die Log-Kette wird nicht beeinflusst (bei Log). Sinnvoll für Ad-hoc-Sicherungen (z. B. vor einem riskanten Deployment), ohne die produktive Backup-Strategie zu stören.
 
 - 📓 **Notebook:**  
   [`08_03_backup_types_and_copyonly.ipynb`](08_03_backup_types_and_copyonly.ipynb)
@@ -99,6 +104,46 @@
 - 📘 **Docs:**  
   - [Differential Backups](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/differential-backups-sql-server)  
   - [Copy-Only Backups](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/copy-only-backups-sql-server)
+
+---
+
+### 2.3 | Entscheidungshilfe: Welches Backup-Konzept für welches Recovery Model?
+
+Die folgende Tabelle fasst zusammen, welche Backup-Typen unter welchem Recovery Model überhaupt möglich sind, welchen Datenverlust (RPO) das jeweils bedeutet, und ob ein Point-in-Time-Restore erreichbar ist — belegt anhand der offiziellen Microsoft-Referenz zu [Recovery Models](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/recovery-models-sql-server) (Abschnitt "Recovery time and recovery point objectives"):
+
+| Recovery Model | Sinnvolle Backup-Typen | RPO (Datenverlust im Ernstfall) | Point-in-Time-Restore |
+|---|---|---|---|
+| **SIMPLE** | Full, Differential — **kein** Log-Backup möglich (keine fortlaufende Log-Kette) | Alle Änderungen seit dem letzten Full-/Differential-Backup gehen verloren | **Nicht möglich** — nur Wiederherstellung bis zum Ende eines Backups |
+| **FULL** | Full, Differential, Log — Log-Backup ist **zwingend** erforderlich, sonst wächst das Log unbegrenzt | Praktisch kein Datenverlust, sofern das Log intakt und die Log-Kette lückenlos ist | Bis zur exakten Sekunde/Transaktion möglich (`STOPAT`/`STOPATMARK`) |
+| **BULK_LOGGED** | Full, Differential, Log — meist **temporär** anstelle von FULL während großer Bulk-Loads eingesetzt | Kein Datenverlust, außer das Log ist beschädigt oder eine minimal geloggte Bulk-Operation liegt im betroffenen Zeitraum | Nur bis zum **Ende** des Log-Backups möglich, wenn dieses eine Bulk-Operation enthält — kein `STOPAT` innerhalb dieses Backups |
+
+**Praktische Konsequenz:**
+
+- Wird **kein** Point-in-Time-Restore benötigt und ist ein Datenverlust bis zum letzten Full-/Differential-Backup akzeptabel (z. B. bei reinen Reporting-/Staging-Datenbanken, die aus einer Quelle neu befüllbar sind), ist **SIMPLE** die einfachste, wartungsärmste Wahl — kein Log-Backup-Management nötig.
+- Wird **minimaler Datenverlust und PITR** benötigt (der Regelfall für produktive Datenbanken), ist **FULL** die richtige Wahl — vorausgesetzt, Log-Backups laufen tatsächlich regelmäßig (siehe Anti-Pattern in [2.11](#211--anti-patterns--checkliste)).
+- **BULK_LOGGED** ist kein dauerhafter Ersatz für FULL, sondern ein **temporäres Fenster**: vor einem großen Bulk-Load aktivieren, danach zurück zu FULL wechseln, um die volle PITR-Fähigkeit wiederherzustellen.
+
+```mermaid
+flowchart TD
+    Start(["Backup-Strategie planen"]) --> Q1{"Wird Point-in-Time-Restore\nbenoetigt (Wiederherstellung\nbis zur exakten Transaktion)?"}
+
+    Q1 -->|"Nein - Datenverlust bis zum\nletzten Full/Diff akzeptabel"| Simple["SIMPLE Recovery Model\nFull + Differential Backups\nkein Log-Backup noetig/moeglich"]
+
+    Q1 -->|"Ja"| Q2{"Laufen regelmaessig\ngrosse Bulk-Operationen\n(BULK INSERT, SELECT INTO,\nIndex-Neuaufbau)?"}
+
+    Q2 -->|"Nein"| Full["FULL Recovery Model\nFull + Differential + Log Backups\nLog-Backup ist PFLICHT"]
+    Q2 -->|"Ja, zeitlich begrenztes Fenster"| Bulk["Temporaer zu BULK_LOGGED wechseln\nnur waehrend des Bulk-Load-Fensters,\nLog-Backup danach faellt groesser aus"]
+
+    Bulk -->|"Bulk-Load abgeschlossen"| Full
+
+    style Full fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style Simple fill:#2f6f4f,stroke:#2f6f4f,color:#fff
+    style Bulk fill:#8a6d1f,stroke:#8a6d1f,color:#fff
+```
+
+- 📘 Microsoft Learn: [Recovery Models – Abschnitt "Recovery time and recovery point objectives"](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/recovery-models-sql-server) — offizielle RPO/RTO-Vergleichstabelle je Recovery Model.
+- 📘 Microsoft Learn: [Restore to a Point in Time (Full Recovery Model)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/restore-a-sql-server-database-to-a-point-in-time-full-recovery-model) — Details zur PITR-Einschränkung bei BULK_LOGGED.
+- 📘 Microsoft Learn: [Backup Overview (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/backup-overview-sql-server) — "The recovery model of database determines its backup and restore requirements."
 
 ---
 
@@ -167,12 +212,63 @@
 ### 2.9 | Automatisierung & Aufräumen: Wartung, msdb, Retention
 > **Kurzbeschreibung:** Jobs/Plans/Skripte, `msdb`-Historie, Lösch-/Kopier-Policies, Reporting.
 
+**Welche Wege gibt es überhaupt, ein Backup einzurichten?** Alle folgenden Ansätze laufen letztlich über denselben Container — den **SQL Server Agent Job** — der aus einem oder mehreren Job Steps mit definiertem Erfolgs-/Fehlerpfad besteht und über Schedules zeit- oder ereignisgesteuert (oder manuell) gestartet wird; zulässige Step-Typen umfassen u. a. T-SQL-Skripte, Betriebssystemkommandos (`CmdExec`), PowerShell-Skripte und SSIS-Pakete ([SQL Server Agent](https://learn.microsoft.com/en-us/ssms/agent/sql-server-agent), [Manage Job Steps](https://learn.microsoft.com/en-us/ssms/agent/manage-job-steps)). Die konkreten Wege, ein Backup darin einzubetten:
+
+- **Maintenance Plans (SSMS-Wizard):** Erzeugt im Hintergrund ein Integration-Services-(SSIS-)Paket, das von einem Agent Job ausgeführt wird. Vorteil: schnell per GUI eingerichtet, inklusive Backup, `DBCC CHECKDB`, Index-/Statistik-Wartung und Cleanup in gruppierbaren Subplänen. Nachteil: erzeugt oft wenig granulares T-SQL (z. B. Index-Rebuild für alle statt selektiv betroffene Tabellen), ist schlecht skript-/versionierbar und wird in unternehmenskritischen Umgebungen häufig nicht empfohlen ([Maintenance Plans](https://learn.microsoft.com/en-us/sql/relational-databases/maintenance-plans/maintenance-plans)).
+- **T-SQL direkt in einem Agent Job:** Der klassische, seit Jahren bewährte Standardweg — ein Job Step vom Typ "Transact-SQL Script (T-SQL)" enthält `BACKUP DATABASE`/`BACKUP LOG`-Statements und läuft nach einem definierten Zeitplan. Voll transparent, versionierbar und ohne Zusatzsoftware nutzbar ([Schedule a Backup](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/schedule-database-backup-operation-ssms)).
+- **Ola Hallengren's SQL Server Maintenance Solution:** Eine kostenlose, äußerst weit verbreitete Sammlung von Stored Procedures (`DatabaseBackup`, `DatabaseIntegrityCheck`, `IndexOptimize`), die über ein einziges Installationsskript eingerichtet wird — dieses legt die Prozeduren und passende Agent Jobs samt Zeitplänen automatisch an. Gilt in der Praxis als De-facto-Standardalternative zu Maintenance Plans, da es deutlich mehr Flexibilität, Logging, Fehlerbehandlung und Best-Practice-Konfiguration (intelligentes Backup-Scheduling, Verify, Komprimierung) mitbringt und breit community-erprobt ist ([ola.hallengren.com](https://ola.hallengren.com/)).
+- **PowerShell:** Microsofts offizielles `SqlServer`-Modul stellt das Cmdlet `Backup-SqlDatabase` bereit — funktional nahe an einem einfachen `BACKUP`-Statement. Das Community-Modul **dbatools** (Open Source) bietet mit `Backup-DbaDatabase` deutlich mehr Automatisierungslogik: Pfadvalidierung, automatische Ausschlüsse (z. B. `tempdb`), Dateiname-Platzhalter, strukturierte Rückgabewerte und Massenoperationen über viele Instanzen/Datenbanken hinweg — dbatools gilt als das mächtigere, DBA-fokussierte Pendant zum schlankeren offiziellen Cmdlet ([Backup-SqlDatabase](https://learn.microsoft.com/en-us/powershell/module/sqlserver/backup-sqldatabase), [Backup-DbaDatabase](https://dbatools.io/Backup-DbaDatabase/)). Ein PowerShell-Skript läuft dabei selbst wieder typischerweise als eigener Agent-Job-Step-Typ ([PowerShell Script Job Step](https://learn.microsoft.com/en-us/ssms/agent/create-a-powershell-script-job-step)).
+- **Python:** Kein offizielles Microsoft-Pattern, sondern ein Community-Ansatz — meist über `pyodbc`/`pymssql`, um `BACKUP DATABASE`-Statements per Cursor abzusetzen (dabei laufen Backup/Restore über ODBC asynchron mit mehreren Result Sets, weshalb ohne eine `cursor.nextset()`-Schleife der tatsächliche Erfolg nicht zuverlässig erkannt wird), oder per `subprocess`-Aufruf von `sqlcmd`/PowerShell. Im Vergleich zu Agent Jobs, Ola Hallengren oder PowerShell deutlich unüblicher und meist nur sinnvoll, wenn das Backup ohnehin Teil einer größeren Python-Orchestrierung (z. B. einer Datenpipeline) ist.
+- **Weitere Wege:** Für **Azure SQL Database** gibt es keinen klassischen SQL Server Agent — dort übernehmen **Elastic Jobs** (T-SQL über viele Datenbanken hinweg geplant ausführen) oder Azure Automation/Runbooks diese Rolle, während **Azure SQL Managed Instance** SQL Server Agent nativ weiter unterstützt ([Elastic Jobs](https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-jobs-overview)). `dbatools` bietet zudem mit `Install-DbaMaintenanceSolution` einen PowerShell-Wrapper, der Ola Hallengrens Lösung automatisiert installiert und pflegt. Daneben existieren kommerzielle Drittanbieter-Tools (z. B. Redgate SQL Backup, Veeam, SqlBak) mit eigener Scheduling-, Kompressions- und Cloud-Offsite-Funktionalität oberhalb der nativen `BACKUP`-Engine.
+
+**Praktische Einordnung:** Für die meisten Umgebungen ist entweder ein einfacher T-SQL-Agent-Job (kleine, wenige Datenbanken) oder Ola Hallengrens Lösung (mehrere Datenbanken, produktive Umgebungen) die richtige Wahl. Maintenance Plans eignen sich für sehr einfache Szenarien ohne hohe Ansprüche an Granularität; PowerShell/dbatools lohnt sich, sobald Backups über mehrere Instanzen hinweg orchestriert werden müssen; Python bleibt die Ausnahme für Fälle, in denen das Backup ohnehin in eine bestehende Nicht-SQL-Automatisierung eingebettet wird.
+
+**Weiterführende Artikel zu den einzelnen Automatisierungswegen:**
+
+*Microsoft Learn:*
+- 📘 [SQL Server Agent](https://learn.microsoft.com/en-us/ssms/agent/sql-server-agent) — Überblick über den Agent-Dienst und seine Rolle bei geplanten administrativen Aufgaben.
+- 📘 [Create SQL Server Agent Jobs](https://learn.microsoft.com/en-us/ssms/agent/create-jobs) — Jobs erstellen über SSMS, T-SQL oder SMO.
+- 📘 [Configure a User to Create and Manage SQL Server Agent Jobs](https://learn.microsoft.com/en-us/ssms/agent/configure-a-user-to-create-and-manage-sql-server-agent-jobs) — Berechtigungskonzept (Agent-Rollen, `sysadmin`) für die Job-Verwaltung.
+- 📘 [Use the Maintenance Plan Wizard](https://learn.microsoft.com/en-us/sql/relational-databases/maintenance-plans/use-the-maintenance-plan-wizard) — Schritt-für-Schritt-Anleitung zum SSMS-Wizard.
+- 📘 [Create a Full Database Backup – SQL Server](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/create-a-full-database-backup-sql-server) — T-SQL-Grundlagen für vollständige Backups.
+- 📘 [Restore-SqlDatabase (SqlServer-Modul)](https://learn.microsoft.com/en-us/powershell/module/sqlserver/restore-sqldatabase) — Gegenstück zu `Backup-SqlDatabase`.
+- 📘 [Create and manage elastic jobs by using PowerShell](https://learn.microsoft.com/en-us/azure/azure-sql/database/elastic-jobs-powershell-create) — praktische Anleitung zu Azure Elastic Jobs.
+- 📘 [Automation in Azure SQL overview](https://learn.microsoft.com/en-us/azure/azure-sql/database/job-automation-overview) — Übersicht der Automatisierungsoptionen (Elastic Jobs, Agent, Automation) in Azure SQL.
+
+*Ola Hallengren – Maintenance Solution:*
+- 📝 [SQL Server Backup – Ola Hallengren](https://ola.hallengren.com/sql-server-backup.html) — detaillierte Parameterdokumentation der `DatabaseBackup`-Prozedur.
+- 📝 [SQL Server Integrity Check – Ola Hallengren](https://ola.hallengren.com/sql-server-integrity-check.html) — Parameter/Optionen der `DBCC CHECKDB`-Integration.
+- 📝 [SQL Server Maintenance Solution Downloads](https://ola.hallengren.com/downloads.html) — Download-Seite mit dem Installationsskript `MaintenanceSolution.sql`.
+- 📝 Brent Ozar: [How to Configure Ola Hallengren's IndexOptimize Maintenance Script](https://www.brentozar.com/archive/2014/12/tweaking-defaults-ola-hallengrens-maintenance-scripts/) — typische Parameteranpassungen aus der Praxis.
+
+*dbatools-Dokumentation:*
+- 📝 [Backup-DbaDatabase](https://docs.dbatools.io/Backup-DbaDatabase.html) — vollständige Cmdlet-Referenz inkl. Kompression, Verschlüsselung, Striping, Azure-Blob-Ziel.
+- 📝 [Restore-DbaDatabase](https://docs.dbatools.io/Restore-DbaDatabase.html) — Gegenstück zum Wiederherstellen, relevant als Backup-Workflow-Ergänzung.
+
+*Experten-Blogs (Best Practices, Kritik, Vergleiche):*
+- 📝 Brent Ozar: [Backups 3: Setting Up Maintenance Plans](https://www.brentozar.com/training/fundamentals-database-administration/backups-3-setting-up-maintenance-plans/) — wann Maintenance Plans sinnvoll sind (und wann nicht).
+- 📝 Brent Ozar: [Backups 4: Setting Up Ola Hallengren's Maintenance Scripts](https://www.brentozar.com/training/fundamentals-database-administration/ola-setup-34m/) — direkter Vergleich Maintenance Plans vs. Ola-Skripte.
+- 📝 Paul Randal (SQLskills): [Planning a backup strategy – where to start?](https://www.sqlskills.com/blogs/paul/planning-a-backup-strategy-where-to-start/) — Backup-Strategie von der Restore-Anforderung her denken.
+- 📝 MSSQLTips: [SQL Server Agent Job Management](https://www.mssqltips.com/sqlservertip/2139/sql-server-agent-job-management/) — Best Practices zur Verwaltung/Überwachung von Agent-Jobs.
+- 📝 MSSQLTips: [Invoking SQL Server Database Backups with PowerShell](https://www.mssqltips.com/sqlservertip/4223/invoking-sql-server-database-backups-with-powershell/) — Praxisbeispiel für PowerShell-basierte Backup-Automatisierung.
+- 📝 MSSQLTips: [Automate SQL Server Backups using SQLCMD and Windows Task Scheduler](https://www.mssqltips.com/sqlservertip/7683/automate-sql-server-backups-sqlcmd-windows-task-scheduler/) — skriptbasierter Weg außerhalb des Agents.
+- 📝 SQL Nuggets: [Backing Up Databases With The dbatools PowerShell Module](https://sqlnuggets.com/backing-up-databases-with-the-dbatools-powershell-module/) — Praxisvergleich natives Cmdlet vs. dbatools.
+
+*Python-basierte Automatisierung:*
+- 📝 freeCodeCamp: [How to Automate SQL Database Backups Using Python](https://www.freecodecamp.org/news/automate-sql-database-backups-using-python/) — Tutorial mit `pyodbc`, inkl. Hinweis auf asynchrone `BACKUP`-Result-Sets.
+- 📝 [MS SQL Backup with Python and pyodbc](https://mindless.gr/2012/09/ms-sql-backup-with-python-and-pyodbc/) — kompaktes Codebeispiel für `BACKUP DATABASE` via `pyodbc`.
+
 - 📓 **Notebook:**  
   [`08_14_automation_msdb_retention.ipynb`](08_14_automation_msdb_retention.ipynb)
 - 🎥 **YouTube:**  
   - [Automate SQL Backups](https://www.youtube.com/results?search_query=sql+server+automate+backups+ola+hallengren)
 - 📘 **Docs:**  
   - [msdb Backup History Tables](https://learn.microsoft.com/en-us/sql/relational-databases/system-tables/backup-and-restore-tables-msdb-database)
+  - [SQL Server Agent](https://learn.microsoft.com/en-us/ssms/agent/sql-server-agent)
+  - [Maintenance Plans](https://learn.microsoft.com/en-us/sql/relational-databases/maintenance-plans/maintenance-plans)
+  - [Backup-SqlDatabase (SqlServer-Modul)](https://learn.microsoft.com/en-us/powershell/module/sqlserver/backup-sqldatabase)
+  - [Backup-DbaDatabase (dbatools)](https://dbatools.io/Backup-DbaDatabase/)
+  - [Ola Hallengren's SQL Server Maintenance Solution](https://ola.hallengren.com/)
 
 ---
 
@@ -192,12 +288,15 @@
 ### 2.11 | Anti-Patterns & Checkliste
 > **Kurzbeschreibung:** Nur Full-Backups im FULL-Model (ohne Log), keine Restore-Tests, Copy-Only falsch eingesetzt, Differential-Basen zerstört, LSN-Lücken, ungeprüfte Verschlüsselungs-Keys, fehlende Offsite/Immutability, `msdb`-Cleanup vergessen.
 
+**Der klassische Fall aus 2.3:** Eine Datenbank läuft im **FULL Recovery Model**, aber es werden nie Log-Backups durchgeführt (nur gelegentliche Full-Backups). Das führt zu einer doppelten Fehlfunktion, belegt in Microsofts Troubleshooting zu [Fehler 9002 (volles Transaktionslog)](https://learn.microsoft.com/en-us/sql/relational-databases/logs/troubleshoot-a-full-transaction-log-sql-server-error-9002): Das Log kann nur durch ein Log-Backup abgeschnitten (truncated) werden — ohne Log-Backup wächst es unbegrenzt, bis der Datenträger voll ist oder `MAXSIZE` erreicht wird. **Gleichzeitig** entfällt trotz FULL Model der eigentliche Vorteil (Point-in-Time-Restore), da keine Log-Backup-Kette existiert, die dafür nötig wäre. Diese Kombination ist damit weder in der Wiederherstellbarkeit noch im Ressourcenverbrauch besser als SIMPLE — nur mit dem zusätzlichen Risiko eines vollgelaufenen Logs. Richtig ist: entweder tatsächlich regelmäßige Log-Backups im FULL Model einplanen, oder bei fehlendem PITR-Bedarf konsequent auf SIMPLE wechseln.
+
 - 📓 **Notebook:**  
   [`08_16_backup_restore_antipatterns_checklist.ipynb`](08_16_backup_restore_antipatterns_checklist.ipynb)
 - 🎥 **YouTube:**  
   - [Common Backup/Restore Mistakes](https://www.youtube.com/results?search_query=sql+server+backup+restore+mistakes)
 - 📘 **Docs/Blog:**  
   - [Backup/Restore Best Practices](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/back-up-and-restore-of-sql-server-databases#best-practices)
+  - [Troubleshoot a Full Transaction Log (Error 9002)](https://learn.microsoft.com/en-us/sql/relational-databases/logs/troubleshoot-a-full-transaction-log-sql-server-error-9002)
 
 ---
 
