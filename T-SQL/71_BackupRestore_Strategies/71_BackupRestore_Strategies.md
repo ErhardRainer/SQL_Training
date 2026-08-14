@@ -150,17 +150,100 @@ flowchart TD
 ### 2.4 | BACKUP DATABASE/LOG – Syntax & Optionen
 > **Kurzbeschreibung:** `WITH COMPRESSION`, `CHECKSUM`, `STATS`, `INIT/FORMAT`, Striping (`TO DISK = ... , ...`).
 
+#### Grundsyntax
+
+```sql
+BACKUP DATABASE { db_name | @variable }
+TO <backup_device> [ ,...n ]
+[ WITH { DIFFERENTIAL | <allgemeine_WITH_optionen> [ ,...n ] } ]
+
+BACKUP LOG { db_name | @variable }
+TO <backup_device> [ ,...n ]
+[ WITH { <allgemeine_WITH_optionen> | <log_spezifische_optionen> } [ ,...n ] ]
+
+<backup_device> ::=
+    { logischer_geraetename | { DISK | URL | TAPE } = 'physischer_geraetename' }
+```
+
+Als Ziel (`<backup_device>`) sind `DISK` (lokal/UNC), `URL` (Azure Blob bzw. S3-kompatibler Objektspeicher, siehe [2.7](#27--backups-in-die-cloud-to-url-azure-blob)) und `TAPE` (als veraltet markiert) möglich; in einer einzigen `TO`-Klausel dürfen bis zu 64 Geräte angegeben werden — das ist zugleich die Grundlage für Striping (siehe [2.5](#25--performance-striping-compression-buffercount)). Quelle: [`BACKUP` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql).
+
+#### Die wichtigsten `WITH`-Optionen im Detail
+
+| Option | Bedeutung |
+|---|---|
+| `COMPRESSION` / `NO_COMPRESSION` | Komprimiert das Backup. Reduziert die Backup-Größe und damit das Device-I/O deutlich, erhöht aber die CPU-Last spürbar ("compression significantly increases CPU usage"). Der instanzweite Default wird über `sp_configure 'backup compression default', 1; RECONFIGURE;` gesteuert (Werkseinstellung: aus). Ab SQL Server 2025 zusätzlich der modernere `ZSTD`-Algorithmus wählbar (`WITH COMPRESSION (ALGORITHM = ZSTD)`), der bei gleicher oder besserer Kompressionsrate schneller ist als der bisherige `MS_XPRESS`-Standard. |
+| `CHECKSUM` / `NO_CHECKSUM` | `CHECKSUM` prüft während des Backups jede Seite auf ihre Seiten-Checksumme bzw. Torn-Page-Markierung (sofern auf der Datenbank aktiviert) und erzeugt zusätzlich eine Checksumme über das gesamte Backup-Set. `NO_CHECKSUM` ist der Default — außer bei komprimierten Backups, wo `CHECKSUM` automatisch greift. Standardverhalten bei einem Fehler ist `STOP_ON_ERROR` (Backup bricht ab); `CONTINUE_AFTER_ERROR` erlaubt das Fortsetzen trotz beschädigter Seiten — relevant z. B. für ein Tail-Log-Backup einer bereits angeschlagenen Datenbank (meist kombiniert mit `NO_TRUNCATE`, siehe [4.3](#43--tail-log-restore-notfallwiederherstellung)). |
+| `STATS = n` | Gibt den Fortschritt in Schritten von etwa `n` Prozent aus (Default 10, wenn nicht angegeben) — eine Annäherung an die nächste Schwelle, keine exakte Prozentanzeige. |
+| `INIT` / `NOINIT` | `NOINIT` (Default) hängt das neue Backup-Set an ein bestehendes Medium an. `INIT` überschreibt vorhandene Backup-Sets auf dem Medium (mit Prüfung auf Namen/Ablaufdatum, sofern nicht zusätzlich `SKIP` gesetzt ist) — der Medienheader selbst bleibt dabei erhalten. |
+| `FORMAT` / `NOFORMAT` | `NOFORMAT` (Default) lässt einen bestehenden Medienheader unangetastet. `FORMAT` schreibt einen komplett neuen Medienheader und macht damit **alle** bisherigen Backup-Sets auf diesem Medium unbrauchbar (impliziert `SKIP`) — bei einem gestripten Set genügt das Formatieren eines einzigen Volumes, um das gesamte Set ungültig zu machen. |
+| `COPY_ONLY` | Nimmt das Backup aus der regulären Backup-Sequenz heraus: Bei `BACKUP DATABASE` bleibt die Differential-Bitmap unverändert (nachfolgende Differential-Backups basieren weiter auf der letzten regulären Full-Sicherung); bei `BACKUP LOG` wird die Log-Kette nicht beeinflusst, das Log also nicht abgeschnitten. Die Kombination `DIFFERENTIAL` + `COPY_ONLY` ist unzulässig. |
+| `RETAINDAYS = n` / `EXPIREDATE = 'datum'` | Steuert, bis wann SQL Server dieses Backup-Set nicht automatisch überschreibt (bei Angabe beider Optionen hat `RETAINDAYS` Vorrang). Wirkt nur gegenüber SQL Server selbst — ein explizites `INIT`/`FORMAT` mit `SKIP` kann das Set trotzdem überschreiben. |
+| `NAME = '...'` / `DESCRIPTION = '...'` | Metadaten am Backup-Set (Name max. 128, Beschreibung max. 255 Zeichen), abrufbar über `RESTORE HEADERONLY`. Für das gesamte Medien-Set (v. a. bei Striping relevant) existieren analog `MEDIANAME`/`MEDIADESCRIPTION` — der Medienname muss beim Anhängen an ein bestehendes Set übereinstimmen, außer bei `SKIP`. |
+
+#### Beispiele
+
+```sql
+-- Komprimiertes Full-Backup mit Seitenprüfung und Fortschrittsanzeige
+BACKUP DATABASE [BI_DQ]
+TO DISK = N'D:\Backup\BI_DQ_Full.bak'
+WITH COMPRESSION, CHECKSUM, STATS = 10, INIT;
+
+-- Log-Backup, das die Log-Kette NICHT beeinflusst (Ad-hoc-Sicherung)
+BACKUP LOG [BI_DQ]
+TO DISK = N'D:\Backup\BI_DQ_AdHoc.trn'
+WITH COPY_ONLY, COMPRESSION;
+
+-- Full-Backup, gestriped auf drei Zieldateien (ein Backup-Set über drei physische Ziele)
+BACKUP DATABASE [BI_DQ]
+TO DISK = N'X:\Backup\BI_DQ_1.bak',
+   DISK = N'Y:\Backup\BI_DQ_2.bak',
+   DISK = N'Z:\Backup\BI_DQ_3.bak'
+WITH FORMAT, MEDIANAME = N'BI_DQ_StripedSet', COMPRESSION, STATS = 5;
+```
+
 - 📓 **Notebook:**  
   [`08_04_backup_syntax_options.ipynb`](08_04_backup_syntax_options.ipynb)
 - 🎥 **YouTube:**  
   - [BACKUP DATABASE Tutorial](https://www.youtube.com/results?search_query=sql+server+backup+database+tutorial)
 - 📘 **Docs:**  
-  - [`BACKUP DATABASE`](https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql)
+  - [`BACKUP` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql)
+  - [Backup Compression (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/backup-compression-sql-server)
+  - [View or Configure the backup compression default Option](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/view-or-configure-the-backup-compression-default-server-configuration-option)
+  - [Enable or Disable Backup Checksums](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/enable-or-disable-backup-checksums-during-backup-or-restore-sql-server)
 
 ---
 
 ### 2.5 | Performance: Striping, Compression, BUFFERCOUNT
 > **Kurzbeschreibung:** Mehrere Ziele (Striping), Transfergrößen, `MAXTRANSFERSIZE`, `BLOCKSIZE`, IO/CPU abwägen.
+
+Backup-Performance wird von vier Stellschrauben bestimmt, die zusammenspielen: der Anzahl paralleler I/O-Ziele (Striping), der Menge an I/O-Puffern (`BUFFERCOUNT`), der Größe jeder einzelnen I/O-Anfrage (`MAXTRANSFERSIZE`, `BLOCKSIZE`) und der Frage, ob Kompression CPU gegen I/O tauscht.
+
+#### Striping: parallele I/O über mehrere Ziele
+
+Werden in der `TO DISK =`-Klausel mehrere Dateien angegeben (siehe Beispiel in [2.4](#24--backup-databaselog--syntax--optionen)), bilden sie zusammen **ein** Backup-Set, das über die Geräte verteilt wird — bis zu 64 Ziele je Anweisung. Liegen diese Dateien auf **unterschiedlichen physischen Datenträgern/Controllern**, kann SQL Server parallel auf mehrere I/O-Pfade schreiben statt seriell auf einen einzigen, was den effektiven Durchsatz proportional zur Anzahl unabhängiger Kanäle erhöht. Liegen die Stripe-Dateien dagegen auf demselben physischen Datenträger, bringt Striping **keinen** Performance-Vorteil — es teilt dann nur dieselbe I/O-Bandbreite auf mehrere Dateien auf.
+
+#### BUFFERCOUNT: Anzahl der I/O-Puffer
+
+`WITH BUFFERCOUNT = n` legt die Gesamtzahl der Speicherpuffer fest, die für den Datentransfer reserviert werden. Wird der Wert nicht angegeben, ermittelt SQL Server selbst einen Vorschlag über die interne Logik `GetSuggestedIoDepth` (Default-Tiefe je Gerätetyp: Disk 3, Tape 1, VDI 1–4) und passt ihn an die Anzahl der beteiligten Backup-/Datenbankgeräte an. **Wichtig:** Ein zu hoch gewählter `BUFFERCOUNT`-Wert kann zu "Out of Memory"-Bedingungen führen — dokumentiert bis hin zu **Fehler 701** ("There is insufficient system memory to run this query"), besonders kritisch bei 32-Bit-Instanzen mit begrenztem virtuellem Adressraum außerhalb des Buffer Pools. `BUFFERCOUNT` sollte daher nie "auf Verdacht" hochgesetzt werden, ohne den resultierenden Speicherbedarf (siehe Formel unten) gegen den verfügbaren Server-Arbeitsspeicher zu prüfen.
+
+#### MAXTRANSFERSIZE und BLOCKSIZE: Größe der I/O-Anfragen
+
+- **`MAXTRANSFERSIZE`** bestimmt die Größe einer einzelnen I/O-Transfereinheit in Bytes, gültiger Bereich 65.536 (64 KB) bis 4.194.304 (4 MB) — bei `URL`-Zielen (Azure Blob/S3-kompatibel) sind größere Werte bis 10–20 MB möglich. Ohne explizite Angabe wählt SQL Server über `GetSuggestedIoSize` automatisch: beim **Schreiben auf Disk** (also beim Backup, auf Nicht-Desktop/Express-Editionen) typischerweise **1 MB** (größere Schreibblöcke reduzieren den Overhead durch Dateierweiterungen/NTFS-Metadaten), beim **Lesen von Disk** (Restore) sowie auf Desktop/Express-Editionen dagegen 64 KB. Bei TDE-verschlüsselten Datenbanken ist ab SQL Server 2016 ein `MAXTRANSFERSIZE > 65536` erforderlich, damit die Reihenfolge Entschlüsseln → Komprimieren → Verschlüsseln greifen kann; ab SQL Server 2019 CU5 hebt SQL Server den Wert bei aktiver Kompression automatisch auf mindestens 128 KB an (nie automatisch verkleinert).
+- **`BLOCKSIZE`** legt die physische Blockgröße des Mediums fest (512 bis 65.536 Bytes). Default: 65.536 für Tape, 512 für alle anderen Zieltypen (Disk/URL). Praktisch relevant vor allem bei Tape-Laufwerken oder Wechselmedien — bei Disk-Zielen trifft die automatische Wahl von SQL Server meist bereits das Optimum, sodass eine manuelle Anpassung selten nötig ist.
+
+**Faustformel für den Speicherbedarf** (aus der von Microsoft dokumentierten internen Berechnungslogik):
+
+```
+Speicherbedarf ≈ BUFFERCOUNT × MAXTRANSFERSIZE
+```
+
+Mit gerätezahlabhängigen Zuschlägen: bei `BACKUP DATABASE` erhöht sich `BUFFERCOUNT` intern um `backupDeviceCount + 2 × databaseDeviceCount`, bei `BACKUP LOG` um `2 × backupDeviceCount`. Übersteigt der berechnete Speicherbedarf **1/16 des gesamten physischen Arbeitsspeichers**, reduziert SQL Server `BUFFERCOUNT`/`MAXTRANSFERSIZE` automatisch — das ist zugleich die praktische Obergrenze für manuelle Anpassungen.
+
+#### Kompression: CPU-für-I/O-Tausch
+
+Kompression (siehe [2.4](#24--backup-databaselog--syntax--optionen)) reduziert die zu schreibende Datenmenge und damit das Device-I/O spürbar, erhöht aber gleichzeitig die CPU-Last signifikant. Auf **I/O-gebundenen** Systemen mit CPU-Reserven lohnt sich Kompression fast immer — kleinere Dateien bedeuten schnellere Backups trotz höherer CPU-Last. Auf bereits **CPU-gesättigten** Systemen (z. B. während intensiver OLTP-Lastfenster) kann die zusätzliche CPU-Last dagegen andere Workloads spürbar verlangsamen; hier empfiehlt Microsoft, komprimierte Backups über den **Resource Governor** mit reduzierter Priorität laufen zu lassen, oder ein zeitversetztes Backup-Fenster zu wählen. Ab SQL Server 2022 steht zusätzlich *Backup Compression Hardware Offload* ("Integrated Acceleration") zur Verfügung, um die Kompressionslast auf spezialisierte Hardware auszulagern und die CPU zu entlasten.
+
+**Praktische Reihenfolge beim Performance-Tuning:** zuerst prüfen, ob Striping über tatsächlich unabhängige Datenträger möglich ist (größter Hebel bei I/O-Engpässen), danach `MAXTRANSFERSIZE`/`BUFFERCOUNT` nur gezielt und mit Blick auf den verfügbaren Arbeitsspeicher anpassen, und erst zuletzt über Kompression CPU gegen I/O tauschen — abhängig davon, ob auf dem System eher CPU oder I/O der Engpass ist.
 
 - 📓 **Notebook:**  
   [`08_10_backup_performance_tuning.ipynb`](08_10_backup_performance_tuning.ipynb)
@@ -168,6 +251,10 @@ flowchart TD
   - [Speed Up Backups](https://www.youtube.com/results?search_query=sql+server+backup+performance+striped)
 - 📘 **Docs:**  
   - [Optimize Backup and Restore Performance](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/tune-performance-of-backup-operations)
+  - [`BACKUP` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/statements/backup-transact-sql)
+  - [Backup Compression (SQL Server)](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/backup-compression-sql-server)
+  - [How does SQL Server Backup and Restore select transfer sizes (Bob Dorr, MS Escalation Engineering)](https://learn.microsoft.com/en-us/archive/blogs/psssql/how-it-works-how-does-sql-server-backup-and-restore-select-transfer-sizes)
+  - [Incorrect BufferCount data transfer option can lead to OOM condition](https://learn.microsoft.com/en-us/archive/blogs/sqlserverfaq/incorrect-buffercount-data-transfer-option-can-lead-to-oom-condition)
 
 ---
 
@@ -223,6 +310,17 @@ flowchart TD
 
 **Praktische Einordnung:** Für die meisten Umgebungen ist entweder ein einfacher T-SQL-Agent-Job (kleine, wenige Datenbanken) oder Ola Hallengrens Lösung (mehrere Datenbanken, produktive Umgebungen) die richtige Wahl. Maintenance Plans eignen sich für sehr einfache Szenarien ohne hohe Ansprüche an Granularität; PowerShell/dbatools lohnt sich, sobald Backups über mehrere Instanzen hinweg orchestriert werden müssen; Python bleibt die Ausnahme für Fälle, in denen das Backup ohnehin in eine bestehende Nicht-SQL-Automatisierung eingebettet wird.
 
+**Schritt-für-Schritt-Anleitungen: Backup per Maintenance Plan einrichten**
+
+📄 **Eigene, ausführliche Anleitung mit Screenshot-Platzhaltern:** [MaintenancePlan_BackupSetup_Anleitung.md](MaintenancePlan_BackupSetup_Anleitung.md) — fasst die vier unten genannten Quellen zu einem durchgängigen Ablauf zusammen (Plan anlegen, Zeitpläne, Full-/Differential-/Log-Backup-Task, Cleanup- und History-Cleanup-Task, Verifikation).
+
+Für alle, die zusätzlich die Original-Quellen nachvollziehen wollen, wie ein Backup-Wartungsplan in SSMS Klick für Klick entsteht:
+
+- 📘 Microsoft Learn: [Use the Maintenance Plan Wizard](https://learn.microsoft.com/en-us/sql/relational-databases/maintenance-plans/use-the-maintenance-plan-wizard) — offizielle, vollständig durchnummerierte Anleitung durch den gesamten Wizard, inklusive aller Optionsfelder auf der Seite "Define Back Up Database Task".
+- 📘 Microsoft Learn: [Schedule a Database Backup Operation Using SSMS](https://learn.microsoft.com/en-us/sql/relational-databases/backup-restore/schedule-database-backup-operation-ssms) — ergänzende, nummerierte Schritt-für-Schritt-Anleitung inkl. Zeitplan-Konfiguration.
+- 📝 SQLShack: [Automate SQL Database Backups Using Maintenance Plans](https://www.sqlshack.com/automate-sql-database-backups-using-maintenance-plans/) — Praxis-Tutorial mit Screenshots: Full-, Differential- und Transaction-Log-Backup-Pläne per Toolbox-Drag&Drop aufbauen, Zielpfad und Zeitplan konfigurieren, Ergebnis verifizieren.
+- 📝 SQLServerCentral: [Backup and Housekeeping with Maintenance Plans](https://www.sqlservercentral.com/articles/backup-and-housekeeping-with-maintenance-plans) — Community-Tutorial mit Screenshots zu Backup-Task, Cleanup-Task (alte Backups automatisch löschen) und History-Cleanup-Task.
+
 **Weiterführende Artikel zu den einzelnen Automatisierungswegen:**
 
 *Microsoft Learn:*
@@ -269,6 +367,8 @@ flowchart TD
   - [Backup-SqlDatabase (SqlServer-Modul)](https://learn.microsoft.com/en-us/powershell/module/sqlserver/backup-sqldatabase)
   - [Backup-DbaDatabase (dbatools)](https://dbatools.io/Backup-DbaDatabase/)
   - [Ola Hallengren's SQL Server Maintenance Solution](https://ola.hallengren.com/)
+- 🧩 **Scripts:**  
+  - [SQLScripts/LastBackupOverview.sql](SQLScripts/LastBackupOverview.sql) (Doku: [SQLScripts/LastBackupOverview.md](SQLScripts/LastBackupOverview.md)) — zeigt je Datenbank Recovery Model, letztes Full-Backup und letztes Backup jeglichen Typs aus `msdb.dbo.backupset`, mit Klartext-Einordnung von Backup-Lücken.
 
 ---
 
@@ -374,6 +474,9 @@ Das ist der Punkt, der am häufigsten zu Verwirrung führt: Eine Datenbank mit 3
 - 📝 Erin Stellato (SQLskills): [Capturing DBCC CHECKDB Output](https://www.sqlskills.com/blogs/erin/capturing-dbcc-checkdb-output/) — Praxisleitfaden zum Erfassen und Auswerten von `CHECKDB`-Ausgaben in Agent-Jobs.
 - 📝 Brent Ozar: [3 Ways to Run DBCC CHECKDB Faster](https://www.brentozar.com/archive/2020/08/3-ways-to-run-dbcc-checkdb-faster/) — praxisnahe Performance-Tipps (`PHYSICAL_ONLY`, `MAXDOP`, Backup-Restore-Strategie).
 
+**🧩 Scripts:**  
+- [SQLScripts/CheckDbAllDatabases.sql](SQLScripts/CheckDbAllDatabases.sql) (Doku: [SQLScripts/CheckDbAllDatabases.md](SQLScripts/CheckDbAllDatabases.md)) — führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenbanken der Instanz nacheinander aus, mit Fortschrittsanzeige und zusammenfassendem Laufprotokoll.
+
 ---
 
 ### 3.1 | Status auslesen
@@ -384,6 +487,10 @@ FROM sys.databases;
 ```
 
 Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und Kritikalitäts-Sortierung siehe [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) (Doku: [SQLScripts/DatabaseStatusOverview.md](SQLScripts/DatabaseStatusOverview.md)) — das Skript ordnet jeden Status direkt in Klartext ein und sortiert kritische Zustände (`SUSPECT`, `RECOVERY_PENDING`, `EMERGENCY`) an den Anfang der Ausgabe. Zeigt es eine betroffene Datenbank an, hilft als nächster Schritt [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)), die konkrete Ursache automatisiert einzugrenzen (Dateizugriff, Speicherplatz, Seitenkorruption, Errorlog).
+
+**🧩 Scripts:**  
+- [SQLScripts/DatabaseStatusOverview.sql](SQLScripts/DatabaseStatusOverview.sql) (Doku: [SQLScripts/DatabaseStatusOverview.md](SQLScripts/DatabaseStatusOverview.md)) — Status, Recovery Model und Zugriffsmodus aller Datenbanken mit Klartext-Einordnung.
+- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse für betroffene Datenbanken.
 
 ### 3.2 | Die Zustände im Detail: Wie sie entstehen und was sie bedeuten
 
@@ -397,6 +504,11 @@ Für eine vollständige, sofort einsetzbare Abfrage mit Klartext-Einordnung und 
 | **EMERGENCY** | Wird **nicht** von SQL Server automatisch gesetzt, sondern bewusst manuell per `ALTER DATABASE ... SET EMERGENCY` aktiviert — meist als Zwischenschritt, um eine `SUSPECT`-Datenbank überhaupt wieder lesbar zu machen. | Die Datenbank ist nur eingeschränkt (meist `READ_ONLY`, `SINGLE_USER`) zugänglich, i.d.R. zu reinen Diagnose- oder Reparaturzwecken. | Sollte nie ein Dauerzustand sein — nach Abschluss der Reparatur/Extraktion entweder `SET ONLINE`/`SET MULTI_USER` oder die Datenbank gezielt verwerfen (siehe [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql), Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)). |
 | **OFFLINE** | Eine Datenbank wurde bewusst per `ALTER DATABASE ... SET OFFLINE` deaktiviert, z. B. um Dateien zu verschieben, auszutauschen oder für einen VM-/Disk-Level-Restore freizugeben. | Kontrollierter, gewollter Zustand. | `ALTER DATABASE ... SET ONLINE`, sobald die zugrunde liegende Wartungsaktion abgeschlossen ist. |
 | **COPYING** | Nur bei Azure SQL Database: Die Datenbank wird gerade als Kopiervorgang (`CREATE DATABASE ... AS COPY OF`) angelegt. | Übergangszustand, temporär. | Abwarten, bis der Kopiervorgang abgeschlossen ist. |
+
+**🧩 Scripts:**  
+- [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Dateizugriffscheck und Reparaturpfad für `RECOVERY_PENDING`.
+- [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparaturpfad für `SUSPECT` ohne Backup.
+- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)) — Datenbank nach abgeschlossener Reparatur/Extraktion vollständig entfernen.
 
 ### 3.3 | Ist SUSPECT ein fehlgeschlagenes RECOVERY_PENDING? Die genaue Zustandskette
 
@@ -463,6 +575,9 @@ Die Tabelle in 3.2 beschreibt die **mechanische** Ursache auf SQL-Server-Ebene (
 
 **Praktischer Hinweis:** Für die Root-Cause-Analyse eines konkreten Falls automatisiert [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) genau diese Kategorien: Es prüft Dateizugriff, freien Speicherplatz, bekannte Suspect Pages und durchsucht das SQL-Server-Errorlog nach passenden Einträgen (z. B. Hinweisen auf einen unsauberen Shutdown oder I/O-Fehler kurz vor dem Auftreten des Status).
 
+**🧩 Scripts:**  
+- [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Root-Cause-Analyse (Dateizugriff, Speicherplatz, Suspect Pages, Errorlog).
+
 ### 3.5 | Sonderfall: Restore bricht wegen Speicherplatzmangel ab
 
 Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand: Der Datenträger, auf den restored wird, hat **während** des Restore-Vorgangs nicht genug freien Speicherplatz — der Restore bricht ab, die Datenbank bleibt aber im `RESTORING`-Zustand hängen (weder online noch sauber abgebrochen) und blockiert damit den Datenbanknamen für einen erneuten Versuch.
@@ -498,6 +613,9 @@ Ein in der Praxis häufiger Auslöser für einen hängenden `RESTORING`-Zustand:
    Für ein robusteres, automatisiertes Vorgehen (killt aktive Verbindungen, entfernt auch am Dateisystem verbliebene Dateien via `xp_cmdshell`-Fallback) siehe [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)).
 
 4. **Vor dem erneuten Restore-Versuch**: Speicherplatz auf dem Zieldatenträger sicherstellen (freien Platz prüfen, ggf. alte Backups/Logs verschieben oder ein Laufwerk mit mehr Kapazität wählen) — sonst wiederholt sich derselbe Abbruch.
+
+**🧩 Scripts:**  
+- [SQLScripts/DropDatabaseCompletely.sql](SQLScripts/DropDatabaseCompletely.sql) (Doku: [SQLScripts/DropDatabaseCompletely.md](SQLScripts/DropDatabaseCompletely.md)) — killt aktive Verbindungen, führt `DROP DATABASE` aus und entfernt auch am Dateisystem verbliebene Dateien.
 
 ---
 
@@ -646,6 +764,10 @@ flowchart TD
 
 - 📄 **Praxis-Anleitung (SUSPECT-/RECOVERY_PENDING-Datenbank reparieren):**  
   [`SuspectOrRecoveryPendingDatabase_RepairOptions.md`](SuspectOrRecoveryPendingDatabase_RepairOptions.md) — ausführlicher Vergleich aller Restore-Arten bei Seitenkorruption (`msdb.dbo.suspect_pages`, Fehler 823/824) und der `REPAIR_ALLOW_DATA_LOSS`-Notlösung, mit kompletten T-SQL-Befehlen am Beispiel einer Datenbank `BI_DQ`. Siehe auch [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [`SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md`](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) zur automatisierten Ursachenanalyse.
+- 🧩 **Scripts:**  
+  - [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SQLScripts/SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) — automatisierte Ursachenanalyse vor der Entscheidung für diesen Reparaturweg.
+  - [SQLScripts/SuspectDatabaseRepairWithoutBackup.sql](SQLScripts/SuspectDatabaseRepairWithoutBackup.sql) (Doku: [SQLScripts/SuspectDatabaseRepairWithoutBackup.md](SQLScripts/SuspectDatabaseRepairWithoutBackup.md)) — Reparatur für `SUSPECT`.
+  - [SQLScripts/RecoveryPendingRepairWithoutBackup.sql](SQLScripts/RecoveryPendingRepairWithoutBackup.sql) (Doku: [SQLScripts/RecoveryPendingRepairWithoutBackup.md](SQLScripts/RecoveryPendingRepairWithoutBackup.md)) — Reparatur für `RECOVERY_PENDING`.
 
 ---
 
