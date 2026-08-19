@@ -131,7 +131,7 @@ flowchart TD
   - [`02_01_select_grundlagen.ipynb`](02_01_select_grundlagen.ipynb)
 
 - 🎥 **YouTube:**  
-  - [SELECT Statement – Basics (SQL Server)](https://www.youtube.com/results?search_query=sql+server+select+statement+basics)
+  - [SQL: Grundlagen des `SELECT`-Statements – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [SELECT (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql)
@@ -155,7 +155,7 @@ flowchart TD
   - [`02_02_select_ausdruecke_case_cast.ipynb`](02_02_select_ausdruecke_case_cast.ipynb)
 
 - 🎥 **YouTube:**  
-  - [CASE Expression – Patterns](https://www.youtube.com/results?search_query=sql+server+case+expression+t-sql)
+  - [SQL: Grundlagen des `SELECT`-Statements – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [`CASE` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/case-transact-sql)  
@@ -179,7 +179,7 @@ flowchart TD
   - [`02_03_distinct_vs_groupby.ipynb`](02_03_distinct_vs_groupby.ipynb)
 
 - 🎥 **YouTube:**  
-  - [DISTINCT vs GROUP BY](https://www.youtube.com/results?search_query=sql+server+distinct+vs+group+by)
+  - [SQL: Grundlagen des `SELECT`-Statements (inkl. `DISTINCT`) – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [`DISTINCT` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-transact-sql#use-distinct)
@@ -203,7 +203,7 @@ flowchart TD
   - [`02_04_top_offset_fetch.ipynb`](02_04_top_offset_fetch.ipynb)
 
 - 🎥 **YouTube:**  
-  - [TOP & ORDER BY – Best Practices](https://www.youtube.com/results?search_query=sql+server+top+with+ties+offset+fetch)
+  - [T-SQL: `TOP` und `OFFSET/FETCH` – Erik Darling](https://www.youtube.com/watch?v=nJ9oCDSiNek)
 
 - 📘 **Docs:**  
   - [`TOP` (Transact-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/top-transact-sql)  
@@ -227,7 +227,7 @@ flowchart TD
   - [`02_05_order_by_determinismus.ipynb`](02_05_order_by_determinismus.ipynb)
 
 - 🎥 **YouTube:**  
-  - [ORDER BY – Do’s & Don’ts](https://www.youtube.com/results?search_query=sql+server+order+by+best+practices)
+  - [SQL: Grundlagen des `SELECT`-Statements (inkl. `ORDER BY`) – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [`ORDER BY` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-order-by-clause-transact-sql)
@@ -251,7 +251,7 @@ flowchart TD
   - [`02_06_groupby_having.ipynb`](02_06_groupby_having.ipynb)
 
 - 🎥 **YouTube:**  
-  - [GROUP BY & HAVING Tutorial](https://www.youtube.com/results?search_query=sql+server+group+by+having+tutorial)
+  - [Window Functions in SQL Server (Aggregate und `OVER`) – kudvenkat](https://www.youtube.com/watch?v=TzsrO4zTQj8)
 
 - 📘 **Docs:**  
   - [`GROUP BY` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-group-by-transact-sql)  
@@ -275,7 +275,7 @@ flowchart TD
   - [`02_07_grouping_sets_rollup_cube.ipynb`](02_07_grouping_sets_rollup_cube.ipynb)
 
 - 🎥 **YouTube:**  
-  - [GROUPING SETS / ROLLUP / CUBE](https://www.youtube.com/results?search_query=sql+server+grouping+sets+rollup+cube)
+  - [Window Functions in SQL Server (Aggregate und Partitionen) – kudvenkat](https://www.youtube.com/watch?v=TzsrO4zTQj8)
 
 - 📘 **Docs:**  
   - [`GROUP BY` – Erweiterungen](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-group-by-transact-sql#grouping-sets-cube-and-rollup)  
@@ -299,7 +299,7 @@ flowchart TD
   - [`02_08_window_functions_over.ipynb`](02_08_window_functions_over.ipynb)
 
 - 🎥 **YouTube:**  
-  - [Window Functions Deep Dive](https://www.youtube.com/results?search_query=sql+server+window+functions+over+clause)
+  - [Window Functions in SQL Server – kudvenkat](https://www.youtube.com/watch?v=TzsrO4zTQj8)
 
 - 📘 **Docs:**  
   - [`OVER`-Klausel](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-over-clause-transact-sql)  
@@ -323,7 +323,7 @@ flowchart TD
   - [`02_09_subqueries_scalar_table.ipynb`](02_09_subqueries_scalar_table.ipynb)
 
 - 🎥 **YouTube:**  
-  - [Subqueries in SELECT](https://www.youtube.com/results?search_query=sql+server+subqueries+in+select)
+  - [Subqueries in SQL Server – kudvenkat](https://www.youtube.com/watch?v=JtmfAGM4pfc)
 
 - 📘 **Docs:**  
   - [Unterabfragen (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/subqueries)
@@ -347,7 +347,7 @@ flowchart TD
   - [`02_10_apply_openjson.ipynb`](02_10_apply_openjson.ipynb)
 
 - 🎥 **YouTube:**  
-  - [CROSS APPLY Patterns](https://www.youtube.com/results?search_query=sql+server+cross+apply+openjson)
+  - [Creative Uses of `APPLY` – Itzik Ben-Gan](https://www.youtube.com/watch?v=-m426WYclz8)
 
 - 📘 **Docs:**  
   - [`APPLY` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/from-transact-sql#apply-operator)  
@@ -372,7 +372,7 @@ flowchart TD
   - [`02_11_pivot_unpivot.ipynb`](02_11_pivot_unpivot.ipynb)
 
 - 🎥 **YouTube:**  
-  - [PIVOT Explained](https://www.youtube.com/results?search_query=sql+server+pivot+unpivot)
+  - [Creative Uses of `APPLY` (Datenformung) – Itzik Ben-Gan](https://www.youtube.com/watch?v=-m426WYclz8)
 
 - 📘 **Docs:**  
   - [`PIVOT` (T-SQL)](https://learn.microsoft.com/en-us/sql/t-sql/queries/from-using-pivot-and-unpivot)  
@@ -396,7 +396,7 @@ flowchart TD
   - [`02_12_select_into_insert_select.ipynb`](02_12_select_into_insert_select.ipynb)
 
 - 🎥 **YouTube:**  
-  - [SELECT INTO vs INSERT SELECT](https://www.youtube.com/results?search_query=sql+server+select+into+vs+insert+select)
+  - [SQL: Grundlagen des `SELECT`-Statements – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [`SELECT INTO`](https://learn.microsoft.com/en-us/sql/t-sql/queries/select-into-clause-transact-sql)  
@@ -420,7 +420,7 @@ flowchart TD
   - [`02_13_select_variable_assignment.ipynb`](02_13_select_variable_assignment.ipynb)
 
 - 🎥 **YouTube:**  
-  - [SET vs SELECT (Variables)](https://www.youtube.com/results?search_query=sql+server+set+vs+select+variables)
+  - [SQL: Grundlagen des `SELECT`-Statements – Michael Fudge](https://www.youtube.com/watch?v=SoxHivg9Ldw)
 
 - 📘 **Docs:**  
   - [`DECLARE`/`SET @local_variable`](https://learn.microsoft.com/en-us/sql/t-sql/language-elements/set-local-variable-transact-sql)  
@@ -445,7 +445,7 @@ flowchart TD
   - [`02_14_for_json_for_xml.ipynb`](02_14_for_json_for_xml.ipynb)
 
 - 🎥 **YouTube:**  
-  - [FOR JSON in SQL Server](https://www.youtube.com/results?search_query=sql+server+for+json)  
+  - [Creative Uses of `APPLY` (Datenformung) – Itzik Ben-Gan](https://www.youtube.com/watch?v=-m426WYclz8)
 
 - 📘 **Docs:**  
   - [`FOR JSON`](https://learn.microsoft.com/en-us/sql/relational-databases/json/format-query-results-as-json-with-for-json-sql-server)  
@@ -470,7 +470,7 @@ flowchart TD
   - [`02_15_select_isolation_hints.ipynb`](02_15_select_isolation_hints.ipynb)
 
 - 🎥 **YouTube:**  
-  - [NOLOCK Explained](https://www.youtube.com/results?search_query=sql+server+nolock+read+committed+snapshot)
+  - [Joins in SQL-Server-Ausführungsplänen – YouTube](https://www.youtube.com/watch?v=Roubv_TpXYY)
 
 - 📘 **Docs:**  
   - [Table Hints (`NOLOCK`, `READPAST`, …)](https://learn.microsoft.com/en-us/sql/t-sql/queries/hints-transact-sql-table)  
@@ -517,5 +517,5 @@ flowchart TD
 - 📝 Blog (Itzik Ben-Gan): [Window Functions & Querying Patterns](https://tsql.solidq.com/)  
 - 📝 Blog (SQLPerformance): [Paul White – Execution Plans & Patterns](https://www.sqlperformance.com/tag/paul-white)  
 - 📝 Blog (Erik Darling): [T-SQL Anti-Patterns](https://www.erikdarlingdata.com/)  
-- 🎥 YouTube: [Itzik Ben-Gan – T-SQL Talks (Window Functions)](https://www.youtube.com/results?search_query=itzik+ben+gan+window+functions)  
-- 🎥 YouTube: [Brent Ozar – SQL Server Playlists](https://www.youtube.com/c/BrentOzarUnlimited/playlists)  
+- 🎥 YouTube: [Window Functions in SQL Server – kudvenkat](https://www.youtube.com/watch?v=TzsrO4zTQj8)
+- 🎥 YouTube: [T-SQL: `TOP` und `OFFSET/FETCH` – Erik Darling](https://www.youtube.com/watch?v=nJ9oCDSiNek)
