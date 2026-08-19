@@ -1,4 +1,4 @@
-﻿# SearchAuditColumns.sql
+# SearchAuditColumns.sql
 
 Dieses Skript durchsucht die Metadaten der aktuell verbundenen Datenbank nach typischen Audit-Spalten. Es bewertet Spaltennamen wie `CreatedAt`, `ModifiedBy`, `DeletedAt` oder `rowversion` gegen eine nachvollziehbare Pattern-Liste und verdichtet die Treffer je Objekt.
 
@@ -89,7 +89,7 @@ flowchart TD
 ## SQL-Code
 
 <!-- SQLDOC:SQL_CODE:BEGIN -->
-`sql
+```sql
 /*
 BEGIN:SQL-HEADER v1
 ---
@@ -448,7 +448,7 @@ ORDER BY
 DROP TABLE IF EXISTS #BestMatches;
 DROP TABLE IF EXISTS #AuditPatterns;
 
-`
+```
 <!-- SQLDOC:SQL_CODE:END -->
 
 

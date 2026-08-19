@@ -1,4 +1,4 @@
-﻿# RetryDelayBackoffDemo.sql
+# RetryDelayBackoffDemo.sql
 
 Dieses Skript demonstriert feste, lineare und exponentielle Backoff-Strategien fuer retrybare SQL-Fehler. Statt echter Wartezeiten protokolliert das Lab bewusst nur die geplanten Delay-Werte, damit der Retry-Ablauf reproduzierbar und schnell bleibt.
 
@@ -90,7 +90,7 @@ flowchart TD
 ## SQL-Code
 
 <!-- SQLDOC:SQL_CODE:BEGIN -->
-`sql
+```sql
 /*
 BEGIN:SQL-HEADER v1
 ---

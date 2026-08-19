@@ -1,0 +1,265 @@
+{
+  "feed_url": "https://www.reddit.com/r/SQLServer/new/.rss",
+  "downloaded_at": "2026-08-19T11:19:24.197909+00:00",
+  "posts": [
+    {
+      "id": "t3_1vq12g8",
+      "status": "done",
+      "analyzed_at": "2026-08-19T11:00:00+00:00",
+      "analysis": "Die allgemeine Diagnose lang laufender Requests, Memory Grants, TempDB-/I/O-Hypothesen und optionaler Extended Events ist bereits im Troubleshooting-Modul abgedeckt; Spills werden zusätzlich im Ausführungsplan-Kapitel erklärt.",
+      "related_repository_paths": [
+        "T-SQL/82_Troubleshooting_Sessions_Requests/82_Troubleshooting_Sessions_Requests.md",
+        "T-SQL/27_ExecutionPlans_Basics/27_ExecutionPlans_Basics.md",
+        "T-SQL/20_Create_Database/SQLScripts/TempdbFileLayoutCheck.md"
+      ],
+      "title": "Temp Cache endlessly expanding until server failure/slowdown",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vq12g8/temp_cache_endlessly_expanding_until_server/",
+      "published": "2026-08-16T16:11:28+00:00",
+      "updated": "2026-08-16T16:11:28+00:00",
+      "author": "/u/TheSmashingChamp",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I am working on a consultant&#39;s azure gov cloud portal where I put applications on. There is a consistent issue with queries running forever even after being finished executing. Do anyone have experience with this? The temp cache endlessly expands until our DB fails.</p> <p>I believe the issue is the connector, but it may be the queries? I dont know.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TheSmashingChamp\"> /u/TheSmashingChamp </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vq12g8/temp_cache_endlessly_expanding_until_server/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vq12g8/temp_cache_endlessly_expanding_until_server/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vohtr1",
+      "status": "done",
+      "analyzed_at": "2026-08-19T11:00:00+00:00",
+      "analysis": "Query Store mit Capture-Modus, Speichergrenzen und Cleanup-Politik wird bereits im Advanced-Performance-Kapitel behandelt; der Post liefert darüber hinaus keine konkrete, dauerhaft aufbereitbare Lernfrage.",
+      "related_repository_paths": [
+        "T-SQL/64_PerformanceTuning_Advanced/64_PerformanceTuning_Advanced.md"
+      ],
+      "title": "Friday Feedback - retaining more Query Store data",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vohtr1/friday_feedback_retaining_more_query_store_data/",
+      "published": "2026-08-14T20:00:10+00:00",
+      "updated": "2026-08-14T20:00:10+00:00",
+      "author": "/u/erinstellato",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Hey folks - another Friday, another feedback question about Query Store. I will ask about other QP features, I promise!</p> <p>If you could keep more Query Store data, without it creating any performance issues, would you? I have a poll below, but as always, feel free to add a comment if the available options don&#39;t match what you&#39;d want to see, or if you want to provide more detail. And you&#39;ll note, I&#39;m asking about it in terms of time, not size...the two are not linearly related, it&#39;s very workload dependent. Perhaps that&#39;s a topic for next week.</p> <p>Thanks as always for your input, and happy back to school 🎒 for those who are in (or about to enter) that phase!</p> <p><a href=\"https://www.reddit.com/poll/1vohtr1\">View Poll</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/erinstellato\"> /u/erinstellato </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vohtr1/friday_feedback_retaining_more_query_store_data/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vohtr1/friday_feedback_retaining_more_query_store_data/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vodh7s",
+      "status": "ignore",
+      "analyzed_at": "2026-08-19T11:00:00+00:00",
+      "analysis": "Die konkrete Verfügbarkeit von ESU-Patches für SQL Server 2014 ist ein zeitgebundener Produktlebenszyklus- und Supportfall, kein nachhaltiges Lernmodul für das Repository.",
+      "related_repository_paths": [],
+      "title": "Is 2014 ESU a real thing?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vodh7s/is_2014_esu_a_real_thing/",
+      "published": "2026-08-14T17:21:19+00:00",
+      "updated": "2026-08-14T17:21:19+00:00",
+      "author": "/u/mirrorsaw",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>It was an expensive purchase, but I&#39;ve bit the bullet to get one of our old 2014 servers onto ESU (via Azure Arc).</p> <p>I then rubbed my hands together as I eagerly waited for all the patches (released since Oct 2024 when it went EOL) to arrive. Nothing, not a sausage.</p> <p>I waited 2 days in case it was a timing thing, but nothing arrived, a real anticlimax. So I thought I&#39;d do some Googling and find out how many patches I should be expecting, maybe some of the KB numbers, and I can&#39;t find any evidence of any SQL 2014 patches in the ESU lifetime.</p> <p>So it made me wonder, has Microsoft actually released any SQL 2014 patches since October 2024? Maybe not, maybe they&#39;ve found no vulnerabilities that need addressing.</p> <p>And if so, why would anyone buy this ESU? Is it more of an insurance, just in case Microsoft does decide to release a patch?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/mirrorsaw\"> /u/mirrorsaw </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vodh7s/is_2014_esu_a_real_thing/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vodh7s/is_2014_esu_a_real_thing/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vnlxno",
+      "status": "idea",
+      "analyzed_at": "2026-08-19T11:00:00+00:00",
+      "analysis": "Sicherer Umgang mit potenziell verlustbehafteten DacPac-Schemaänderungen ist für SQL-Server-Praxis relevant; eine Abdeckung von DacFx oder BlockOnPossibleDataLoss wurde nicht gefunden.",
+      "related_repository_paths": [
+        "T-SQL/20_Create_Database/20_Create_Database.md"
+      ],
+      "task_path": "_internal/Task/idea/MSSQL_TASK_0001.md",
+      "title": "SQL's best feature? BlockOnPossibleDataLoss",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vnlxno/sqls_best_feature_blockonpossibledataloss/",
+      "published": "2026-08-13T20:12:49+00:00",
+      "updated": "2026-08-13T20:12:49+00:00",
+      "author": "/u/Jerry-Nixon",
+      "content_html": "<table> <tr><td> <a href=\"https://www.reddit.com/r/SQLServer/comments/1vnlxno/sqls_best_feature_blockonpossibledataloss/\"> <img src=\"https://external-preview.redd.it/SsPsspyMEQyAJ-723t6Z5tIAfaz-Prnk2EmsQ6rleNk.jpeg?width=640&amp;crop=smart&amp;auto=webp&amp;s=56a4eb2239793581eacf02e8df6c89afd1bcc17e\" alt=\"SQL's best feature? BlockOnPossibleDataLoss\" title=\"SQL's best feature? BlockOnPossibleDataLoss\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Let’s start with an admission: developers hate <code>BlockOnPossibleDataLoss</code>. It is the bane of a smooth development workflow, as significant schema changes can block deployment. Having said that, there’s more to life than the developer’s local loop. In fact, it’s arguable that the local loop, while important to you and me, is far less important to the business, perhaps immeasurably so.</p> <p>However, it&#39;s super-important.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Jerry-Nixon\"> /u/Jerry-Nixon </a> <br/> <span><a href=\"https://devblogs.microsoft.com/azure-sql/blockonpossibledataloss/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vnlxno/sqls_best_feature_blockonpossibledataloss/\">[comments]</a></span> </td></tr></table>"
+    },
+    {
+      "id": "t3_1vnjf2p",
+      "status": "idea",
+      "analyzed_at": "2026-08-19T11:00:00+00:00",
+      "analysis": "Das Repository behandelt TempDB-Dateilayout, Execution-Plan-Spills und allgemeines Session-Troubleshooting, aber keine zusammenhängende Zuordnung von TempDB-Verbrauch zu Sessions, Requests und Extended Events.",
+      "related_repository_paths": [
+        "T-SQL/20_Create_Database/SQLScripts/TempdbFileLayoutCheck.md",
+        "T-SQL/27_ExecutionPlans_Basics/27_ExecutionPlans_Basics.md",
+        "T-SQL/82_Troubleshooting_Sessions_Requests/82_Troubleshooting_Sessions_Requests.md"
+      ],
+      "task_path": "_internal/Task/idea/MSSQL_TASK_0002.md",
+      "title": "Tempdb size getting high",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vnjf2p/tempdb_size_getting_high/",
+      "published": "2026-08-13T18:42:24+00:00",
+      "updated": "2026-08-13T18:42:24+00:00",
+      "author": "/u/ManufacturerSalty148",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Hello all my colleagues</p> <p>I know this is an old topic, but I still haven&#39;t found clear instructions on how to solve this one problem. I have a SQL Server 2017 where tempdb keeps growing to almost 80 GB. I know it&#39;s because of temp spills, but I want to collect the queries or sessions causing this tempdb consumption using extended events. I haven&#39;t found clear instructions or examples of extended events on any site, and I don&#39;t know what to do if I find queries consuming tempdb or what to check in the query plan.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/ManufacturerSalty148\"> /u/ManufacturerSalty148 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vnjf2p/tempdb_size_getting_high/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vnjf2p/tempdb_size_getting_high/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vmzdvz",
+      "title": "Replication/CDC From SQL Server 2008 to SQL 2025",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vmzdvz/replicationcdc_from_sql_server_2008_to_sql_2025/",
+      "published": "2026-08-13T03:25:45+00:00",
+      "updated": "2026-08-13T03:25:45+00:00",
+      "author": "/u/IMetalhead666I",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Hello, I&#39;m faced with a challenge I&#39;m hoping to get some clarity and advice.</p> <p>Our current production db is SQL Server 2008 R2 which is replicated to another SQL 2008 R2 where all our analytics workload is currently done. We&#39;ve recently set up SQL Server 2025 and the intention is to have our production data be replicated to a newer version of SQL and migrate our analytics workloads to that same server. I know that direct replication from 2008 to 2025 is not supported, but CDC is available. What would be the best options to quickly setup near real time replication or even incremental data loads (i.e. hourly) for a select number of tables in source db on SQL2008 to SQL 2025 with minimal engineering effort?</p> <p>We also have a Fabric capacity, and I know that the Copy Job supports CDC for incremental data loads and also lets you write to a SQL 25 db, however the preference is to minimize cloud costs and SKU consumption since both 2008 and 2025 dbs are on prem.</p> <p>Generally, I&#39;m also trying to avoid writing custom code to orchestrate this task. Does microsoft have any tools (like SSIS?) that allow you to configure such data migration? Does SQL 2025 have any feature that allows you to link a legacy server to it?</p> <p>Any advice is welcome, thanks.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/IMetalhead666I\"> /u/IMetalhead666I </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vmzdvz/replicationcdc_from_sql_server_2008_to_sql_2025/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vmzdvz/replicationcdc_from_sql_server_2008_to_sql_2025/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vkyuva",
+      "title": "How much prefix adding do you do to your objects in SSMS? Is it still important?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vkyuva/how_much_prefix_adding_do_you_do_to_your_objects/",
+      "published": "2026-08-10T22:03:50+00:00",
+      "updated": "2026-08-10T22:03:50+00:00",
+      "author": "/u/Reasonable-Job4205",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I am naming all my stored procedures as &quot;spActualSPName&quot;. I got into this habit because of working with a SQL database that used MS Access as the front end, so it was helpful to know that the thing I was looking at in VBA was an SP. Is prefixing still needed? Do you do this?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Reasonable-Job4205\"> /u/Reasonable-Job4205 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vkyuva/how_much_prefix_adding_do_you_do_to_your_objects/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vkyuva/how_much_prefix_adding_do_you_do_to_your_objects/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vky70z",
+      "title": "SQL DB2 Integration",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vky70z/sql_db2_integration/",
+      "published": "2026-08-10T21:37:36+00:00",
+      "updated": "2026-08-10T21:37:36+00:00",
+      "author": "/u/TechnicianPersonal72",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Need help connecting SSIS to DB2 (mainframe z/OS) via SQL Server, anyone with experience?<br/> Hey network<br/> I’m working on connecting SSIS packages to a DB2 z/OS database through SQL Server (using Microsoft’s OLE DB/ODBC providers for DB2). Running into connectivity/config issues.<br/> If you’ve done DB2-to-SQL Server integration before or know someone who has, I’d love to pick your brain!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/TechnicianPersonal72\"> /u/TechnicianPersonal72 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vky70z/sql_db2_integration/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vky70z/sql_db2_integration/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vkdh7f",
+      "title": "Resources to Learn SSDT?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vkdh7f/resources_to_learn_ssdt/",
+      "published": "2026-08-10T06:55:10+00:00",
+      "updated": "2026-08-10T06:55:10+00:00",
+      "author": "/u/SmoothFunny4475",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I am new to Data field, pivoting from Web Dev. My new job requires knowledge of SQL Server Data Tools (SSDT), any recommendations on where to learn from? I have bought an Udemy course but it is quite brief, I am looking for something detailed.</p> <p>Edit: Adding some clarification as I missed some details. Yes I am looking for specific SSDT which are SSIS, SSAS, and SSRS. These three were mentioned in the job posting, but I highly believe maybe not all of them would be in-use as HR most of the time just adds everything. But I want to be prepared incase I am asked about specific tools in the interview. </p> <p>Any recommendations?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/SmoothFunny4475\"> /u/SmoothFunny4475 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vkdh7f/resources_to_learn_ssdt/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vkdh7f/resources_to_learn_ssdt/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1viesxf",
+      "title": "Is it possible to transform the connection string via the driver, not the application?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1viesxf/is_it_possible_to_transform_the_connection_string/",
+      "published": "2026-08-07T22:28:07+00:00",
+      "updated": "2026-08-07T22:28:07+00:00",
+      "author": "/u/catmanjan2",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>We have a third party application that will not let us modify the connection string in the way we require (to allow us to connect to readonly replicas)</p> <p>It’s basically decomposing the parameters in the string and discarding the bits it cant parse</p> <p>One of the things it does let us configure is the driver e.g. mssql 17 driver etc etc</p> <p>On Linux systems I know it is possible to configure the connection string at the driver level via dsn , but unfortunately this is a windows app</p> <p>Is there something similar on windows? E.g configure the driver to intercept and transform the connection string before it is sent to the database?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/catmanjan2\"> /u/catmanjan2 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1viesxf/is_it_possible_to_transform_the_connection_string/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1viesxf/is_it_possible_to_transform_the_connection_string/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vic4dc",
+      "title": "Help! SQL is very slow",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vic4dc/help_sql_is_very_slow/",
+      "published": "2026-08-07T20:39:13+00:00",
+      "updated": "2026-08-07T20:39:13+00:00",
+      "author": "/u/throwaway6565558",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I’m a novice in the world of SQL. However, recently I upgraded with my company from 2021 to 2022 SQL server application. I need advice on how to get this fixed.</p> <p>The problem I’m running into is anytime I switch databases or servers. It’s very slow to load. I never had this issue before with 2020 or 2021 SQL. ANY ADVICE APPRECIATED AND WELCOME.</p> <p>Edit: I meant to say 2019 instead of 2021/2020 getting my years confused. Sorry </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/throwaway6565558\"> /u/throwaway6565558 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vic4dc/help_sql_is_very_slow/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vic4dc/help_sql_is_very_slow/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1viaxy6",
+      "title": "mssql-python 1.13: Now you can pass Arrow objects directly to bulk copy",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1viaxy6/mssqlpython_113_now_you_can_pass_arrow_objects/",
+      "published": "2026-08-07T19:54:19+00:00",
+      "updated": "2026-08-07T19:54:19+00:00",
+      "author": "/u/dlevy-msft",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Short version: if anyone in your shop loads data into Microsoft SQL from Python, mssql-python 1.13.0 adds a bulk copy path that skips building a Python object for every single value.</p> <p>Bulk copy in mssql-python requires a list of row tuples. You hand the driver rows, it converts each value and streams them to the server. Fine, except most people&#39;s source data is a Parquet file or a query result that&#39;s already columnar. So before anything moves, you turn columns into rows and pay for a Python object per row and per value. A 4.4 million row file I was testing with would have needed roughly 6.6 GB of memory just to stage the rows.</p> <p>1.13.0 adds <code>bulkcopy_arrow()</code>, which takes columnar data directly. The typed column buffers get read into the bulk load packets down in the Rust TDS layer, so there&#39;s no per-row object at all.</p> <pre><code>import duckdb from mssql_python import connect rel = duckdb.sql(&quot;SELECT * FROM &#39;sales/*.parquet&#39;&quot;) with connect(&quot;Server=&lt;server&gt;;Database=&lt;database&gt;;Encrypt=yes&quot;) as conn: cur = conn.cursor() result = cur.bulkcopy_arrow(&quot;dbo.FactSale&quot;, rel) print(result[&quot;rows_copied&quot;], result[&quot;rows_per_second&quot;]) </code></pre> <p>In my unscientific test, I had 200k rows, 21 columns, the WideWorldImporters <code>fact_sale</code> shape: bigints, decimals, datetimes, and one wide <code>NVARCHAR</code> (I couldn&#39;t leave that column that only said &quot;each&quot; for every row an NVARCHAR(MAX) - it was just wrong). Batch size 100k, 7 repeats, median. SQL Server 2025 on an Azure E4bds v5 (4 vCPU, 32 GiB), with the client on the same box loading over localhost so the network stays out of it.</p> <table><thead> <tr> <th align=\"left\">path</th> <th align=\"left\">median total</th> <th align=\"left\">rows/sec</th> </tr> </thead><tbody> <tr> <td align=\"left\"><code>bulkcopy_arrow()</code></td> <td align=\"left\">5.14s</td> <td align=\"left\">38,918</td> </tr> <tr> <td align=\"left\">old <code>bulkcopy()</code> with row tuples</td> <td align=\"left\">9.93s</td> <td align=\"left\">20,141</td> </tr> </tbody></table> <p>Usual caveat, this is one table shape on one VM with the client stealing cores from the server. Your mileage will vary with column types.</p> <p><strong>Things that might matter to you specifically:</strong></p> <p>Server side, nothing changes. Both APIs go through the same bulk load path, so your minimal logging rules, recovery model behavior and lock escalation are exactly what they were. The difference is entirely on the client, removing unnecessary conversions.</p> <p>I ran the comparison in both SIMPLE and FULL recovery, with <code>table_lock</code> on and off, on two different databases. The Arrow advantage held between 1.62x and 1.93x in all five configurations. Worth noting that in FULL recovery, <code>table_lock</code> made essentially no difference to either path, which tracks, since you don&#39;t get minimal logging there anyway.</p> <p>All the options you&#39;d expect carry over unchanged: <code>table_lock</code>, <code>batch_size</code>, <code>keep_identity</code>, <code>keep_nulls</code>, <code>check_constraints</code>, <code>fire_triggers</code>, <code>use_internal_transaction</code>, and column mappings. Same statistics dictionary comes back.</p> <p>One nice side effect: string widths are validated against the destination schema before anything is sent. An overlong value fails immediately and tells you the length, rather than dying partway through a load and leaving you to work out how much landed.</p> <p><strong>Other goodness in this release</strong>: connection pooling now keys on the security context rather than just the connection string, so a pooled connection opened under one identity can&#39;t be handed to a caller running as another. And there&#39;s a fix for an <code>executemany()</code> bug where a <code>NULL</code> partway through a numeric batch could silently insert zero rows without raising, which is the kind of thing worth knowing about if you have Python jobs feeding nullable numeric columns.</p> <pre><code>pip install --upgrade mssql-python </code></pre> <p>The driver is pip-installable and the ODBC driver comes along as a dependency, so there&#39;s no separate driver install to manage on your app servers.</p> <p>I&#39;d genuinely like to know what throughput people are seeing on real hardware, especially with the client on a separate machine from the server, which is the normal case and not what I tested. <code>bulkcopy_arrow()</code> returns <code>rows_copied</code> and <code>rows_per_second</code> so the number is right there.</p> <p>Full blog post: <a href=\"https://techcommunity.microsoft.com/blog/sqlserver/mssql-python-1-13-0-arrow-bulk-copy-smarter-tokens-slimmer-wheels/4544858\">https://techcommunity.microsoft.com/blog/sqlserver/mssql-python-1-13-0-arrow-bulk-copy-smarter-tokens-slimmer-wheels/4544858</a></p> <p>Repo: <a href=\"https://github.com/microsoft/mssql-python\">https://github.com/microsoft/mssql-python</a></p> <p>Happy to answer questions.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/dlevy-msft\"> /u/dlevy-msft </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1viaxy6/mssqlpython_113_now_you_can_pass_arrow_objects/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1viaxy6/mssqlpython_113_now_you_can_pass_arrow_objects/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vi8er3",
+      "title": "What Docker image do you use locally to mimic Azure SQL?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vi8er3/what_docker_image_do_you_use_locally_to_mimic/",
+      "published": "2026-08-07T18:19:28+00:00",
+      "updated": "2026-08-07T18:19:28+00:00",
+      "author": "/u/youwillnevercatme",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I&#39;m using Azure SQL on Azure and want to run a local Docker container for development/testing.</p> <p>I found these options:</p> <ul> <li><strong>SQL Server:</strong> 2022/2025? <a href=\"https://hub.docker.com/r/microsoft/mssql-server\">https://hub.docker.com/r/microsoft/mssql-server</a></li> <li><strong>Azure SQL Database local development:</strong> <a href=\"https://learn.microsoft.com/en-us/azure/azure-sql/database/local-dev-experience-overview?utm_source=chatgpt.com\">Microsoft&#39;s Azure SQL local development docs</a></li> <li><strong>Azure SQL Edge:</strong> <a href=\"https://hub.docker.com/r/microsoft/azure-sql-edge\">https://hub.docker.com/r/microsoft/azure-sql-edge</a></li> </ul> <p>Which option is currently recommended if I want the closest local equivalent to Azure SQL Database?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/youwillnevercatme\"> /u/youwillnevercatme </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi8er3/what_docker_image_do_you_use_locally_to_mimic/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi8er3/what_docker_image_do_you_use_locally_to_mimic/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vi718c",
+      "title": "Anyone still using Idera’s SQLsafe?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vi718c/anyone_still_using_ideras_sqlsafe/",
+      "published": "2026-08-07T17:29:11+00:00",
+      "updated": "2026-08-07T17:29:11+00:00",
+      "author": "/u/same_hair_new_chair",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Back in the day this tool used to be one of the industry standards for managing SQL database backups, but I wonder if it was one of those tools that has been abandoned over the years.</p> <p>Is it still considered the industry standard or has something replaced it?</p> <p>I’m also talking on something enterprise-scale, like 100+ instances, 500+ databases</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/same_hair_new_chair\"> /u/same_hair_new_chair </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi718c/anyone_still_using_ideras_sqlsafe/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi718c/anyone_still_using_ideras_sqlsafe/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vi5o6k",
+      "title": "mssql-django 1.8.0: Now with Django 6.1 support",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vi5o6k/mssqldjango_180_now_with_django_61_support/",
+      "published": "2026-08-07T16:38:52+00:00",
+      "updated": "2026-08-07T16:38:52+00:00",
+      "author": "/u/dlevy-msft",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>We&#39;re pretty proud of this: Django 6.1 GA&#39;d on August 5. The Microsoft SQL backend for Django shipped 6.1 support within 48 hours.</p> <pre><code>pip install --upgrade mssql-django Django </code></pre> <p>What changed:</p> <ul> <li>Query compilation updated for 6.1&#39;s sliced and offset queries. 6.1 deprecated <code>SQLCompiler.quote_name_unless_alias()</code>, so sliced querysets and <code>OFFSET ... FETCH</code> now compile without Django 7.0 deprecation warnings.</li> <li><code>get_relations()</code> returns 6.1&#39;s expanded shape including the database-level <code>ON DELETE</code> rule, so <code>inspectdb</code> keeps working.</li> <li>Upfront errors for the 6.1 features SQL Server can&#39;t support.</li> </ul> <p>Everything is version-gated, so if you&#39;re on 5.2 or earlier nothing changes for you.</p> <p>Two 6.1 features do not work:</p> <ul> <li><strong>Database-level referential actions</strong> (<code>DB_CASCADE</code>, <code>DB_SET_NULL</code>, <code>DB_SET_DEFAULT</code>). SQL Server disallows multiple cascade paths to the same table. Using one fails system checks with <code>fields.E324</code>. Use <code>on_delete</code> instead.</li> <li><strong>Bitwise aggregates</strong> (<code>BitAnd</code>, <code>BitOr</code>, <code>BitXor</code>). No native SQL Server equivalent and we don&#39;t emulate it yet, so it raises <code>NotSupportedError</code>. If you need this, comment on <a href=\"https://github.com/microsoft/mssql-django/issues/572\">#572</a> with your use case, since that&#39;s what will get it prioritized.</li> </ul> <p>Release notes: <a href=\"https://github.com/microsoft/mssql-django/releases/tag/1.8.0\">https://github.com/microsoft/mssql-django/releases/tag/1.8.0</a></p> <p>Full blog post: <a href=\"https://techcommunity.microsoft.com/blog/sqlserver/mssql-django-1-8-0-django-6-1-support-within-48-hours-of-django-6-1-ga/4545141\">mssql-django 1.8.0: Django 6.1 Support within 48 Hours of Django 6.1 GA</a></p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/dlevy-msft\"> /u/dlevy-msft </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi5o6k/mssqldjango_180_now_with_django_61_support/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vi5o6k/mssqldjango_180_now_with_django_61_support/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vhkndj",
+      "title": "what is closes to Multi-Master setup in SQL server (writes on multiple sites)",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vhkndj/what_is_closes_to_multimaster_setup_in_sql_server/",
+      "published": "2026-08-06T23:47:37+00:00",
+      "updated": "2026-08-06T23:47:37+00:00",
+      "author": "/u/matados",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>leadership exploring options and I always get asked why SQL server have setups where we have no option but to bear the pain of maintaining solutions like Merge or Transactional P2P replication? what have you setup in your shop that&#39;s closest to multi master, SQL server or otherwise, I would love to hear from you?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/matados\"> /u/matados </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhkndj/what_is_closes_to_multimaster_setup_in_sql_server/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhkndj/what_is_closes_to_multimaster_setup_in_sql_server/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vhhkkn",
+      "title": "Hi! We're the Microsoft SQL team - ask US anything!",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vhhkkn/hi_were_the_microsoft_sql_team_ask_us_anything/",
+      "published": "2026-08-06T21:38:52+00:00",
+      "updated": "2026-08-06T21:38:52+00:00",
+      "author": "/u/vandana-mahtani-msft",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Hi <a href=\"/r/SQLServer\">r/SQLServer</a> community!</p> <p>I&#39;m Vandana Mahtani, Principal Product Manager on the SQL team at Microsoft, and I&#39;m co-hosting this AMA with my colleagues <a href=\"https://www.reddit.com/user/ucmsft/\">ucmsft</a>, <a href=\"/u/jerry-nixon\">u/jerry-nixon</a>, <a href=\"/u/bluefooted\">u/bluefooted</a> and <a href=\"/u/strahinjarodic\">u/strahinjarodic</a>.</p> <p>Our team works closely with app developers who are modernizing existing applications and with teams building new cloud-native and AI-powered solutions.</p> <p>If you are planning your next app architecture, migrating from on-prem SQL Server, or exploring modern data experiences powered by Azure SQL, this AMA is for you. We&#39;ll share practical guidance, lessons from real-world projects, and recommendations to help you get started quickly.</p> <p>We&#39;re here to answer your questions about:</p> <ul> <li>Modernizing existing applications with Azure SQL: <ul> <li>Migration paths from SQL Server</li> <li>Cloud architecture modernization patterns</li> <li>Integrating with Microsoft cloud services</li> </ul></li> <li>Building new modern applications: <ul> <li>Cloud-native app backends on Azure SQL Database</li> <li>AI-powered apps and vector-enabled scenarios</li> <li>Local-first development workflows with Azure SQL Developer</li> </ul></li> <li>Cost-conscious app development: <ul> <li>Getting started with free and low-friction options</li> <li>Choosing the right SQL deployment model for your scenario</li> </ul></li> <li>Developer productivity and roadmap: <ul> <li>Recommended tooling and workflows</li> <li>Where SQL app development is heading next</li> </ul></li> </ul> <p>Whether you are refreshing a long-running enterprise app or creating a brand-new intelligent app, bring your toughest architecture, migration, and implementation questions.</p> <p><strong>Tutorials, links and resources before the event:</strong></p> <ul> <li><a href=\"https://aka.ms/azuresql-developer\">Build local with the Azure SQL Developer (Private Preview signup)</a></li> <li><a href=\"https://www.youtube.com/watch?v=UMivSJUTBns\">Build an app on Azure SQL Database for Free</a></li> <li><a href=\"https://github.com/Azure-Samples/azure-sql-db-vector-search\">Azure SQL Vector Search Samples (GitHub)</a></li> <li><a href=\"https://techcommunity.microsoft.com/blog/azuresqlblog/integrate-microsoft-cloud-services-with-your-azure-sql-database-managed-instance/1083543\">Integrate Microsoft cloud services with your Azure SQL Database managed instance</a></li> <li><a href=\"https://techcommunity.microsoft.com/blog/modernizationbestpracticesblog/microsoft-options-to-migrate-sql-server-databases/4521637\">Microsoft options to migrate SQL Server databases</a></li> <li><a href=\"https://learn.microsoft.com/azure/azure-sql/database/sql-database-paas-overview\">What is Azure SQL Database?</a></li> </ul> <p><strong>AMA Schedule:</strong></p> <ul> <li>Start taking questions 24 hours before the event begins</li> <li>Start answering your questions at: Aug 13, 2026, 09:00 AM PDT / 16:00 UTC</li> <li>End the event after 1 hour</li> </ul> <blockquote> <p>Thank you for your time and attendance. Hope to see you at SQLCon Barcelona and keep your questions flowing :)</p> </blockquote> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/vandana-mahtani-msft\"> /u/vandana-mahtani-msft </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhhkkn/hi_were_the_microsoft_sql_team_ask_us_anything/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhhkkn/hi_were_the_microsoft_sql_team_ask_us_anything/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vhfouz",
+      "title": "A colleague TRUNCATEd a production table by accident — took the whole afternoon to sort out",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vhfouz/a_colleague_truncated_a_production_table_by/",
+      "published": "2026-08-06T20:25:26+00:00",
+      "updated": "2026-08-06T20:25:26+00:00",
+      "author": "/u/ManuelVariabileP",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>It wasn&#39;t malicious, just a fat-fingered script run against the wrong connection in SSMS. Got me thinking about how little stands between &quot;hit F5&quot; and a production incident — no confirmation, no &quot;are you sure&quot;, nothing checking whether the statement even has a WHERE clause.</p> <p>How do you all guard against this today? Separate prod/dev connection colors, restricted permissions, code review before anyone runs a script, something else? Curious what actually works in practice vs. what&#39;s just theater.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/ManuelVariabileP\"> /u/ManuelVariabileP </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhfouz/a_colleague_truncated_a_production_table_by/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vhfouz/a_colleague_truncated_a_production_table_by/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vg9wpq",
+      "title": "July SQL Newsletter",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vg9wpq/july_sql_newsletter/",
+      "published": "2026-08-05T15:04:38+00:00",
+      "updated": "2026-08-05T15:04:38+00:00",
+      "author": "/u/pmpjr-msft",
+      "content_html": "<table> <tr><td> <a href=\"https://www.reddit.com/r/SQLServer/comments/1vg9wpq/july_sql_newsletter/\"> <img src=\"https://external-preview.redd.it/TWYjcM19_uAVjqozuqV6TdvwgLGgrevG_X0OaKlqzw8.png?width=640&amp;crop=smart&amp;auto=webp&amp;s=354e5f817fd9c33ad839600d8095e5559d5e4843\" alt=\"July SQL Newsletter\" title=\"July SQL Newsletter\" /> </a> </td><td> <!-- SC_OFF --><div class=\"md\"><p>Hi everybody</p> <p>It&#39;s that time again, here is the link for the July SQL public newsletter. Please let me know if you have any questions or suggestions for future editions. Cheers.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/pmpjr-msft\"> /u/pmpjr-msft </a> <br/> <span><a href=\"https://www.linkedin.com/pulse/microsoft-sql-newsletter-july-2026-paul-popovich-jr-jvjpc/?trackingId=Nu%2FHyxR7RvmF01%2B8nw5IXA%3D%3D\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vg9wpq/july_sql_newsletter/\">[comments]</a></span> </td></tr></table>"
+    },
+    {
+      "id": "t3_1vg8gs3",
+      "title": "VS Code+ MSSQL extension has really come a long way.",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vg8gs3/vs_code_mssql_extension_has_really_come_a_long_way/",
+      "published": "2026-08-05T14:10:31+00:00",
+      "updated": "2026-08-05T14:10:31+00:00",
+      "author": "/u/thesqlguy",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>I was one of the many disappointed with the discontinuation of Azure Data Studio as I felt the experience in VS Code was very lacking.</p> <p>Recently I fired up VS code and was very impressed how far the MSSQL extension has come along. With a little configuration, it looks and feels very much like Azure Data Studio and works quite well IMHO. In fact, quite a few areas seem to have tangible improvements.</p> <p>Connections, execution plans, server browsing, query results, object definitions, etc, has all really improved in the past year or so.</p> <p>What does everyone else think?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/thesqlguy\"> /u/thesqlguy </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vg8gs3/vs_code_mssql_extension_has_really_come_a_long_way/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vg8gs3/vs_code_mssql_extension_has_really_come_a_long_way/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vg4lfv",
+      "title": "Type-safe SQL Server access generated from your queries, without an ORM",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vg4lfv/typesafe_sql_server_access_generated_from_your/",
+      "published": "2026-08-05T11:22:36+00:00",
+      "updated": "2026-08-05T11:22:36+00:00",
+      "author": "/u/Goldziher",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>If you write T-SQL by hand and then hand-map the results into your language types, this might be relevant. I maintain scythe, a tool that reads your SQL and generates typed access code at build time (SQL Server backend via the standard drivers).</p> <p>The useful part is nullability inference from the query shape. A LEFT JOIN makes the right-side columns nullable:</p> <pre><code>-- @name GetUserOrders SELECT u.id, u.name, o.total, o.notes FROM users u LEFT JOIN orders o ON u.id = o.user_id WHERE u.status = @status; </code></pre> <p>The generated row type marks total and notes nullable, so the compiler forces you to handle the no-order case. No runtime ORM, no query builder assembling strings, just the SQL you wrote and typed code out.</p> <p>The tradeoff is honest: queries are static, so if you need runtime query composition an ORM or a query DSL is a better fit. For a fixed set of queries against SQL Server it removes a lot of boilerplate.</p> <p>Interested how people here handle the T-SQL to application-type mapping today.</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Goldziher\"> /u/Goldziher </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vg4lfv/typesafe_sql_server_access_generated_from_your/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vg4lfv/typesafe_sql_server_access_generated_from_your/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vf7qap",
+      "title": "What is your frequently used keyboard query shortcuts?",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vf7qap/what_is_your_frequently_used_keyboard_query/",
+      "published": "2026-08-04T11:31:53+00:00",
+      "updated": "2026-08-04T11:31:53+00:00",
+      "author": "/u/time_keeper_1",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Mine is alt+f1 to trigger sp_help and another for “select top 10 * from” to see the table. </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/time_keeper_1\"> /u/time_keeper_1 </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vf7qap/what_is_your_frequently_used_keyboard_query/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vf7qap/what_is_your_frequently_used_keyboard_query/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vf1n8d",
+      "title": "How many ips are required in Multi subnet AG",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vf1n8d/how_many_ips_are_required_in_multi_subnet_ag/",
+      "published": "2026-08-04T05:51:04+00:00",
+      "updated": "2026-08-04T05:51:04+00:00",
+      "author": "/u/Kenn_35edy",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>So I was asked this question thah we have 3 node mutis7bnet AG with each node in different subnets so how many ips would required in total ? </p> <p>I ans 6 , 3 for each node and 3 for listeners .I didnt count if any ips is required for the underlying wfc.what would be actual ans and hiwm many ips are required for underlying WFC if all node are in different subnets ?</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/Kenn_35edy\"> /u/Kenn_35edy </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vf1n8d/how_many_ips_are_required_in_multi_subnet_ag/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vf1n8d/how_many_ips_are_required_in_multi_subnet_ag/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1veaxcr",
+      "title": "Post about the DP-800 exam and the Microsoft Fabric connection",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1veaxcr/post_about_the_dp800_exam_and_the_microsoft/",
+      "published": "2026-08-03T11:36:43+00:00",
+      "updated": "2026-08-03T11:36:43+00:00",
+      "author": "/u/ChantifiedLens",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>New post where I share my insights into the DP-800 exam and the Microsoft Fabric connection. Plus, some recommended resources since it contains some recent updates that can help others.</p> <p><a href=\"https://chantifiedlens.com/2026/08/03/insights-into-the-dp-800-exam-and-the-microsoft-fabric-connection/\">https://chantifiedlens.com/2026/08/03/insights-into-the-dp-800-exam-and-the-microsoft-fabric-connection/</a> </p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/ChantifiedLens\"> /u/ChantifiedLens </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1veaxcr/post_about_the_dp800_exam_and_the_microsoft/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1veaxcr/post_about_the_dp800_exam_and_the_microsoft/\">[comments]</a></span>"
+    },
+    {
+      "id": "t3_1vdltlh",
+      "title": "August 2026 | \"What are you working on?\"",
+      "url": "https://www.reddit.com/r/SQLServer/comments/1vdltlh/august_2026_what_are_you_working_on/",
+      "published": "2026-08-02T16:01:39+00:00",
+      "updated": "2026-08-02T16:01:39+00:00",
+      "author": "/u/AutoModerator",
+      "content_html": "<!-- SC_OFF --><div class=\"md\"><p>Welcome to the open thread for <a href=\"/r/SQLServer\">r/SQLServer</a> members!</p> <p>This is your space to share what you’re working on, compare notes, offer feedback, or simply lurk and soak it all in - whether it’s a new project, a feature you’re exploring, or something you just launched and are proud of (yes, humble brags are encouraged!).</p> <p>It doesn’t have to be polished or perfect. This thread is for the in-progress, the “I can’t believe I got it to work,” and the “I’m still figuring it out.”</p> <p>So, what are you working on this month?</p> <p>---</p> <p>Want to help shape the future of SQL Server? Join the <a href=\"https://aka.ms/JoinSQLUserPanel\">SQL User Panel</a> and share your feedback directly with the team!</p> </div><!-- SC_ON --> &#32; submitted by &#32; <a href=\"https://www.reddit.com/user/AutoModerator\"> /u/AutoModerator </a> <br/> <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vdltlh/august_2026_what_are_you_working_on/\">[link]</a></span> &#32; <span><a href=\"https://www.reddit.com/r/SQLServer/comments/1vdltlh/august_2026_what_are_you_working_on/\">[comments]</a></span>"
+    }
+  ]
+}

@@ -14,6 +14,12 @@ Unterlagen zu meiner Vorlesung zum Thema SQL
 * [Sybase](https://github.com/ErhardRainer/SQL_Training/blob/main/Sybase/README.md)
 * [Derby](https://github.com/ErhardRainer/SQL_Training/blob/main/Derby/README.md)
 
+## Arbeitsweise für Agenten
+
+Die [Arbeitsweise von Agenten](ai_agents.md) beschreibt die verbindlichen
+Anweisungen zum Verbessern von Artikeln sowie zum Prüfen und Überführen von
+Reddit-Themen in Ideen-Tasks.
+
 # Einführung
 ## SQL-Dialekte
 

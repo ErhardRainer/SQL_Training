@@ -104,7 +104,7 @@ flowchart TD
 ## SQL-Code
 
 <!-- SQLDOC:SQL_CODE:BEGIN -->
-`sql
+```sql
 /*
 BEGIN:SQL-HEADER v1
 ---
