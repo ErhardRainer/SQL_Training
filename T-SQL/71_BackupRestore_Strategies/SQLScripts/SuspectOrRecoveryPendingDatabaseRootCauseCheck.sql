@@ -3,7 +3,7 @@ BEGIN:SQL-HEADER v1
 ---
 sql_header: v1
 script_name: "SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql"
-script_version: "2.5"
+script_version: "2.6"
 script_type: "diagnostic"
 chapter: "71_BackupRestore_Strategies"
 purpose: >
@@ -56,7 +56,6 @@ dependencies:
   - "msdb.dbo.suspect_pages"
   - "sys.dm_os_file_exists"
   - "sp_readerrorlog"
-  - "STRING_SPLIT"
 
 safety:
   level: "read-only"
@@ -111,6 +110,10 @@ version_history:
     date: "2026-08-13"
     user: "ER"
     description: "NextStep fuer Seitenkorruption (Check 3) listet jetzt explizit die drei konkreten Optionen auf: (1) vollstaendiger DB-Restore aus Backup-Kette, (2) Page Restore nur der betroffenen Seiten aus Backup, (3) DBCC CHECKDB WITH REPAIR_ALLOW_DATA_LOSS als letzte, datenverlustbehaftete Notloesung ohne Backup; NextStep-Spalte auf VARCHAR(600) vergroessert"
+  - version: "2.6"
+    date: "2026-08-17"
+    user: "ER"
+    description: "STRING_SPLIT (erfordert SQL Server 2016+ bzw. Compatibility Level 130+) durch eine XML-basierte Split-Logik (CAST ... AS XML / nodes()) ersetzt, da STRING_SPLIT auf Instanzen/Datenbanken mit niedrigerem Compatibility Level mit Msg 208 'Invalid object name STRING_SPLIT' fehlschlaegt und dadurch den gesamten Batch samt #AffectedDatabases-Erstellung verhindert"
 
 notes:
   - "Reines Leseskript; es fuehrt keine Reparatur (kein SET EMERGENCY, kein CHECKDB REPAIR) durch."
@@ -119,6 +122,7 @@ notes:
   - "Der Auto-Discovery-Modus (@TargetDatabaseName IS NULL) durchlaeuft die betroffenen Datenbanken sequenziell per WHILE-Schleife, da sp_readerrorlog und die Dateipruefungen je Datenbank ausgefuehrt werden muessen."
   - "Das Skript enthaelt bewusst ein GO zwischen Vorbereitung und Cursor-Block; lokale Variablen (@TargetDatabaseName, @ErrorLogEntriesToScan) werden deshalb vor dem GO ausschliesslich gelesen bzw. in #ScriptParams gesichert, da sie nach GO nicht mehr existieren."
   - "Der Vergleich von sys.databases.state_desc gegen die Werte aus #TargetStates verwendet bewusst COLLATE DATABASE_DEFAULT auf beiden Seiten, da #temp-Tabellen die tempdb-Collation erben, die von der Server-/Datenbank-Collation abweichen kann (Msg 468 'Cannot resolve the collation conflict')."
+  - "@TargetStates wird bewusst per XML-Trick (CAST ... AS XML / .nodes('/r')) statt STRING_SPLIT zerlegt, da STRING_SPLIT ein Compatibility Level von 130+ voraussetzt und auf aelteren Instanzen bzw. Datenbanken mit niedrigerem Level mit Msg 208 'Invalid object name STRING_SPLIT' fehlschlaegt; die XML-Variante funktioniert unabhaengig vom Compatibility Level."
 ---
 END:SQL-HEADER v1
 */
@@ -153,8 +157,12 @@ END;
 
 IF @TargetDatabaseName IS NULL AND EXISTS (
     SELECT 1
-    FROM STRING_SPLIT(@TargetStates, N',') AS s
-    WHERE UPPER(LTRIM(RTRIM(s.value))) NOT IN (N'SUSPECT', N'RECOVERY_PENDING', N'EMERGENCY', N'RESTORING', N'RECOVERING', N'OFFLINE', N'COPYING', N'ONLINE')
+    FROM (
+        SELECT UPPER(LTRIM(RTRIM(x.i.value(N'.', N'NVARCHAR(60)')))) AS StateDesc
+        FROM (SELECT CAST(N'<r><![CDATA[' + REPLACE(@TargetStates, N',', N']]></r><r><![CDATA[') + N']]></r>' AS XML) AS x) AS xt
+        CROSS APPLY xt.x.nodes(N'/r') AS x(i)
+    ) AS s
+    WHERE s.StateDesc NOT IN (N'SUSPECT', N'RECOVERY_PENDING', N'EMERGENCY', N'RESTORING', N'RECOVERING', N'OFFLINE', N'COPYING', N'ONLINE')
 )
 BEGIN
     THROW 50003, '@TargetStates enthaelt einen unbekannten state_desc-Wert. Gueltig sind z.B. SUSPECT, RECOVERY_PENDING, EMERGENCY, RESTORING, RECOVERING, OFFLINE, COPYING, ONLINE.', 1;
@@ -184,9 +192,13 @@ CREATE TABLE #TargetStates
 IF @TargetDatabaseName IS NULL
 BEGIN
     INSERT INTO #TargetStates (StateDesc)
-    SELECT DISTINCT UPPER(LTRIM(RTRIM(s.value)))
-    FROM STRING_SPLIT(@TargetStates, N',') AS s
-    WHERE LTRIM(RTRIM(s.value)) <> N'';
+    SELECT DISTINCT s.StateDesc
+    FROM (
+        SELECT UPPER(LTRIM(RTRIM(x.i.value(N'.', N'NVARCHAR(60)')))) AS StateDesc
+        FROM (SELECT CAST(N'<r><![CDATA[' + REPLACE(@TargetStates, N',', N']]></r><r><![CDATA[') + N']]></r>' AS XML) AS x) AS xt
+        CROSS APPLY xt.x.nodes(N'/r') AS x(i)
+    ) AS s
+    WHERE s.StateDesc <> N'';
 END;
 
 -- 2. Zu untersuchende Datenbanken ermitteln:

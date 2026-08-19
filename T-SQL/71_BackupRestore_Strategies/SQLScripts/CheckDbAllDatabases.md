@@ -8,7 +8,7 @@ Dieses Skript führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenb
 | Feld | Wert |
 |---|---|
 | Script | [CheckDbAllDatabases.sql](CheckDbAllDatabases.sql) |
-| Version | `1.1` |
+| Version | `1.2` |
 | Typ | `diagnostic` |
 | Kapitel | `71_BackupRestore_Strategies` |
 | Sicherheit | `read-only` |
@@ -19,7 +19,7 @@ Dieses Skript führt `DBCC CHECKDB` für alle (oder gezielt ausgewählte) Datenb
 
 Dieses Skript ist **rein diagnostisch** (kein `REPAIR_ALLOW_DATA_LOSS`, keine Datenänderung) und ergänzt die anderen Skripte in diesem Kapitel um eine instanzweite, proaktive Konsistenzprüfung — statt reaktiv erst nach dem Auftreten eines `SUSPECT`-Zustands zu handeln. Siehe [DatabaseStatusOverview.sql](DatabaseStatusOverview.sql) (Doku: [DatabaseStatusOverview.md](DatabaseStatusOverview.md)) für eine reine Statusübersicht ohne Konsistenzprüfung, und [SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql](SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql) (Doku: [SuspectOrRecoveryPendingDatabaseRootCauseCheck.md](SuspectOrRecoveryPendingDatabaseRootCauseCheck.md)) für die gezielte Ursachenanalyse bereits betroffener Datenbanken.
 
-Ist eine Datenbank bereits `SUSPECT` oder `RECOVERY_PENDING`, wird sie von diesem Skript standardmäßig **übersprungen** (siehe `@SkipOfflineOrInaccessible`), da `DBCC CHECKDB` dort ohnehin mit einem Zugriffsfehler abbricht. Für diesen Fall stattdessen [SuspectDatabaseRepairWithoutBackup.sql](SuspectDatabaseRepairWithoutBackup.sql) bzw. [RecoveryPendingRepairWithoutBackup.sql](RecoveryPendingRepairWithoutBackup.sql) verwenden.
+Ist eine Datenbank bereits `SUSPECT` oder `RECOVERY_PENDING`, wird sie von diesem Skript standardmäßig **übersprungen** (siehe `@SkipOfflineOrInaccessible`), da `DBCC CHECKDB` dort ohnehin mit einem Zugriffsfehler abbricht. Soll fuer genau diese eine Datenbank dennoch ein reiner `DBCC CHECKDB`-Diagnosecheck (ohne Reparatur, ueber einen voruebergehenden `EMERGENCY`/`SINGLE_USER`-Wechsel) laufen, siehe [SuspectOrRecoveryPendingDatabaseCheckDb.sql](SuspectOrRecoveryPendingDatabaseCheckDb.sql). Soll direkt repariert werden, stattdessen [SuspectDatabaseRepairWithoutBackup.sql](SuspectDatabaseRepairWithoutBackup.sql) bzw. [RecoveryPendingRepairWithoutBackup.sql](RecoveryPendingRepairWithoutBackup.sql) verwenden.
 
 ## Annahmen
 
@@ -65,6 +65,7 @@ Regelmäßige, proaktive Konsistenzprüfung aller Datenbanken einer Instanz (z. 
 |---|---|---|---|
 | `1.0` | `2026-08-14` | `ER` | Erstversion: DBCC CHECKDB für alle Datenbanken nacheinander per dynamischem SQL, Ausgabe direkt nach jeder einzelnen Prüfung, mit vorgeschaltetem Status-Filter und abschließendem Laufprotokoll |
 | `1.1` | `2026-08-14` | `ER` | PRINT-Fortschrittsmeldung 'Pruefe jetzt: <DB> (x von y)' wird jetzt VOR dem Start jeder Prüfung ausgegeben, nicht erst mit der Startzeit vermischt. Dauer wird per DATEDIFF(MILLISECOND, ...) millisekundengenau gemessen und sowohl in der PRINT-Ausgabe als auch in der DurationSeconds-Spalte des abschließenden CheckDbRunLog mit drei Nachkommastellen angezeigt. |
+| `1.2` | `2026-08-17` | `ER` | Notes-Verweis auf das neue SuspectOrRecoveryPendingDatabaseCheckDb.sql ergaenzt, das speziell einen DBCC CHECKDB-Diagnose-Check (ohne Reparatur) fuer eine bereits SUSPECT/RECOVERY_PENDING-Datenbank via EMERGENCY/SINGLE_USER ausfuehrt, statt sie wie dieses Skript zu ueberspringen. |
 <!-- SQLDOC:VERSION_HISTORY_TABLE:END -->
 
 ## Ablauf
@@ -94,7 +95,7 @@ BEGIN:SQL-HEADER v1
 ---
 sql_header: v1
 script_name: "CheckDbAllDatabases.sql"
-script_version: "1.1"
+script_version: "1.2"
 script_type: "diagnostic"
 chapter: "71_BackupRestore_Strategies"
 purpose: >
@@ -165,10 +166,14 @@ version_history:
     date: "2026-08-14"
     user: "ER"
     description: "PRINT-Fortschrittsmeldung 'Pruefe jetzt: <DB> (x von y)' wird jetzt VOR dem Start jeder Pruefung ausgegeben, nicht erst mit der Startzeit vermischt. Dauer wird per DATEDIFF(MILLISECOND, ...) millisekundengenau gemessen und sowohl in der PRINT-Ausgabe als auch in der DurationSeconds-Spalte des abschliessenden CheckDbRunLog mit drei Nachkommastellen angezeigt."
+  - version: "1.2"
+    date: "2026-08-17"
+    user: "ER"
+    description: "Notes-Verweis auf das neue SuspectOrRecoveryPendingDatabaseCheckDb.sql ergaenzt, das speziell einen DBCC CHECKDB-Diagnose-Check (ohne Reparatur) fuer eine bereits SUSPECT/RECOVERY_PENDING-Datenbank via EMERGENCY/SINGLE_USER ausfuehrt, statt sie wie dieses Skript zu ueberspringen."
 
 notes:
   - "DBCC CHECKDB ist rein lesend (ohne REPAIR-Option) und aendert keine Daten; bei sehr grossen Datenbanken kann die Pruefung dennoch erheblich I/O- und CPU-intensiv sein und laenger dauern - nicht ungeprueft waehrend der Hauptlast-Zeit auf Produktionsinstanzen einplanen."
-  - "Datenbanken, die nicht ONLINE sind (z.B. SUSPECT, RECOVERY_PENDING, OFFLINE), werden bei @SkipOfflineOrInaccessible = 1 (Default) uebersprungen, da DBCC CHECKDB dort ohnehin mit einem Zugriffsfehler abbricht. Fuer die Diagnose einer bereits SUSPECT/RECOVERY_PENDING-Datenbank stattdessen SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql bzw. die entsprechenden Repair-Skripte verwenden."
+  - "Datenbanken, die nicht ONLINE sind (z.B. SUSPECT, RECOVERY_PENDING, OFFLINE), werden bei @SkipOfflineOrInaccessible = 1 (Default) uebersprungen, da DBCC CHECKDB dort ohnehin mit einem Zugriffsfehler abbricht. Fuer die Diagnose einer bereits SUSPECT/RECOVERY_PENDING-Datenbank stattdessen SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql (Ursachenanalyse), SuspectOrRecoveryPendingDatabaseCheckDb.sql (DBCC CHECKDB ohne Reparatur, via EMERGENCY/SINGLE_USER) bzw. die entsprechenden Repair-Skripte verwenden."
   - "Jede Datenbank wird als eigener dynamischer Batch per sp_executesql ausgefuehrt; ein Fehler bei einer Datenbank (z.B. weil sie zwischenzeitlich offline geht) wird per TRY/CATCH abgefangen und im CheckDbRunLog protokolliert, blockiert aber nicht die Pruefung der uebrigen Datenbanken."
   - "Die eigentliche DBCC CHECKDB-Ausgabe erscheint in SSMS als eigenes Ergebnis-Grid pro Datenbank, direkt nachdem diese Datenbank geprueft wurde - nicht erst gesammelt am Ende des gesamten Laufs."
   - "Fuer eine anschliessende Reparatur (REPAIR_ALLOW_DATA_LOSS o.ae.) NICHT dieses Skript verwenden, sondern SuspectDatabaseRepairWithoutBackup.sql bzw. RecoveryPendingRepairWithoutBackup.sql - dieses Skript ist ausschliesslich diagnostisch."

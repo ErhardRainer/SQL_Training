@@ -3,7 +3,7 @@ BEGIN:SQL-HEADER v1
 ---
 sql_header: v1
 script_name: "CheckDbAllDatabases.sql"
-script_version: "1.1"
+script_version: "1.2"
 script_type: "diagnostic"
 chapter: "71_BackupRestore_Strategies"
 purpose: >
@@ -74,10 +74,14 @@ version_history:
     date: "2026-08-14"
     user: "ER"
     description: "PRINT-Fortschrittsmeldung 'Pruefe jetzt: <DB> (x von y)' wird jetzt VOR dem Start jeder Pruefung ausgegeben, nicht erst mit der Startzeit vermischt. Dauer wird per DATEDIFF(MILLISECOND, ...) millisekundengenau gemessen und sowohl in der PRINT-Ausgabe als auch in der DurationSeconds-Spalte des abschliessenden CheckDbRunLog mit drei Nachkommastellen angezeigt."
+  - version: "1.2"
+    date: "2026-08-17"
+    user: "ER"
+    description: "Notes-Verweis auf das neue SuspectOrRecoveryPendingDatabaseCheckDb.sql ergaenzt, das speziell einen DBCC CHECKDB-Diagnose-Check (ohne Reparatur) fuer eine bereits SUSPECT/RECOVERY_PENDING-Datenbank via EMERGENCY/SINGLE_USER ausfuehrt, statt sie wie dieses Skript zu ueberspringen."
 
 notes:
   - "DBCC CHECKDB ist rein lesend (ohne REPAIR-Option) und aendert keine Daten; bei sehr grossen Datenbanken kann die Pruefung dennoch erheblich I/O- und CPU-intensiv sein und laenger dauern - nicht ungeprueft waehrend der Hauptlast-Zeit auf Produktionsinstanzen einplanen."
-  - "Datenbanken, die nicht ONLINE sind (z.B. SUSPECT, RECOVERY_PENDING, OFFLINE), werden bei @SkipOfflineOrInaccessible = 1 (Default) uebersprungen, da DBCC CHECKDB dort ohnehin mit einem Zugriffsfehler abbricht. Fuer die Diagnose einer bereits SUSPECT/RECOVERY_PENDING-Datenbank stattdessen SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql bzw. die entsprechenden Repair-Skripte verwenden."
+  - "Datenbanken, die nicht ONLINE sind (z.B. SUSPECT, RECOVERY_PENDING, OFFLINE), werden bei @SkipOfflineOrInaccessible = 1 (Default) uebersprungen, da DBCC CHECKDB dort ohnehin mit einem Zugriffsfehler abbricht. Fuer die Diagnose einer bereits SUSPECT/RECOVERY_PENDING-Datenbank stattdessen SuspectOrRecoveryPendingDatabaseRootCauseCheck.sql (Ursachenanalyse), SuspectOrRecoveryPendingDatabaseCheckDb.sql (DBCC CHECKDB ohne Reparatur, via EMERGENCY/SINGLE_USER) bzw. die entsprechenden Repair-Skripte verwenden."
   - "Jede Datenbank wird als eigener dynamischer Batch per sp_executesql ausgefuehrt; ein Fehler bei einer Datenbank (z.B. weil sie zwischenzeitlich offline geht) wird per TRY/CATCH abgefangen und im CheckDbRunLog protokolliert, blockiert aber nicht die Pruefung der uebrigen Datenbanken."
   - "Die eigentliche DBCC CHECKDB-Ausgabe erscheint in SSMS als eigenes Ergebnis-Grid pro Datenbank, direkt nachdem diese Datenbank geprueft wurde - nicht erst gesammelt am Ende des gesamten Laufs."
   - "Fuer eine anschliessende Reparatur (REPAIR_ALLOW_DATA_LOSS o.ae.) NICHT dieses Skript verwenden, sondern SuspectDatabaseRepairWithoutBackup.sql bzw. RecoveryPendingRepairWithoutBackup.sql - dieses Skript ist ausschliesslich diagnostisch."
